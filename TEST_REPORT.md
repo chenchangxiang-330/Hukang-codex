@@ -6,10 +6,11 @@
 
 结果：**PASS**
 
-- 最后构建时间：2026-09-21 23:09 +0800。
-- Gradle：`BUILD SUCCESSFUL`，385 tasks。
+- 最后构建时间：2026-09-22（Asia/Shanghai）。
+- Gradle Wrapper 9.3.1：`BUILD SUCCESSFUL`，385 tasks。
 - APK：`android/app/build/outputs/apk/release/app-release.apk`。
-- 交付副本：项目父目录 `HuKang-V1.4.apk`。
+- 交付副本：正式源码根目录 `HuKang-V1.4-P0-fix.apk`。
+- 构建缓存已清除旧目录绝对路径，最终 autolinking 与原生依赖全部来自正式源码目录。
 - 版本：1.4.0 / versionCode 14。
 - 包名：`com.hukang.local`。
 - minSdk 24、targetSdk 36。
@@ -17,7 +18,7 @@
 - zipalign 检查：PASS。
 - APK v2 签名检查：PASS。
 - 签名：Android Debug certificate，仅供内测。
-- SHA-256：`de69f77956574f5651870b594286d8700e55be2108e27c804daf21803c8c44d5`。
+- SHA-256：`459144e91add0b59509e6ff997e0ae443d064028e1d99b5cf87d972cac2febde`。
 
 ## TypeScript
 
@@ -29,9 +30,9 @@
 
 结果：**PASS**
 
-命令：`npm test`。18/18 通过。
+命令：`npm test`。21/21 通过。
 
-覆盖：摄入/库存模型、存档解析、日期边界、条码规范化、候选评分、营养文字解析、配料解析、日期解析、添加糖 unknown 保持 null。
+覆盖：原有模型/解析/搜索测试，以及照片复制必须等待、文件验证先后顺序、OCR 异常不可静默吞掉的 P0 回归测试。
 
 限制：这些是 Node 单元测试，不会调用 Android Camera、Kotlin OCR、真实 SQLite 文件、Vision API 或真机网络。
 
@@ -39,7 +40,7 @@
 
 结果：**NO DEVICE**
 
-2026-09-21 执行 `adb devices -l`，列表为空。本机没有可用 AVD。因此当前 Codex 没有亲自安装最终 V1.4 APK 或运行 Android instrumentation 测试。
+2026-09-22 在允许启动 ADB 服务的本机环境执行 `adb devices -l`，列表为空。本机没有可用 AVD。因此当前 Codex 没有安装修复 APK，也没有运行 Android instrumentation 或实拍测试。
 
 ## App Launch
 
@@ -66,7 +67,7 @@
 
 ## Product Photo
 
-结果：**FAIL（用户真机报告）**
+结果：**旧 V1.4 APK FAIL（用户真机报告）/ 修复 APK NOT VERIFIED**
 
 测试：真实商品包装正面，具体商品名未记录。
 
@@ -74,13 +75,16 @@
 
 没有取得当次扫描诊断事件、文件路径、文件大小、OCR 文本或 logcat。
 
+修复版已等待原图/work 图复制并加入明确错误提示，但由于无连接设备，尚不能标记 PASS。
+
 ## Nutrition Label
 
-结果：**FAIL（用户真机报告）**
+结果：**旧 V1.4 APK FAIL（用户真机报告）/ 修复 APK NOT VERIFIED**
 
 实际：拍摄 → “正在准备照片…” → 无识别结果。
 
 没有取得 OCR raw text 或 parser 结果。
+修复版已移除空 OCR catch，并记录 `OCR_STARTED`、`OCR_CALL_FAILED`、`OCR_TEXT_LENGTH`；真机 raw text 仍待验证。
 
 ## Ingredients
 
@@ -94,13 +98,13 @@
 
 结果：**NOT VERIFIED**
 
-APK 内包含 ML Kit 中文模型和 `HuKangOcr` 原生模块。没有 V1.4 真机成功 raw text 记录。
+修复 APK 内包含 ML Kit 中文模型和 `HuKangOcr` 原生模块，原生编译 PASS。没有修复版真机成功 raw text 记录。
 
 ## Online Vision
 
 结果：**NOT TESTED WITH VALID CONFIG**
 
-请求代码已构建进 APK。没有证据显示真机 SecureStore 中配置过有效 Endpoint/Model/API Key，也没有成功的 `VISION_RESPONSE_RECEIVED` 记录。
+请求代码已构建进 APK。Key 为空时会记录 `VISION_NOT_CONFIGURED` 并显示明确提示；没有有效 Endpoint/Model/API Key 的真机配置，因此没有成功的 `VISION_RESPONSE_RECEIVED` 记录。
 
 ## Product Search
 

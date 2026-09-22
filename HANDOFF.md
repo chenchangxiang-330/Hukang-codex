@@ -11,7 +11,23 @@ HuKang 是一个无账号、离线优先的 Android 食品营养、摄入记录�
 
 当前主要目标是跑通：相机拍照 → 稳定图片文件 → 图片质量检查 → 本地 OCR / 可选在线 Vision → 商品搜索或标签解析 → 结果页面 → SQLite 保存。
 
-当前最重要的问题是：用户真机拍摄商品正面或营养成分表后，只看到“正在准备照片…”，数秒后回到相机，没有进入识别结果。该闭环尚未跑通。
+当前最高优先级 P0 已完成代码修复和构建，但尚未完成修复版真机验收：旧 V1.4 APK 中，用户拍摄商品正面或营养成分表后只看到“正在准备照片…”，随后无提示恢复相机。
+
+### 2026-09-22 P0 接手结论
+
+- 根因已确认：`src/scanning.ts` 对原图和 work 图调用异步 `File.copy()` 时均缺少 `await`，随后立即读取 `exists/size`，导致落盘竞态并可能抛出 `PHOTO_FILE_INVALID`。
+- 静默表现已确认：`ScannerV14` 捕获异常后把 `busy` 设为 false，而错误状态仅在 `busy` 时渲染，用户看不到失败原因。
+- 两次复制现已等待完成，并分别验证 `exists` 和 `size > 0`。
+- 新增 `PHOTO_CAPTURE_SUCCESS`、`PHOTO_URI`、`FILE_EXISTS`、`FILE_SIZE`、图片尺寸/EXIF、`IMAGE_PREPARE_SUCCESS`、`OCR_INPUT_READY`、`VISION_INPUT_READY`、`OCR_STARTED`、`OCR_TEXT_LENGTH`、`SEARCH_RESULT_COUNT`、`RESULT_STATE_UPDATED`、`RESULT_SCREEN_RENDERED`、错误阶段/消息/堆栈等事件。
+- OCR 空 catch 已移除；照片、OCR、Vision 失败都有明确日志和用户提示。
+- Vision API Key 为空时记录 `VISION_NOT_CONFIGURED`，并明确告知用户，不视为识别成功。
+- `npm run typecheck` PASS；`npm test` 21/21 PASS；Android release 构建 PASS。
+- 修复 APK：`HuKang-V1.4-P0-fix.apk`；SHA-256 `459144e91add0b59509e6ff997e0ae443d064028e1d99b5cf87d972cac2febde`。
+- 2026-09-22 `adb devices -l` 无设备，商品实拍、营养表 OCR raw text、有效 Key Vision 和联网候选均为 NOT VERIFIED。
+
+当前有效正式源码目录是：`/Users/yangbing/Ai/open ai/我开发的app/App/护康/内测/2.0/HuKang`。
+
+工作期间上级目录被外部移动；原先确认的 `/Users/yangbing/Ai/我开发的app/App/护康/内测/2.0/HuKang` 已不存在。不要使用旧 `.codex/.chatgpt-projects/.../hukang`。
 
 ## 2. 技术栈
 
@@ -349,7 +365,7 @@ src/ocr.ts recognizeText(uri)
 
 - Android release 构建成功，生成可解析、对齐并带 v2 签名的 APK。
 - TypeScript `tsc --noEmit` 通过。
-- 18 项 Node 自动测试通过；这些测试覆盖规则和数据逻辑，不是 Android 真机测试。
+- 21 项 Node 自动测试通过；新增照片复制等待与 OCR 异常日志回归检查，这些仍不是 Android 真机测试。
 - 用户真机能够安装/启动到 App 并进入扫描页，否则无法产生后述扫描现象。设备型号和 Android 版本未记录。
 - 用户真机相机预览和快门能够启动。
 - 用户真机成功检测条码 `6930487920475`。
@@ -385,9 +401,9 @@ src/ocr.ts recognizeText(uri)
 
 实际结果：显示“正在准备照片…”，数秒后恢复相机，没有结果页。  
 期望结果：稳定保存照片并进入对应识别页面。  
-疑似原因：`finishPhoto()` 已开始，但 `persistScanImage()` 或随后 `onCapture()` 未完成；缺少当次日志，准确位置 UNKNOWN。  
+已确认原因：`persistScanImage()` 的两次异步 `File.copy()` 缺少 `await`，文件检查与复制发生竞态；捕获后错误状态又被隐藏。
 相关文件：`src/ScannerV14.tsx`、`src/scanning.ts`、`App.tsx`  
-当前状态：OPEN
+当前状态：FIX IMPLEMENTED / DEVICE VERIFICATION PENDING
 
 ### BUG-002
 
@@ -397,9 +413,9 @@ src/ocr.ts recognizeText(uri)
 复现步骤：进入拍商品，拍摄完整包装正面。  
 实际结果：没有进入 OCR、Vision、搜索或候选结果。  
 期望结果：至少展示识别线索或明确分层错误。  
-疑似原因：受 BUG-001 阻断；后续 Vision 与搜索也尚未真机验证。  
+当前判断：BUG-001 代码修复完成，OCR/Vision/搜索事件已补齐；修复 APK 尚未真机验证。
 相关文件：`src/ProductRecognitionScreen.tsx`、`src/vision.ts`、`src/productSearch.ts`  
-当前状态：OPEN
+当前状态：DEVICE VERIFICATION PENDING
 
 ### BUG-003
 
@@ -409,9 +425,9 @@ src/ocr.ts recognizeText(uri)
 复现步骤：进入营养成分表并拍照。  
 实际结果：准备照片后回到相机。  
 期望结果：进入识别结果，至少显示 OCR 原文或对应失败原因。  
-疑似原因：与 BUG-001 共用 capture/persist 链路。  
+当前判断：共用的 capture/persist 竞态已修复；仍需真机取得 OCR raw text 或明确错误。
 相关文件：`src/ScannerV14.tsx`、`src/scanning.ts`、`src/RecognitionScreen.tsx`  
-当前状态：OPEN
+当前状态：DEVICE VERIFICATION PENDING
 
 ### BUG-004
 
@@ -421,9 +437,9 @@ src/ocr.ts recognizeText(uri)
 复现步骤：让 `HuKangOcr.recognize()` 抛错。  
 实际结果：错误被转成空文本，商品流程只记录文字长度，标签流程可能记录 `OCR_NO_TEXT`。  
 期望结果：日志能区分 OCR 调用失败与识别结果为空。  
-疑似原因：两处 `try { recognizeText } catch {}`。  
+修复：两处空 catch 已移除，记录 `OCR_CALL_FAILED`、错误阶段/消息/堆栈，并区分 `OCR_NO_TEXT`。
 相关文件：`src/ProductRecognitionScreen.tsx`、`src/RecognitionScreen.tsx`  
-当前状态：OPEN
+当前状态：FIXED IN CODE / DEVICE VERIFICATION PENDING
 
 ### BUG-005
 
@@ -431,11 +447,11 @@ src/ocr.ts recognizeText(uri)
 严重级别：P1
 
 复现步骤：允许联网增强，但不在隐藏开发模式配置 API Key，然后拍商品。  
-实际结果：不会发 Vision 请求，普通 UI 不说明未配置。  
+旧版本结果：不会发 Vision 请求，普通 UI 不说明未配置。
 期望结果：诊断信息明确说明 Vision 未配置，普通流程仍给出可操作的本地结果。  
-疑似原因：`if(config.apiKey)` 分支没有 else 日志。  
+修复：Key 为空时记录 `VISION_NOT_CONFIGURED` 并显示明确提示；本地流程继续。
 相关文件：`src/ProductRecognitionScreen.tsx`、`src/RecognitionScreen.tsx`、`src/vision.ts`  
-当前状态：OPEN
+当前状态：FIXED IN CODE / DEVICE VERIFICATION PENDING
 
 ### BUG-006
 
@@ -465,7 +481,7 @@ src/ocr.ts recognizeText(uri)
 
 先不要改首页、视觉、库存、营养功能或增加数据源。
 
-最高优先级是用一台连接 ADB 的真机，逐层定位：
+最高优先级是用一台连接 ADB 的真机验证修复后的完整链路：
 
 ```text
 Capture
@@ -479,14 +495,14 @@ Capture
 → Result State
 ```
 
-第一目标是让一张真实照片可靠进入结果页面，即使暂时只显示 OCR 原文或明确错误。随后才验证 Vision、联网候选和 SQLite 缓存。
+第一目标是确认商品包装能进入识别并显示视觉/本地结果或明确错误，同时确认营养表真正执行 OCR 并返回 raw text 或明确错误。随后才验证有效 Key Vision、联网候选和 SQLite 缓存。
 
 ## 16. Build
 
 安装依赖与检查：
 
 ```bash
-cd /Users/yangbing/.codex/.chatgpt-projects/g-p-6aa8fd4c70248191910c02f5e1e4ff04/hukang
+cd "/Users/yangbing/Ai/open ai/我开发的app/App/护康/内测/2.0/HuKang"
 npm ci
 npm run typecheck
 npm test
@@ -509,20 +525,17 @@ npx expo prebuild --platform android
 本机 release 构建命令：
 
 ```bash
-export JAVA_HOME="$PWD/../.build-tools/java/Contents/Home"
-export ANDROID_HOME="$PWD/../.build-tools/android-sdk"
-export ANDROID_SDK_ROOT="$ANDROID_HOME"
-export GRADLE_USER_HOME="$PWD/../.build-tools/gradle"
-export PATH="$JAVA_HOME/bin:$ANDROID_HOME/platform-tools:$PATH"
-export NODE_ENV=production
 cd android
-./gradlew assembleRelease
+env JAVA_HOME=/Library/Java/JavaVirtualMachines/temurin-17.jdk/Contents/Home \
+  ANDROID_HOME=/Users/yangbing/Library/Android/sdk \
+  ANDROID_SDK_ROOT=/Users/yangbing/Library/Android/sdk NODE_ENV=production \
+  ./gradlew assembleRelease
 ```
 
-最后一次 release build：2026-09-21 23:09 +0800，`BUILD SUCCESSFUL`，385 tasks。  
+最后一次 release build：2026-09-22，`BUILD SUCCESSFUL`，385 tasks。
 原始产物：`android/app/build/outputs/apk/release/app-release.apk`  
-交付 APK：项目父目录 `HuKang-V1.4.apk`  
-SHA-256：`de69f77956574f5651870b594286d8700e55be2108e27c804daf21803c8c44d5`
+交付 APK：正式源码根目录 `HuKang-V1.4-P0-fix.apk`
+SHA-256：`459144e91add0b59509e6ff997e0ae443d064028e1d99b5cf87d972cac2febde`
 
 APK 使用 v2 签名，签名证书是 Android Debug。包名 `com.hukang.local`，最低 API 24，目标 API 36，包含 `arm64-v8a` 和 `armeabi-v7a`。
 
@@ -533,7 +546,7 @@ APK 使用 v2 签名，签名证书是 Android Debug。包名 `com.hukang.local`
 - macOS / Darwin 27.0.0 arm64
 - Node.js 24.20.0
 - npm 11.19.0
-- Java 17.0.20.1，Zulu 17 LTS
+- Java / Javac 17.0.20.1，Eclipse Temurin
 - Android SDK Platform 36
 - Android Build Tools 36.0.0
 - Android Platform Tools / ADB 37.0.1
@@ -543,7 +556,7 @@ APK 使用 v2 签名，签名证书是 Android Debug。包名 `com.hukang.local`
 - compileSdk 36、targetSdk 36、minSdk 24
 - ABI：armeabi-v7a、arm64-v8a
 
-构建工具位于项目父目录 `.build-tools/`。不要重新安装或替换，除非现有路径失效。
+没有全局 `gradle` 命令；使用项目自带 `android/gradlew`。Java 位于 `/Library/Java/JavaVirtualMachines/temurin-17.jdk/Contents/Home`，Android SDK 位于 `/Users/yangbing/Library/Android/sdk`。不要重新安装或替换现有工具。
 
 ## 18. 真机测试状态
 
@@ -556,8 +569,8 @@ APK 使用 v2 签名，签名证书是 Android Debug。包名 `com.hukang.local`
 | Barcode Detect | PASS（用户侧） | 读出 `6930487920475` |
 | Barcode Local Lookup | NOT VERIFIED | 没有保存过同码商品后的重扫记录 |
 | Barcode Online Lookup | NOT VERIFIED | 样本显示未找到，没有当次 HTTP 日志 |
-| Product Photo | FAIL（用户侧） | “正在准备照片…”后恢复相机，无结果 |
-| Nutrition Label | FAIL（用户侧） | 同样没有结果页 |
+| Product Photo | 旧 APK FAIL / 修复 APK NOT VERIFIED | 异步复制竞态已修复；无连接设备，未实拍 |
+| Nutrition Label | 旧 APK FAIL / 修复 APK NOT VERIFIED | OCR 空 catch 已移除；无连接设备，未取得 raw text |
 | Ingredients | NOT TESTED | 无真机记录 |
 | Date | NOT TESTED | 无真机记录 |
 | Native OCR | NOT VERIFIED | 无成功 raw text 记录 |
@@ -568,14 +581,13 @@ APK 使用 v2 签名，签名证书是 Android Debug。包名 `com.hukang.local`
 
 ## 19. 下一位开发者建议从哪里开始
 
-1. 连接真机，确认 `adb devices -l` 能看到设备；安装当前 APK 或运行 development build。
-2. 在“我的 → 关于护康”连续点击版本号 7 次，打开扫描诊断；清楚记录一次失败前后的 event 列表。
-3. 重现拍商品失败，确认最后一个事件是 `PHOTO_CAPTURE_STARTED`、`PHOTO_CAPTURE_SUCCESS`、`FILE_EXISTS`、`FILE_SIZE`、`VISION_INPUT_READY` 中的哪一个。
-4. 同时查看 logcat。若没有 `PHOTO_CAPTURE_SUCCESS`，检查 `takePictureAsync()`；若有成功但没有有效文件事件，检查 `File.copy()`；若有 `VISION_INPUT_READY` 但没有结果页，检查 `onCapture()` 和自定义 stack 更新。
-5. 先让处理后的 `workUri` 在一个简单结果页面显示出来，再继续 OCR。不要同时改 Vision 或搜索。
-6. 确认 `HuKangOcr.recognize(workUri)` 真正返回 raw text，并取消空 catch，记录 native error code。
-7. OCR 稳定后配置一个有效 Provider，确认出现 `VISION_REQUEST_STARTED`、非零 `IMAGE_BYTES_LENGTH`、HTTP status 和 `VISION_RESPONSE_RECEIVED`。
-8. 最后验证 `searchProducts()` 候选、`ProductConfirm` 保存、强制结束 App、断网重启、再次扫描本地命中。
+1. 连接真机，确认 `adb devices -l` 能看到设备；安装 `HuKang-V1.4-P0-fix.apk`。
+2. 先清空 logcat，再拍一张真实商品包装。必须进入结果页，至少得到本地/视觉线索，或看到明确错误 Alert；保存隐藏诊断事件和 logcat。
+3. 拍一张真实营养成分表。必须执行 `HuKangOcr.recognize(workUri)`，记录 raw text；若失败，记录明确 native error 和 `ERROR_STAGE`。
+4. 确认事件顺序包含 `PHOTO_CAPTURE_SUCCESS → FILE_EXISTS/FILE_SIZE → IMAGE_PREPARE_SUCCESS → OCR_INPUT_READY/VISION_INPUT_READY → RESULT_SCREEN_RENDERED`。
+5. 使用有效 Provider Key 验证 `VISION_REQUEST_STARTED`、非零 `IMAGE_BYTES_LENGTH`、HTTP status 和 `VISION_RESPONSE_RECEIVED`；Key 为空只验证 `VISION_NOT_CONFIGURED` 提示。
+6. 验证 `searchProducts()` 候选、`ProductConfirm` 保存、强制结束 App、断网重启、再次扫描本地命中。
+7. 只有上述实拍通过后，才能把 BUG-001/002/003 从 DEVICE VERIFICATION PENDING 改为 CLOSED。
 
 ## 20. 关键文件索引
 
@@ -607,7 +619,9 @@ APK 使用 v2 签名，签名证书是 Android Debug。包名 `com.hukang.local`
 
 ## Git 状态
 
-`hukang/` 及其父目录当前不是 Git repository；`git status` 返回 `fatal: not a git repository`。因此没有 branch、最近 commit 或可列出的 tracked/modified/untracked 状态，也没有创建交接 commit。不要误以为 `.gitignore` 代表仓库已经初始化。
+正式源码目录已建立 Git 仓库，分支为 `main`。
+
+V1.4 基线提交：`3c415d9 chore: establish HuKang V1.4 source baseline`。`android/` 和手写 ML Kit 模块已纳入版本控制；`node_modules`、Gradle/build 产物、APK、密钥和本机配置已忽略。
 
 ## 环境变量与密钥
 

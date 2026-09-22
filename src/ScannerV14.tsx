@@ -1,5 +1,5 @@
 import React,{useEffect,useRef,useState}from"react";
-import{ActivityIndicator,AppState,Image,Linking,Modal,Pressable,ScrollView,StyleSheet,Text,View}from"react-native";
+import{ActivityIndicator,Alert,AppState,Image,Linking,Modal,Pressable,ScrollView,StyleSheet,Text,View}from"react-native";
 import{SafeAreaView}from"react-native-safe-area-context";
 import{CameraView,useCameraPermissions}from"expo-camera";
 import*as ImagePicker from"expo-image-picker";
@@ -7,7 +7,7 @@ import*as Haptics from"expo-haptics";
 import{findProductByBarcode}from"./productLookupService";
 import{OnlineProduct}from"./productLookup";
 import{persistScanImage}from"./scanning";
-import{countScanMetric,logScanEvent,resetScanDebug,saveScanDebug}from"./scanMetrics";
+import{countScanMetric,logScanError,logScanEvent,resetScanDebug,saveScanDebug}from"./scanMetrics";
 
 export type ScanMode="barcode"|"product"|"nutrition"|"ingredients"|"date";
 type Capture={mode:Exclude<ScanMode,"barcode">;photo:string;barcode?:string;scanMeta:string};
@@ -21,8 +21,38 @@ const guideSub=(mode:ScanMode)=>mode==="product"?"尽量让品牌名、商品名
 export default function ScannerV14({back,initialMode,pendingBarcode:initialBarcode,onLocal,onOnline,onCapture,onManual}:Props){const[permission,requestPermission]=useCameraPermissions(),[mode,setMode]=useState<ScanMode|undefined>(initialMode),[step,setStep]=useState<"menu"|"guide"|"camera">(initialMode?"guide":"menu"),[pendingBarcode,setPendingBarcode]=useState(initialBarcode),[unknown,setUnknown]=useState<string>(),[busy,setBusy]=useState(false),[ready,setReady]=useState(false),[torch,setTorch]=useState(false),[status,setStatus]=useState(""),[active,setActive]=useState(AppState.currentState==="active"),camera=useRef<CameraView>(null),last=useRef({code:"",at:0});useEffect(()=>{const sub=AppState.addEventListener("change",x=>{setActive(x==="active");if(x==="active")setReady(false)});return()=>sub.remove()},[]);
  const choose=async(next:ScanMode)=>{await resetScanDebug();setMode(next);setStep("guide");setStatus("")};
  const found=async(raw:string)=>{const now=Date.now();if(busy||(last.current.code===raw&&now-last.current.at<1800))return;last.current={code:raw,at:now};setBusy(true);setStatus("正在查找商品…");await logScanEvent("BARCODE_DETECTED",{raw});countScanMetric("barcodeDetected").catch(()=>{});Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light).catch(()=>{});try{const result=await findProductByBarcode(raw);if(result.kind==="local"){await logScanEvent("BARCODE_LOCAL_HIT",{barcode:result.barcode});countScanMetric("localHit").catch(()=>{});onLocal(result.product.id);return}if(result.kind==="online"){await logScanEvent("BARCODE_ONLINE_HIT",{barcode:result.barcode});countScanMetric("onlineHit").catch(()=>{});onOnline(result.barcode,result.product);return}const code=result.barcode||raw;setPendingBarcode(code);setUnknown(code);await logScanEvent("BARCODE_NOT_FOUND",{barcode:code,reason:result.kind})}catch(e){setPendingBarcode(raw);setUnknown(raw);await logScanEvent("BARCODE_LOOKUP_FAILED",{error:String(e)})}finally{setBusy(false)}};
- const finishPhoto=async(uri:string,meta?:{width?:number;height?:number;orientation?:unknown})=>{setBusy(true);setStatus("正在准备照片…");try{const stable=await persistScanImage(uri,meta);await countScanMetric("photoCaptured");await saveScanDebug({cameraUri:uri,stableUri:stable.workUri,bytes:stable.workBytes,resolution:`${stable.width}×${stable.height}`,orientation:stable.orientation});if(mode&&mode!=="barcode")onCapture({mode,photo:stable.workUri,barcode:pendingBarcode,scanMeta:JSON.stringify(stable)})}catch(e){setStatus("照片没有保存成功，请重新拍摄。");await logScanEvent("PHOTO_CAPTURE_FAILED",{error:String(e)});setBusy(false)}};
- const capture=async()=>{if(!camera.current||busy||!ready||mode==="barcode")return;setBusy(true);setStatus("正在拍摄…");await logScanEvent("PHOTO_CAPTURE_STARTED",{mode});try{await new Promise(r=>setTimeout(r,280));const pic=await camera.current.takePictureAsync({quality:1,skipProcessing:true,exif:true});if(!pic?.uri)throw new Error("PHOTO_CAPTURE_FAILED");await finishPhoto(pic.uri,{width:pic.width,height:pic.height,orientation:pic.exif?.Orientation})}catch(e){setStatus("照片没有拍摄成功，请重新拍摄。");await logScanEvent("PHOTO_CAPTURE_FAILED",{error:String(e)});setBusy(false)}};
+ const finishPhoto=async(uri:string,meta?:{width?:number;height?:number;orientation?:unknown})=>{
+  setBusy(true);setStatus("正在准备照片…");
+  try{
+   await logScanEvent("RECOGNITION_MODE",{value:mode});
+   const stable=await persistScanImage(uri,meta);
+   await countScanMetric("photoCaptured");
+   await saveScanDebug({cameraUri:uri,stableUri:stable.workUri,bytes:stable.workBytes,resolution:`${stable.width}×${stable.height}`,orientation:stable.orientation});
+   if(!mode||mode==="barcode")throw new Error("RECOGNITION_MODE_INVALID");
+   await logScanEvent("RESULT_STATE_UPDATED",{stage:"capture_ready",mode,uri:stable.workUri});
+   onCapture({mode,photo:stable.workUri,barcode:pendingBarcode,scanMeta:JSON.stringify(stable)});
+  }catch(error){
+   setStatus("照片没有保存成功，请重新拍摄。");setBusy(false);Alert.alert("照片处理失败","照片没有保存成功，请重新拍摄。");
+   await logScanError("finish_photo",error);
+   await logScanEvent("PHOTO_CAPTURE_FAILED",{error:String(error)});
+  }
+ };
+ const capture=async()=>{
+  if(!camera.current||busy||!ready||mode==="barcode")return;
+  setBusy(true);setStatus("正在拍摄…");await logScanEvent("PHOTO_CAPTURE_STARTED",{mode});
+  try{
+   await new Promise(r=>setTimeout(r,280));
+   const pic=await camera.current.takePictureAsync({quality:1,skipProcessing:true,exif:true});
+   if(!pic?.uri)throw new Error("PHOTO_CAPTURE_FAILED");
+   await logScanEvent("PHOTO_CAPTURE_SUCCESS",{uri:pic.uri,width:pic.width,height:pic.height});
+   await logScanEvent("PHOTO_URI",{value:pic.uri});
+   await finishPhoto(pic.uri,{width:pic.width,height:pic.height,orientation:pic.exif?.Orientation});
+  }catch(error){
+   setStatus("照片没有拍摄成功，请重新拍摄。");setBusy(false);Alert.alert("拍摄失败","照片没有拍摄成功，请重新拍摄。");
+   await logScanError("take_picture",error);
+   await logScanEvent("PHOTO_CAPTURE_FAILED",{error:String(error)});
+  }
+ };
  const album=async()=>{if(mode==="barcode"||busy)return;const p=await ImagePicker.requestMediaLibraryPermissionsAsync();if(!p.granted){setStatus("需要照片权限才能从相册选择。");return}const r=await ImagePicker.launchImageLibraryAsync({mediaTypes:["images"],quality:1,exif:true});if(r.canceled)return;const x=r.assets[0];await logScanEvent("PHOTO_IMPORT_STARTED");await finishPhoto(x.uri,{width:x.width,height:x.height,orientation:x.exif?.Orientation})};
  if(step==="menu")return <SafeAreaView style={a.lightRoot}><View style={a.header}><Pressable onPress={back} style={a.back}><Text style={a.backText}>‹</Text></Pressable><Text style={a.headerTitle}>扫一扫</Text><View style={{width:40}}/></View><Text style={a.menuTitle}>你想识别什么？</Text><View style={a.menu}>{modes.map(x=><Pressable key={x.mode} style={[a.menuItem,x.mode==="product"&&a.productItem]} onPress={()=>choose(x.mode)}><MiniArt mode={x.mode}/><View style={{flex:1}}><Text style={a.itemTitle}>{x.title}</Text><Text style={a.itemSub}>{x.subtitle}</Text></View><Text style={a.arrow}>›</Text></Pressable>)}</View></SafeAreaView>;
  if(step==="guide"&&mode)return <SafeAreaView style={a.lightRoot}><View style={a.header}><Pressable onPress={()=>initialMode?back():setStep("menu")} style={a.back}><Text style={a.backText}>‹</Text></Pressable><Text style={a.headerTitle}>{modes.find(x=>x.mode===mode)?.title}</Text><View style={{width:40}}/></View><View style={a.guide}><MiniArt mode={mode} large/><Text style={a.guideTitle}>{guideText(mode)}</Text><Text style={a.guideSub}>{guideSub(mode)}</Text></View><Pressable style={a.start} onPress={()=>setStep("camera")}><Text style={a.startText}>{mode==="barcode"?"开始扫描":"开始拍摄"}</Text></Pressable></SafeAreaView>;

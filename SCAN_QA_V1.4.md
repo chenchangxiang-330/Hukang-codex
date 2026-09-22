@@ -45,3 +45,21 @@
 | 商品 5 | 待测 |  |  |  |  |  |  |
 
 隐藏诊断入口：我的 → 关于护康 → 连续点击版本号 7 次。
+
+## 2026-09-22 P0 修复验证
+
+- 静态根因确认：`File.copy()` 两处 Promise 未等待，文件检查与复制发生竞态。
+- 修复后原图和处理图均在 copy 完成后检查 `exists === true` 与 `size > 0`。
+- OCR 空 catch 已移除；识别异常现在保存阶段、消息和 JS stack。
+- Key 为空会记录 `VISION_NOT_CONFIGURED` 并显示明确提示，不再被误报为 Vision 正常。
+- 商品搜索所有返回分支会记录 `SEARCH_RESULT_COUNT`。
+- `npm run typecheck`：PASS。
+- `npm test`：PASS，21/21。
+- Android `assembleRelease`：PASS，385 tasks。
+- APK：`HuKang-V1.4-P0-fix.apk`。
+- SHA-256：`459144e91add0b59509e6ff997e0ae443d064028e1d99b5cf87d972cac2febde`。
+- zipalign：PASS；APK v2 签名：PASS（Android Debug certificate，仅供内测）。
+
+真机状态：`adb devices -l` 无设备。因此“拍商品至少进入结果或明确错误”和“拍营养表得到 raw text 或明确识别错误”仍为 **NOT VERIFIED**，不得标记 PASS。
+
+下一次连接设备后，必须分别拍一张商品包装和营养成分表，并保存 logcat 与隐藏诊断事件。失败时应至少能看到 Alert，且事件应停在明确的 `ERROR_STAGE`，不能再无提示恢复相机。
