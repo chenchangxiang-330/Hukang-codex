@@ -1,0 +1,33 @@
+import NetInfo from"@react-native-community/netinfo";
+import*as DB from"./database";
+import{lookupBarcode}from"./productLookup";
+import{normalizeBarcode}from"./barcode";
+import{logScanEvent}from"./scanMetrics";
+import{Nutrients,Product}from"./types";
+import{scoreProductCandidate}from"./productSearchLogic";
+
+export type ProductSearchInput={barcode?:string|null;brand?:string|null;productName?:string|null;variant?:string|null;quantity?:string|null;keywords?:string[]};
+export type ProductCandidate={key:string;productId?:number;name:string;brand:string;variant:string;quantity:string;imageUri:string;barcode:string|null;ingredients:string;basisAmount:number;basisUnit:string;nutrients:Nutrients;source:"local"|"open_food_facts";score:number};
+export type ProductSearchResult={candidates:ProductCandidate[];query:string;network:"online"|"offline"|"error"};
+const emptyNutrients=():Nutrients=>({energyKcal:null,energyKj:null,proteinG:null,fatG:null,carbohydrateG:null,totalSugarG:null,addedSugarG:null,fiberG:null,sodiumMg:null});
+const clean=(v?:string|null)=>v?.trim().toLowerCase().replace(/\s+/g,"")||"";
+function fromLocal(p:Product):ProductCandidate{return{key:`local-${p.id}`,productId:p.id,name:p.name,brand:p.brand||"",variant:p.variant||"",quantity:p.netContent?`${p.netContent}${p.netContentUnit||""}`:"",imageUri:p.imageUri||"",barcode:p.normalizedBarcode||p.barcode,ingredients:p.ingredients||"",basisAmount:p.basisAmount,basisUnit:p.basisUnit,nutrients:{energyKcal:p.energyKcal,energyKj:p.energyKj,proteinG:p.proteinG,fatG:p.fatG,carbohydrateG:p.carbohydrateG,totalSugarG:p.totalSugarG,addedSugarG:p.addedSugarG,fiberG:p.fiberG,sodiumMg:p.sodiumMg},source:"local",score:0}}
+const finite=(v:unknown)=>typeof v==="number"&&Number.isFinite(v)?v:null;
+function fromOpenFoodFacts(p:any,index:number):ProductCandidate{const n=p.nutriments??{},basis=p.nutrition_data_per==="serving"?"份":/ml/i.test(p.nutrition_data_per)?"mL":"g";return{key:`off-${p.code||index}`,name:p.product_name_zh||p.product_name||"未命名食品",brand:p.brands||"",variant:p.generic_name_zh||p.generic_name||"",quantity:p.quantity||"",imageUri:p.image_front_url||"",barcode:p.code||null,ingredients:p.ingredients_text_zh||p.ingredients_text||"",basisAmount:basis==="份"?1:100,basisUnit:basis,nutrients:{energyKj:finite(n["energy-kj_100g"]??n["energy-kj"]),energyKcal:finite(n["energy-kcal_100g"]??n["energy-kcal"]),proteinG:finite(n.proteins_100g),fatG:finite(n.fat_100g),carbohydrateG:finite(n.carbohydrates_100g),totalSugarG:finite(n.sugars_100g),addedSugarG:null,fiberG:finite(n.fiber_100g),sodiumMg:finite(n.sodium_100g)==null?null:n.sodium_100g*1000},source:"open_food_facts",score:0}}
+function fromBarcodeOnline(p:any,barcode:string):ProductCandidate{return{key:`off-${barcode}`,name:p.name,brand:p.brand,variant:"",quantity:p.netContent,imageUri:p.imageUri,barcode,ingredients:p.ingredients,basisAmount:p.basisAmount,basisUnit:p.basisUnit,nutrients:p.nutrients,source:"open_food_facts",score:100}}
+async function requestProducts(url:string,source:string){await logScanEvent("REQUEST_URL",{url,source});const controller=new AbortController(),timer=setTimeout(()=>controller.abort(),8000);try{const response=await fetch(url,{signal:controller.signal,headers:{"User-Agent":"HuKang/1.4 (Android; local-test)"}});await logScanEvent("HTTP_STATUS",{scope:"product_search",source,status:response.status});if(!response.ok)throw new Error(`SEARCH_HTTP_${response.status}`);const json=await response.json(),products=Array.isArray(json.products)?json.products:[];await logScanEvent("SEARCH_RESULT_RECEIVED",{source,count:products.length});await logScanEvent("RESULT_COUNT",{source,value:products.length});return products}finally{clearTimeout(timer)}}
+
+export async function searchProducts(input:ProductSearchInput):Promise<ProductSearchResult>{
+  const query=[input.brand,input.productName,input.variant,input.quantity,...(input.keywords??[]).slice(0,4)].filter(Boolean).join(" ").replace(/\s+/g," ").trim();
+  await logScanEvent("PRODUCT_SEARCH_STARTED",{input});await logScanEvent("SEARCH_QUERY",{query});
+  const local=input.barcode?await DB.findBarcode(input.barcode):null;if(local){const candidate=fromLocal(local);candidate.score=scoreProductCandidate(candidate,input);await logScanEvent("PRODUCT_SEARCH_LOCAL_HIT",{count:1});return{candidates:[candidate],query,network:"offline"}}
+  const all=await DB.getProducts(),localMatches=all.map(fromLocal).map(c=>({...c,score:scoreProductCandidate(c,input)})).filter(c=>c.score>=25).sort((a,b)=>b.score-a.score);
+  if(localMatches[0]?.score>=60){await logScanEvent("PRODUCT_SEARCH_LOCAL_HIT",{count:localMatches.length});return{candidates:localMatches.slice(0,5),query,network:"offline"}}
+  const network=await NetInfo.fetch();await logScanEvent("NETWORK_STATUS",{connected:network.isConnected});if(network.isConnected===false)return{candidates:localMatches.slice(0,5),query,network:"offline"};
+  const results=[...localMatches];
+  try{
+    if(input.barcode){const barcode=normalizeBarcode(input.barcode).normalized,found=await lookupBarcode(barcode);if(found.ok)results.push(fromBarcodeOnline(found.product,barcode));if(found.ok){await logScanEvent("PRODUCT_SEARCH_RESULT_RECEIVED",{source:"barcode",count:1});return{candidates:results.slice(0,5),query,network:"online"}}}
+    if(query){const fields="code,product_name,product_name_zh,generic_name,generic_name_zh,brands,quantity,image_front_url,ingredients_text,ingredients_text_zh,nutrition_data_per,nutriments";let products:any[]=[];try{products=await requestProducts(`https://world.openfoodfacts.org/cgi/search.pl?search_terms=${encodeURIComponent(query)}&search_simple=1&action=process&json=1&page_size=10&fields=${fields}`,"text")}catch(e){await logScanEvent("PRODUCT_SEARCH_SOURCE_FAILED",{source:"text",error:String(e)})}if(!products.length&&input.brand)try{products=await requestProducts(`https://world.openfoodfacts.org/api/v2/search?brands_tags=${encodeURIComponent(input.brand)}&page_size=20&fields=${fields}`,"brand")}catch(e){await logScanEvent("PRODUCT_SEARCH_SOURCE_FAILED",{source:"brand",error:String(e)})}for(let i=0;i<products.length;i++){const c=fromOpenFoodFacts(products[i],i);c.score=scoreProductCandidate(c,input);if(c.score>=12)results.push(c)}}
+    await logScanEvent("NORMALIZE",{inputCount:results.length});const unique=[...new Map(results.sort((a,b)=>b.score-a.score).map(c=>[c.barcode||`${clean(c.brand)}-${clean(c.name)}-${clean(c.quantity)}`,c])).values()].slice(0,5);await logScanEvent("CANDIDATE_LIST",{count:unique.length});return{candidates:unique,query,network:"online"}
+  }catch(e){await logScanEvent("PRODUCT_SEARCH_FAILED",{error:String(e)});return{candidates:localMatches.slice(0,5),query,network:"error"}}
+}
