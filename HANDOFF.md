@@ -17,9 +17,9 @@
 - 真图继续用上轮2张：`6923644266066`、`6937003117814`，共10核心字段。原图、人工真值、来源/CC BY-SA 3.0、固定ROI和SHA在 `tests/fixtures/ocr/`，没有重换样本。
 - Developer Mode可看完整OCR原文、运行内置两图A/B并导出JSON；`node scripts/score-ocr-benchmark.mjs <export.json>` 分阶段评分。缺Key会标not_run，不是成功，也不是0%准确率。
 - 当前检查：TypeScript PASS；Node 59/59 PASS；Expo Android JS/资源导出 PASS（含两张样本）。这些不等于Kotlin编译或APK构建。
-- 当前阻塞：Java Runtime、Android SDK、ADB均不存在；`./gradlew assembleRelease` 在Java查找阶段失败。没有新版APK、设备logcat、真实OCR/预处理A/B或真实Vision执行。默认Key为空，用户尚不清楚设备Provider；不能断言手机曾调用了哪一模型。
+- 当前阻塞：本机Java Runtime、Android SDK、ADB均不可用；`./gradlew assembleRelease` 在Java查找阶段失败。已新增手动触发的 `.github/workflows/android-apk.yml`，但正式源码尚无Git远端，GitHub Actions未运行；没有新版APK、设备logcat、真实OCR/预处理A/B或真实Vision执行。默认Key为空，用户尚不清楚设备Provider；不能断言手机曾调用了哪一模型。
 - 人工正确转写 → Parser：旧 `7077f1a` 与新代码均10/10，仅证明B层正确文字的解析。真实图片原图/预处理/Vision/融合准确率都未测得，不能声称提高。
-- 未上传源码、未触发云构建或费用；仅发现eas.json模板，没有关联EAS项目/Git远程。继续云构建需要用户账户登录与项目/上传授权；即便构建成功也必须做Android设备测试。
+- 未上传源码、未触发云构建或费用；没有关联EAS项目/Git远程。GitHub APK工作流已准备，但需要关联仓库，并把现有 `android/app/debug.keystore` 的Base64内容安全存入仓库Secret `HUKANG_DEBUG_KEYSTORE_B64`。工作流会校验签名文件SHA-256，不匹配就拒绝构建，避免生成无法覆盖旧版的APK；密钥不能提交到Git。即便云构建成功也必须做Android设备测试。
 - 本轮范围以营养链为主；商品、配料、日期旧页面仍有单独质量阻断/文本合并策略，不能宣称全扫描模式统一完成。
 
 详细架构与官方/GitHub依据见 `ARCHITECTURE.md`；实测边界和继续步骤见 `TEST_REPORT.md`。下一位应先解决Android构建/设备及Vision凭证，再运行同批真实样本并评估，不要继续凭文本测试宣称准确率改善。

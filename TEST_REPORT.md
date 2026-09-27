@@ -17,6 +17,7 @@
 | `android/./gradlew assembleRelease` | BLOCKED：Unable to locate a Java Runtime | 构建未开始；没有新的APK |
 | ADB / Native / 设备交互 | NOT TESTED | 本机无Java、SDK、ADB，可用设备连接未建立 |
 | 真实Vision | NOT TESTED | 无有效Key/Provider运行证据，未发真实服务请求 |
+| GitHub APK工作流 | 配置文件解析PASS；GitHub运行NOT TESTED | 尚未关联Git远端、上传签名Secret或产生新版APK |
 
 ### 同一批真实图片与人工真值
 
