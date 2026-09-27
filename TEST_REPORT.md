@@ -1,6 +1,71 @@
 # HuKang V1.4 Test Report
 
-更新日期：2026-09-22。只记录已经发生的测试；没有测试的项目明确标记为 NOT TESTED。
+更新日期：2026-09-27。只记录已经发生的测试；未执行明确标记NOT TESTED/not_run。历史2026-09-22 APK构建不能代表本轮代码。
+
+## 2026-09-27 中文营养标签：当前验收未完成
+
+### 本轮已执行检查
+
+| 检查 | 实际结果 | 证明范围 |
+| --- | --- | --- |
+| Git恢复审计 | 起始只有scanMetrics.ts修改、ocrGeometry.ts新增 | 其他上轮被中断修改均重新实施并读回 |
+| `npm ci --ignore-scripts --no-audit --no-fund` | 513个项目依赖恢复，锁文件未变 | 没有安装JDK/SDK/ADB/全局工具 |
+| `npm run typecheck` | PASS | TS类型检查，不编译Kotlin |
+| `npm test` | 59/59 PASS | Parser/融合/几何/图片哈希与ROI/评分器/mock请求及原有回归 |
+| `npm run build:android` | PASS；Metro 792 modules，含2张真实JPEG | Expo Android JS与资源导出，不是APK |
+| `git diff --check` | PASS | 补丁空白检查 |
+| `android/./gradlew assembleRelease` | BLOCKED：Unable to locate a Java Runtime | 构建未开始；没有新的APK |
+| ADB / Native / 设备交互 | NOT TESTED | 本机无Java、SDK、ADB，可用设备连接未建立 |
+| 真实Vision | NOT TESTED | 无有效Key/Provider运行证据，未发真实服务请求 |
+
+### 同一批真实图片与人工真值
+
+未重新选择样本。图像重新目读，来源/哈希/人工ROI均已存 `tests/fixtures/ocr/nutrition/`。
+
+| 图片 | 基准 | 能量 kJ | 蛋白 g | 脂肪 g | 碳水 g | 钠 mg |
+| --- | --- | --- | --- | --- | --- | --- |
+| 6923644266066，特仑苏包装 | 每100mL | 309 | 3.6 | 4.4 | 5.0 | 58 |
+| 6937003117814，中文营养表 | 每100g | 2075 | 21.0 | 37.7 | 19.0 | 1248 |
+
+共2张照片、10个核心真值字段。第一张另见钙120mg，不计入本次5字段评分；两张均没有可见添加糖、总糖、纤维或kcal。图片许可CC BY-SA 3.0，归属见fixtures README。
+
+### 定量结果：不把人工转写当图片OCR
+
+| 阶段 | 已执行图像数 | 正确/错误/缺失 | 字段准确率 |
+| --- | --- | --- | --- |
+| 原图 ML Kit OCR | 0/2 | 未测 | N/A（not_run） |
+| 预处理后 ML Kit OCR | 0/2 | 未测 | N/A（not_run） |
+| 实际OCR文本 → Parser | 0/2 | 未测 | N/A（not_run） |
+| 实验灰度/对比度 OCR | 0/2 | 未测 | N/A（not_run） |
+| 真实Vision | 0/2 | 未测 | N/A（not_run） |
+| 真实最终融合 | 0/2 | 未测 | N/A（not_run） |
+| 人工正确转写 → 旧7077f1a Parser | 不涉及图片识别 | 10 / 0 / 0 | 100%，仅文本解析 |
+| 同一人工转写 → 新Parser | 不涉及图片识别 | 10 / 0 / 0 | 100%，仅文本解析 |
+
+已实际从Git读取旧Parser并对同一人工转写计算，旧/新均10/10。**无法据此声称OCR准确率提升。优化前与优化后的真实图片字段准确率均未知。** 评分器无设备记录时输出准确率null、覆盖率0，不伪造0%或100%。
+
+额外真实执行的纯Parser反例：旧版把缺蛋白值后的脂肪3.6g借给蛋白，并默认100g；新版蛋白和基准均null。旧版把1,200kJ/1,000mg解释为1.2kJ/1mg；新版标歧义、返回null。这是B层修复证据，不是A层OCR改善证据。
+
+### Vision测试边界与分类
+
+- Mock transport确实使用第一张JPEG的原字节base64作为请求体，断言image_url、高细节和营养专用Prompt；mock响应仅用于分支回归，**未上传到任何真实Provider**。
+- 未配置：Key空时不读取/发送图片，记录VISION_NOT_CONFIGURED + NOT_SENT。
+- 未发送：配置、授权、离线、读图错误/取消有单独原因；设备授权/网络分支尚未真机验证。
+- 请求失败：mock覆盖401、网络异常；记录AUTH_ERROR/NETWORK_ERROR与是否尝试发出。
+- 响应不可用/差：mock覆盖缺content、无效JSON、错误任务/负值、字段缺失与LOW_CONFIDENCE。
+- 返回后使用：纯融合测试覆盖同值、补缺、冲突、100g/100mL基准冲突、未知基准、低confidence和添加糖缺失；真实UI交互尚未验证。
+- 设备原先为何“联网没有效果”尚不能归因到某一个请求：有默认空Key、质量早退/完整度过宽和结果覆盖的代码证据，但没有那次设备日志或真实响应。
+
+### 继续验收的可执行步骤
+
+1. 恢复已授权的Android构建环境或关联经用户授权的云构建账户；保留手写android工程，不运行prebuild --clean。云构建也不等于设备测试。
+2. 原生Build并安装新APK，先从相机/相册选营养表，核对实际方向、手动框选区域、raw text和五核心字段；检查失败不静默返回相机。
+3. 我的 → 关于护康 → 连点版本7次 → 开发者模式 →「运行两张真实图片A/B测试」。未配置Key先收集本地结果，Vision明确not_run。
+4. 将有效服务配置只写入设备安全存储，授权上传两张公开样本，重跑同批。确认REQUEST_START、RESPONSE_RAW、STRUCTURED_RESULT及融合记录；不能只看联网开关。
+5. 导出JSON；运行 `node scripts/score-ocr-benchmark.mjs <导出文件.json>`，分别报告原图/裁剪/灰度/Parser/Vision/融合的正确、错误、缺失、基准与越界补值；保留raw和图片以区分A/B/C/D。
+6. 真机逐项确认冲突、改选整组基准、手动修改、空白保存，再补用户实际失败照片。达标后才关闭BUG-009。
+
+## 以下为2026-09-22历史测试记录（不覆盖当前版本）
 
 ## Android Build
 

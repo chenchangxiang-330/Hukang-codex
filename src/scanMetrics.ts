@@ -7,26 +7,16 @@ export async function countScanMetric(key:keyof ScanMetrics){try{const current=a
 
 const DEBUG_KEY="@hukang/scan-debug/v1";
 export type ScanDebugEvent={at:string;name:string;details?:unknown};
-export type ScanDebugRecord={capturedAt:string;cameraUri?:string;stableUri?:string;bytes?:number;resolution?:string;orientation?:string|null;quality?:unknown;rawText?:string;detectedType?:string;parse?:unknown;provider?:string;network?:string;error?:string;events?:ScanDebugEvent[]};
-export async function saveScanDebug(patch:Partial<ScanDebugRecord>){try{const prior=await loadScanDebug();await AsyncStorage.setItem(DEBUG_KEY,JSON.stringify({...prior,...patch,capturedAt:new Date().toISOString()}))}catch(error){console.warn("scan debug write failed",error)}}
+export type ScanDebugRecord={capturedAt:string;cameraUri?:string;originalUri?:string;stableUri?:string;bytes?:number;resolution?:string;orientation?:string|null;quality?:unknown;rawText?:string;detectedType?:string;parse?:unknown;provider?:string;network?:string;error?:string;events?:ScanDebugEvent[];ocr?:unknown;vision?:unknown;ab?:unknown};
+// Serialize read-modify-write: parallel stage diagnostics must not erase raw text.
+let debugWrites:Promise<void>=Promise.resolve();
+function writeDebug(action:()=>Promise<void>){debugWrites=debugWrites.then(action).catch(error=>{console.warn("scan diagnostic write failed",error)});return debugWrites}
+export function saveScanDebug(patch:Partial<ScanDebugRecord>){return writeDebug(async()=>{const prior=await loadScanDebug();await AsyncStorage.setItem(DEBUG_KEY,JSON.stringify({...prior,...patch,capturedAt:new Date().toISOString()}))})}
 export async function loadScanDebug():Promise<ScanDebugRecord>{const raw=await AsyncStorage.getItem(DEBUG_KEY);try{return raw?JSON.parse(raw):{capturedAt:""}}catch{return{capturedAt:""}}}
-export async function resetScanDebug(){try{await AsyncStorage.setItem(DEBUG_KEY,JSON.stringify({capturedAt:new Date().toISOString(),events:[]}))}catch(error){console.warn("scan debug reset failed",error)}}
-export async function logScanEvent(name:string,details?:unknown){
-  try{
-    const prior=await loadScanDebug(),events=[...(prior.events??[]),{at:new Date().toISOString(),name,details}].slice(-80);
-    await AsyncStorage.setItem(DEBUG_KEY,JSON.stringify({...prior,capturedAt:new Date().toISOString(),events}));
-  }catch(error){
-    console.warn("scan event log failed",name,error);
-  }
-}
-
-export function scanErrorDetails(error:unknown){
-  return{message:error instanceof Error?error.message:String(error),stack:error instanceof Error?error.stack:undefined};
-}
-
-export async function logScanError(stage:string,error:unknown){
-  const{message,stack}=scanErrorDetails(error);
-  await logScanEvent("ERROR_STAGE",{value:stage});
-  await logScanEvent("ERROR_MESSAGE",{value:message});
-  if(stack)await logScanEvent("STACK_TRACE",{value:stack});
-}
+export function resetScanDebug(){return writeDebug(()=>AsyncStorage.setItem(DEBUG_KEY,JSON.stringify({capturedAt:new Date().toISOString(),events:[]})))}
+export function logScanEvent(name:string,details?:unknown){return writeDebug(async()=>{
+  const prior=await loadScanDebug(),events=[...(prior.events??[]),{at:new Date().toISOString(),name,details}].slice(-160);
+  await AsyncStorage.setItem(DEBUG_KEY,JSON.stringify({...prior,capturedAt:new Date().toISOString(),events}));
+})}
+export function scanErrorDetails(error:unknown){return{message:error instanceof Error?error.message:String(error),stack:error instanceof Error?error.stack:undefined}}
+export async function logScanError(stage:string,error:unknown){const{message,stack}=scanErrorDetails(error);await logScanEvent("ERROR_STAGE",{value:stage});await logScanEvent("ERROR_MESSAGE",{value:message});if(stack)await logScanEvent("STACK_TRACE",{value:stack})}

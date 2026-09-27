@@ -1,5 +1,5 @@
 import { Directory, File, Paths } from "expo-file-system";
-import { manipulateAsync, SaveFormat } from "expo-image-manipulator";
+import { preprocessImageForOcr } from "./imagePreprocessing";
 import{logScanError,logScanEvent}from"./scanMetrics";
 export type StableScanImage={scanId:string;originalUri:string;workUri:string;originalBytes:number;workBytes:number;width:number;height:number;orientation:string|null};
 
@@ -25,13 +25,10 @@ export async function persistScanImage(uri:string,meta?:{width?:number;height?:n
       throw new Error("PHOTO_FILE_INVALID:original");
     }
 
-    const orientation=Number(meta?.orientation??1),rotation=orientation===3?180:orientation===6?90:orientation===8?-90:0;
-    const actions:Array<{resize:{width:number}}|{rotate:number}>=[];
-    if(meta?.width&&meta.width>2400)actions.push({resize:{width:2400}});
-    if(rotation)actions.push({rotate:rotation});
     stage="image_manipulation";
-    await logScanEvent("IMAGE_PREPARE_STARTED",{uri:original.uri,rotation,actions:actions.length});
-    const rendered=await manipulateAsync(original.uri,actions,{compress:.95,format:SaveFormat.JPEG});
+    await logScanEvent("IMAGE_PREPARE_STARTED",{uri:original.uri});
+    // One native decoder owns EXIF, including mirrored cases. Keep detail until ROI selection.
+    const rendered=await preprocessImageForOcr(original.uri);
 
     stage="copy_work";
     const work=new File(dir,`${scanId}-work.jpg`);
@@ -43,10 +40,10 @@ export async function persistScanImage(uri:string,meta?:{width?:number;height?:n
       await logScanEvent("PHOTO_FILE_INVALID",{stage:"work",exists:workExists,size:workSize});
       throw new Error("PHOTO_FILE_INVALID:work");
     }
-    await logScanEvent("IMAGE_PREPARE_SUCCESS",{uri:work.uri,size:workSize,width:rendered.width,height:rendered.height,rotation});
+    await logScanEvent("IMAGE_PREPARE_SUCCESS",{uri:work.uri,size:workSize,width:rendered.width,height:rendered.height,steps:rendered.steps});
     await logScanEvent("OCR_INPUT_READY",{uri:work.uri,size:workSize});
     await logScanEvent("VISION_INPUT_READY",{uri:work.uri,size:workSize});
-    return{scanId,originalUri:original.uri,workUri:work.uri,originalBytes:originalSize,workBytes:workSize,width:rendered.width,height:rendered.height,orientation:meta?.orientation==null?null:String(meta.orientation)};
+    return{scanId,originalUri:original.uri,workUri:work.uri,originalBytes:originalSize,workBytes:workSize,width:rendered.width,height:rendered.height,orientation:String(rendered.sourceOrientation)};
   }catch(error){
     await logScanError(stage,error);
     throw error;

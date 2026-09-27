@@ -10,11 +10,11 @@ test("normalizes whitespace and UPC/EAN variants while retaining raw input",()=>
   assert.ok(n.candidates.includes("012345678905"));
 });
 
-test("nutrition recognition requires a basis and at least three fields",()=>{
+test("nutrition recognition requires a basis and all five core groups",()=>{
   const weak=nutritionCompleteness(parseNutritionLabel("蛋白质 3.2g"));
   assert.equal(weak.complete,false);
   const good=nutritionCompleteness(parseNutritionLabel("每100mL 能量261kJ 蛋白质3.2g 脂肪3.6g 碳水化合物4.8g"));
-  assert.equal(good.complete,true);
+  assert.equal(good.complete,false); // Sodium is missing; do not suppress Vision.
   assert.equal(good.basisFound,true);
 });
 
@@ -30,5 +30,9 @@ test("parses five representative OCR label layouts",()=>{
     "每包装 能量:450kcal 蛋白质:12g 脂肪:18g 碳水化合物:62g 膳食纤维:5g",
     "每100克 能量900千焦 蛋白质5.5克 脂肪8克 碳水化合物30克 总糖4克 钠180毫克",
   ];
-  for(const text of samples)assert.equal(nutritionCompleteness(parseNutritionLabel(text)).complete,true,text);
+  for(const text of samples){
+    const parsed=parseNutritionLabel(text);
+    assert.notEqual(parsed.nutrients.proteinG,null,text);
+    assert.equal(nutritionCompleteness(parsed).complete,parsed.nutrients.sodiumMg!=null,text);
+  }
 });

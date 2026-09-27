@@ -55,4 +55,4 @@ adb install -r HuKang-V1.4.apk
 
 V1.4 扫描系统的验证范围和真机测试表见 [`SCAN_QA_V1.4.md`](./SCAN_QA_V1.4.md)。
 
-当前最严重问题：用户真机拍摄商品或营养成分表后，会停在“正在准备照片…”并恢复相机，没有进入结果页。请先定位 capture → stable image → `onCapture` 链路，不要把代码存在视为功能已验收。
+当前最严重问题（2026-09-27）：用户反馈拍照和结果页已通，但中文营养标签识别错误。新营养链已加入方向处理、手动裁剪、原文诊断、严格Parser、Vision分层兜底和冲突确认；尚未完成新代码的原生构建/真机/有效Key验收。见 [ARCHITECTURE.md](./ARCHITECTURE.md) 和 [TEST_REPORT.md](./TEST_REPORT.md)，不要把JS打包或人工转写测试当作真实OCR准确率。

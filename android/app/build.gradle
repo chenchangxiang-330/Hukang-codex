@@ -154,6 +154,7 @@ android {
 
 dependencies {
     implementation("com.google.mlkit:text-recognition-chinese:16.0.1")
+    implementation("androidx.exifinterface:exifinterface:1.4.2")
     // The version of react-native is set by the React Native Gradle Plugin
     implementation("com.facebook.react:react-android")
 

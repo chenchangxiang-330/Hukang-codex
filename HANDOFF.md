@@ -1,9 +1,43 @@
 # HuKang / 护康 Engineering Handoff
 
-交接日期：2026-09-22  
+交接更新：2026-09-27（下方2026-09-22内容为历史记录）
 当前应用版本：1.4.0（Android versionCode 14）
 
 本文只描述当前代码、已经取得的测试证据和已知问题。代码存在不等于真机验收通过。
+
+## 当前接续状态：中文营养标签准确率，尚未完成真机验收
+
+- 用户最新反馈：拍照和结果页已可进入；当前P0是中文食品包装OCR读错、联网没有明显帮助，不再以旧“准备照片后返回相机”作为唯一现象。
+- 本次恢复时，Git实际只有 `scanMetrics.ts` 和 `ocrGeometry.ts` 落盘。被额度中断的 `ocr.ts`、`scanning.ts`、预处理、Parser、Vision、原生改动均未生效；本轮重新小补丁实现并读回确认。上轮审核失败原因是额度不足无法完成审核，不是代码被判定有危险。
+- 正式工程当前实际位置：`/Users/yangbing/Ai/open ai/我开发的app/护康/内测/2.0/HuKang`。上轮地址中的 `App/` 层已被外部移除；Git baseline `3c415d9` 和 `7077f1a` 仍在，不是新建工程。
+- 核实引擎：bundled ML Kit Chinese 16.0.1 + ChineseTextRecognizerOptions，非Latin，无需首次联网下载中文模型。
+- 默认预处理：EXIF1–8实际直立化、手动营养表选区/90°旋转、裁剪后尺寸限制、高质量彩色JPEG。灰度/对比度仅开发者A/B候选，没有证据前不默认启用；无自动透视/deskew/表格检测。
+- 新营养链：NutritionRecognitionScreen → nutritionRecognition → ocr raw/geometry → strict parser → visionFallback/visionRequest → recognitionMerge → 用户逐字段与基准确认。自定义导航、SQLite和商品表单未重构。
+- 原图/工作图、OCR原文、Parser输入输出、Vision是否发出/原响应/结构结果分开保留。缺基准不补100g，不从kJ生成“可见kcal”，不猜添加糖；纠错和冲突需确认。图片质量只作提示，不再拦住新营养链。
+- 真图继续用上轮2张：`6923644266066`、`6937003117814`，共10核心字段。原图、人工真值、来源/CC BY-SA 3.0、固定ROI和SHA在 `tests/fixtures/ocr/`，没有重换样本。
+- Developer Mode可看完整OCR原文、运行内置两图A/B并导出JSON；`node scripts/score-ocr-benchmark.mjs <export.json>` 分阶段评分。缺Key会标not_run，不是成功，也不是0%准确率。
+- 当前检查：TypeScript PASS；Node 59/59 PASS；Expo Android JS/资源导出 PASS（含两张样本）。这些不等于Kotlin编译或APK构建。
+- 当前阻塞：Java Runtime、Android SDK、ADB均不存在；`./gradlew assembleRelease` 在Java查找阶段失败。没有新版APK、设备logcat、真实OCR/预处理A/B或真实Vision执行。默认Key为空，用户尚不清楚设备Provider；不能断言手机曾调用了哪一模型。
+- 人工正确转写 → Parser：旧 `7077f1a` 与新代码均10/10，仅证明B层正确文字的解析。真实图片原图/预处理/Vision/融合准确率都未测得，不能声称提高。
+- 未上传源码、未触发云构建或费用；仅发现eas.json模板，没有关联EAS项目/Git远程。继续云构建需要用户账户登录与项目/上传授权；即便构建成功也必须做Android设备测试。
+- 本轮范围以营养链为主；商品、配料、日期旧页面仍有单独质量阻断/文本合并策略，不能宣称全扫描模式统一完成。
+
+详细架构与官方/GitHub依据见 `ARCHITECTURE.md`；实测边界和继续步骤见 `TEST_REPORT.md`。下一位应先解决Android构建/设备及Vision凭证，再运行同批真实样本并评估，不要继续凭文本测试宣称准确率改善。
+
+### 本轮修改文件清单
+
+- Native：`android/app/build.gradle`、`android/app/src/main/java/com/hukang/local/HuKangOcrModule.kt`。
+- 图片/OCR：`src/scanning.ts`、`src/imagePreprocessing.ts`、`src/ImageCropper.tsx`、`src/ocr.ts`、`src/ocrGeometry.ts`。
+- 解析/融合：`src/parser.ts`、`src/recognitionMerge.ts`、`src/nutritionRecognition.ts`。
+- Vision：`src/vision.ts`、`src/visionProtocol.ts`、`src/visionRequest.ts`、`src/visionFallback.ts`。
+- 营养确认入口：`src/RecognitionScreen.tsx`、`src/NutritionRecognitionScreen.tsx`。
+- 隐藏诊断：`src/scanMetrics.ts`、`src/MineV13.tsx`、`src/RecognitionDiagnostics.tsx`、`src/ocrBenchmark.ts`。
+- 测试：`scripts/score-ocr-benchmark.mjs`、`tests/fixtures/ocr/` 两图与真值/许可说明、`tests/nutrition-quality.test.mjs`、`tests/nutrition-transcription.test.mjs`、`tests/ocr-benchmark.test.mjs`、`tests/ocr-geometry.test.mjs`、`tests/vision-request.test.mjs`、`tests/scan-logic.test.mjs`、`tests/scan.test.mjs`、`tsconfig.json`。
+- 文档：`HANDOFF.md`、`BUGS.md`、`TEST_REPORT.md`、`ARCHITECTURE.md`、`README.md`。没有改App导航、数据库、首页、吉祥物或其他业务。
+
+## 以下为2026-09-22历史记录
+
+旧构建成功、旧设备列表以及旧现象不代表2026-09-27这批未构建代码已验收；冲突信息以本文件顶部当前状态为准。
 
 ## 1. 项目简介
 
@@ -25,7 +59,7 @@ HuKang 是一个无账号、离线优先的 Android 食品营养、摄入记录�
 - 修复 APK：`HuKang-V1.4-P0-fix.apk`；SHA-256 `459144e91add0b59509e6ff997e0ae443d064028e1d99b5cf87d972cac2febde`。
 - 2026-09-22 `adb devices -l` 无设备，商品实拍、营养表 OCR raw text、有效 Key Vision 和联网候选均为 NOT VERIFIED。
 
-当前有效正式源码目录是：`/Users/yangbing/Ai/open ai/我开发的app/App/护康/内测/2.0/HuKang`。
+当时正式源码目录是：`/Users/yangbing/Ai/open ai/我开发的app/App/护康/内测/2.0/HuKang`，现已移动，当前目录见顶部。
 
 工作期间上级目录被外部移动；原先确认的 `/Users/yangbing/Ai/我开发的app/App/护康/内测/2.0/HuKang` 已不存在。不要使用旧 `.codex/.chatgpt-projects/.../hukang`。
 
