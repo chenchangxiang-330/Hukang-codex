@@ -1,6 +1,17 @@
 # HuKang V1.4 Test Report
 
-更新日期：2026-09-27。只记录已经发生的测试；未执行明确标记NOT TESTED/not_run。历史2026-09-22 APK构建不能代表本轮代码。
+更新日期：2026-10-02。只记录已经发生的测试；未执行明确标记NOT TESTED/not_run。历史2026-09-22 APK构建不能代表本轮代码。
+
+## 2026-10-02 原生构建与迁移检查
+
+- 纠正此前环境判断：旧隐藏工作区的 `.build-tools` 中实际保留JDK17.0.20.1、SDK36、NDK27.1和Gradle9.3.1缓存。此次用其工具编译正式源码，没有新安装工具、没有运行prebuild、没有回到旧源码开发。
+- `./gradlew --no-daemon --offline assembleRelease`：PASS，BUILD SUCCESSFUL in 1m27s，385 tasks executed；最新Kotlin OCR模块编译通过。
+- 新交付文件：`HuKang-V1.4-OCR-20261002.apk`；SHA-256 `1ad11de84510e7302b642a9b29b772ebc7718c58f21e96c555cbc7ba5dd0e72b`。
+- APK v2签名验证及 `zipalign -c -P 16 4`：PASS。签名证书SHA-256 `fac61745dc0903786fb9ede62a962b399f7348f0bb6f899b8332667591033b9c`，与旧版一致。
+- `adb devices -l`：列表为空。安装、相机/裁剪交互、原图/预处理ML Kit A/B、Vision和最终字段准确率：NOT TESTED，不能因编译成功判准确率改善。
+- 全部Git历史敏感文件审计：未发现已提交的真实API Key、签名、私钥、个人数据库；两张fixture哈希正确，原生源码/注册/锁文件/wrapper完整。
+- GitHub工作流YAML解析、手动触发入口及Gradle缓存配置：PASS；云构建NOT RUN，签名Secret尚未设置。
+- GitHub远端已读取并保留文档历史；HTTPS上传权限dry-run：BLOCKED `could not read Username`，本机Git未登录。不能报告源码已上传。
 
 ## 2026-09-27 中文营养标签：当前验收未完成
 

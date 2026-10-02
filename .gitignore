@@ -9,6 +9,8 @@ android/local.properties
 ios/
 *.apk
 *.aab
+HuKang-source-*.zip
+HuKang-source-*.bundle
 *.keystore
 *.jks
 .env

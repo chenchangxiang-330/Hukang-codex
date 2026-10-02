@@ -34,25 +34,31 @@ npm ci
 npm run typecheck
 npm test
 
-export JAVA_HOME="$PWD/../.build-tools/java/Contents/Home"
-export ANDROID_HOME="$PWD/../.build-tools/android-sdk"
+# 设置为本机已有 JDK 17 和 Android SDK 的实际目录。
+export JAVA_HOME="/path/to/jdk17"
+export ANDROID_HOME="/path/to/android-sdk"
 export ANDROID_SDK_ROOT="$ANDROID_HOME"
-export GRADLE_USER_HOME="$PWD/../.build-tools/gradle"
 export PATH="$JAVA_HOME/bin:$ANDROID_HOME/platform-tools:$PATH"
 export NODE_ENV=production
 cd android && ./gradlew assembleRelease
 ```
 
-请勿在未备份自定义文字识别原生模块时运行 `expo prebuild --clean`。原始构建产物位于 `android/app/build/outputs/apk/release/app-release.apk`。根目录交付文件 `HuKang-V1.4.apk`（同时保留兼容文件名 `HuKang-debug.apk`）是包含 JS 包的独立 APK，沿用本地测试签名。
+请勿在未备份自定义文字识别原生模块时运行 `expo prebuild --clean`。原始构建产物位于 `android/app/build/outputs/apk/release/app-release.apk`。2026-10-02 已在正式源码中生成 `HuKang-V1.4-OCR-20261002.apk`，包含最新 OCR 修复和 JS 包，沿用本地测试签名。APK 不提交到源码 Git 仓库。
 
 连接开启 USB 调试的手机后安装：
 
 ```bash
-adb install -r HuKang-V1.4.apk
+adb install -r HuKang-V1.4-OCR-20261002.apk
 ```
 
 包名 `com.hukang.local`；最低 Android 7.0（API 24）；支持 `arm64-v8a`、`armeabi-v7a`。
 
 V1.4 扫描系统的验证范围和真机测试表见 [`SCAN_QA_V1.4.md`](./SCAN_QA_V1.4.md)。
 
-当前最严重问题（2026-09-27）：用户反馈拍照和结果页已通，但中文营养标签识别错误。新营养链已加入方向处理、手动裁剪、原文诊断、严格Parser、Vision分层兜底和冲突确认；尚未完成新代码的原生构建/真机/有效Key验收。见 [ARCHITECTURE.md](./ARCHITECTURE.md) 和 [TEST_REPORT.md](./TEST_REPORT.md)，不要把JS打包或人工转写测试当作真实OCR准确率。
+当前最严重问题：用户反馈拍照和结果页已通，但中文营养标签识别错误。新营养链已加入方向处理、手动裁剪、原文诊断、严格Parser、Vision分层兜底和冲突确认；2026-10-02 原生构建与签名检查通过，真机/有效Key验收仍待完成。见 [ARCHITECTURE.md](./ARCHITECTURE.md) 和 [TEST_REPORT.md](./TEST_REPORT.md)，不要把编译或人工转写测试当作真实OCR准确率。
+
+## GitHub 接续开发
+
+目标仓库：[chenchangxiang-330/Hukang-codex](https://github.com/chenchangxiang-330/Hukang-codex)。正式工程沿用已有代码和 Git 历史，不新建 Android 工程。远端原有的 `docs/`、`design/`、`research/` 文档作为规划资料保留；当前实现和测试状态以根目录 `HANDOFF.md`、`BUGS.md`、`TEST_REPORT.md`、`ARCHITECTURE.md` 为准。
+
+云端 APK 构建步骤与签名配置见 [GITHUB_BUILD.md](./GITHUB_BUILD.md)。`node_modules/`、Gradle 缓存、SDK/JDK、构建目录和签名密钥不上传到源码仓库；云端按锁文件安装依赖，缓存 Gradle 下载。`android/` 中的手写 ML Kit 模块和 Gradle 配置必须保留。
