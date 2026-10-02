@@ -22,6 +22,7 @@
 - 当前仍待验收：`adb devices -l` 列表为空；没有设备logcat、真实OCR/预处理A/B或真实Vision执行。默认Key为空，不能声称真实字段准确率提高或Vision联网通过。
 - 人工正确转写 → Parser：旧 `7077f1a` 与新代码均10/10，仅证明B层正确文字的解析。真实图片原图/预处理/Vision/融合准确率都未测得，不能声称提高。
 - 按用户指定关联 `origin=https://github.com/chenchangxiang-330/Hukang-codex.git`，本地合并并保留远端文档与两侧Git历史。源码尚未推送：本机Git无HTTPS登录凭据，dry-run报 `could not read Username`；未触发云构建。工作流增加Gradle缓存及提前检查签名配置；还需要仓库Secret `HUKANG_DEBUG_KEYSTORE_B64`。密钥不能提交到Git。详见 `GITHUB_BUILD.md`。
+- 清理：已永久删除旧工作区八个可再生依赖/构建/下载缓存目录，磁盘可用空间增加约4.96GiB；未删源码、签名、JDK/SDK、历史APK。清理前保存了纯源码 `HuKang-source-20261002.zip` 和完整Git历史 `HuKang-source-20261002.bundle`（均不提交Git、不含缓存和密钥）。目标与验证见 `GITHUB_BUILD.md`。后续本机构建会重新下载Gradle及其缓存。
 - 本轮范围以营养链为主；商品、配料、日期旧页面仍有单独质量阻断/文本合并策略，不能宣称全扫描模式统一完成。
 
 详细架构与官方/GitHub依据见 `ARCHITECTURE.md`；实测边界和继续步骤见 `TEST_REPORT.md`。下一位应先解决Android构建/设备及Vision凭证，再运行同批真实样本并评估，不要继续凭文本测试宣称准确率改善。

@@ -12,6 +12,8 @@
 - 全部Git历史敏感文件审计：未发现已提交的真实API Key、签名、私钥、个人数据库；两张fixture哈希正确，原生源码/注册/锁文件/wrapper完整。
 - GitHub工作流YAML解析、手动触发入口及Gradle缓存配置：PASS；云构建NOT RUN，签名Secret尚未设置。
 - GitHub远端已读取并保留文档历史；HTTPS上传权限dry-run：BLOCKED `could not read Username`，本机Git未登录。不能报告源码已上传。
+- 源码ZIP检查：167个目录/文件entry，含Kotlin模块、wrapper、lockfile与真实fixture，不含缓存/密钥/APK；完整Git bundle验证PASS。
+- 清理后检查：旧工作区八个指定可再生目录均不存在，正式与旧签名哈希一致，原生源码和JDK/SDK保留。磁盘可用空间增加约4.96GiB。详见 `GITHUB_BUILD.md` 清理实录。
 
 ## 2026-09-27 中文营养标签：当前验收未完成
 
