@@ -11,7 +11,7 @@
 - `adb devices -l`：列表为空。安装、相机/裁剪交互、原图/预处理ML Kit A/B、Vision和最终字段准确率：NOT TESTED，不能因编译成功判准确率改善。
 - 全部Git历史敏感文件审计：未发现已提交的真实API Key、签名、私钥、个人数据库；两张fixture哈希正确，原生源码/注册/锁文件/wrapper完整。
 - GitHub工作流YAML解析、手动触发入口及Gradle缓存配置：PASS；云构建NOT RUN，签名Secret尚未设置。
-- GitHub远端已读取并保留文档历史；HTTPS上传权限dry-run：BLOCKED `could not read Username`，本机Git未登录。不能报告源码已上传。
+- GitHub首次上传检查因本机Git未登录而BLOCKED；2026-10-02 用户完成CLI登录后重新验证：账号 `chenchangxiang-330`、仓库ADMIN、默认分支main、远端历史祖先检查及dry-run均PASS。正常推送源码迁移提交 `2393bd176e917a3e66462fa2e992e75a08903f0c` 后，GitHub API返回相同远端SHA。保留原有 `docs/`、`design/`、`research/`，未强推、未上传缓存/签名/APK。源码上传PASS，云构建仍NOT RUN。
 - 源码ZIP检查：167个目录/文件entry，含Kotlin模块、wrapper、lockfile与真实fixture，不含缓存/密钥/APK；完整Git bundle验证PASS。
 - 清理后检查：旧工作区八个指定可再生目录均不存在，正式与旧签名哈希一致，原生源码和JDK/SDK保留。磁盘可用空间增加约4.96GiB。详见 `GITHUB_BUILD.md` 清理实录。
 

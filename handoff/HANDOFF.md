@@ -1,6 +1,6 @@
 # HANDOFF
 
-> 2026-10-02 接续说明：本仓库已准备合入正式 HuKang Android 工程。此文件下方保留最初的规划交接；当前实现、P0 状态与真实测试证据统一见根目录 [HANDOFF.md](../HANDOFF.md)、[BUGS.md](../BUGS.md)、[TEST_REPORT.md](../TEST_REPORT.md) 和 [ARCHITECTURE.md](../ARCHITECTURE.md)。原生工程包含手写中文 ML Kit 模块，不需要重新创建项目。
+> 2026-10-02 接续说明：本仓库 `main` 已合入正式 HuKang Android 工程，源码迁移提交为 `2393bd1`，上传已验证。此文件下方保留最初的规划交接；当前实现、P0 状态与真实测试证据统一见根目录 [HANDOFF.md](../HANDOFF.md)、[BUGS.md](../BUGS.md)、[TEST_REPORT.md](../TEST_REPORT.md) 和 [ARCHITECTURE.md](../ARCHITECTURE.md)。原生工程包含手写中文 ML Kit 模块，不需要重新创建项目。
 
 ## 项目
 

@@ -2,6 +2,8 @@
 
 目标仓库：https://github.com/chenchangxiang-330/Hukang-codex
 
+源码已于2026-10-02正常推送到 `main`：迁移提交 `2393bd176e917a3e66462fa2e992e75a08903f0c`，已用GitHub API验证。原有规划文档和Git历史均保留。后续开发以该仓库为准；本地正式目录作为工作副本。云端APK构建尚未运行，签名Secret仍需配置。
+
 源码包括已有 `android/`、手写中文 ML Kit 模块、Gradle Wrapper、锁文件、测试图片和交接文件。不要上传本机 SDK/JDK、node_modules、构建缓存、APK 或签名文件；不要运行 `expo prebuild --clean`。
 
 ## 签名
@@ -42,4 +44,4 @@
 
 删除前目录占用统计合计 5,646,056 KiB（约5.38 GiB）；清理后磁盘可用空间增加约4.96 GiB。已确认八个目录不存在，正式源码Git干净、原生源码和wrapper保留、两处签名文件哈希未变；JDK/SDK保留约3.5 GiB。删掉的依赖和缓存可以按锁文件及Gradle重新生成，未移到废纸篓。
 
-GitHub上传仍未完成：本机Git尚无HTTPS登录凭据，不能把本地关联/合并当作已经上传。原有源码和历史APK仍保留；本次不会删除整个旧项目目录或整套JDK/SDK。
+清理时本机Git尚未登录，先保留完整本地备份；之后用户完成CLI认证，源码已正常推送并核对远端SHA。原有源码和历史APK仍保留，未删除整个旧项目目录或整套JDK/SDK。
