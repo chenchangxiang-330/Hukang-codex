@@ -5,6 +5,8 @@ export type Nutrients = {
   energyKj: NullableNumber;
   proteinG: NullableNumber;
   fatG: NullableNumber;
+  saturatedFatG?: NullableNumber;
+  transFatG?: NullableNumber;
   carbohydrateG: NullableNumber;
   totalSugarG: NullableNumber;
   addedSugarG: NullableNumber;
@@ -96,7 +98,7 @@ export const nutrientFields: { key: keyof Nutrients; label: string; unit: string
 
 export const zeroNutrients = (): Nutrients => ({
   energyKcal: 0, energyKj: 0, proteinG: 0, fatG: 0, carbohydrateG: 0,
-  totalSugarG: 0, addedSugarG: 0, fiberG: 0, sodiumMg: 0,
+  totalSugarG: 0, addedSugarG: 0, fiberG: 0, sodiumMg: 0, saturatedFatG: 0, transFatG: 0,
 });
 
 export const dateKey = (d = new Date()) => `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, "0")}-${String(d.getDate()).padStart(2, "0")}`;

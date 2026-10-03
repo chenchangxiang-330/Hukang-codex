@@ -1,11 +1,11 @@
 import { NativeModules, Platform } from "react-native";
 import { logScanEvent, saveScanDebug } from "./scanMetrics";
-import { textInReadingRows, type OcrLine } from "./ocrGeometry";
+import { textInReadingRows,textInNutritionRows, type OcrLine } from "./ocrGeometry";
 export async function recognizeText(uri: string): Promise<string> {
   return (await recognizeDetailed(uri)).text;
 }
 export type OcrResult={text:string;parserText:string;lines:OcrLine[];provider:string;durationMs:number;lowConfidence:boolean};
-export async function recognizeDetailed(uri:string):Promise<OcrResult>{
+export async function recognizeDetailed(uri:string,task:"general"|"nutrition"="general"):Promise<OcrResult>{
   const started=Date.now();
   await logScanEvent("OCR_START",{uri});
   try{
@@ -16,7 +16,7 @@ export async function recognizeDetailed(uri:string):Promise<OcrResult>{
     const scores=lines.map(line=>line.confidence).filter((n):n is number=>typeof n==="number"&&n>0);
     // Routing heuristic, not a measured probability of correct nutrition values.
     const lowConfidence=scores.length===0||scores.length!==lines.length||scores.some(n=>n<0.75);
-    const output:OcrResult={...result,lines,parserText:lines.length?textInReadingRows(lines):result.text,durationMs:Date.now()-started,lowConfidence};
+    const output:OcrResult={...result,lines,parserText:lines.length?(task==="nutrition"?textInNutritionRows(lines):textInReadingRows(lines)):result.text,durationMs:Date.now()-started,lowConfidence};
     await logScanEvent("OCR_PROVIDER",{value:output.provider});
     await logScanEvent("OCR_RAW_TEXT",{value:output.text});
     await logScanEvent("OCR_TEXT_LENGTH",{value:output.text.length});

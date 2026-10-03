@@ -31,7 +31,8 @@ export async function requestVision(config:VisionConfig,mode:VisionMode,readImag
   }catch(error){
     // Do not persist fetch error bodies, authorization headers or the base64 image.
     const message=error instanceof Error?error.message:"";
-    const code=message.startsWith("VISION_")?message:phase==="response"?"VISION_INVALID_RESPONSE":phase==="image"?"VISION_IMAGE_UNREADABLE":"VISION_NETWORK_ERROR";
+    const aborted=error instanceof Error&&error.name==="AbortError";
+    const code=message.startsWith("VISION_")?message:aborted?"VISION_TIMEOUT":phase==="response"?"VISION_INVALID_RESPONSE":phase==="image"?"VISION_IMAGE_UNREADABLE":"VISION_NETWORK_ERROR";
     if(!sent)await event("VISION_NOT_SENT",{reason:code});
     await event(code.split(":")[0]);await event("VISION_ERROR",{code,phase,sent});
     throw new Error(code);

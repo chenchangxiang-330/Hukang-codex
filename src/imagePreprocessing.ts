@@ -5,7 +5,7 @@ import { logScanEvent } from "./scanMetrics";
 
 export type CropRegion={originX:number;originY:number;width:number;height:number};
 export type PreparedImage={uri:string;width:number;height:number;sourceOrientation:number;orientation:1;steps:string[]};
-export async function preprocessImageForOcr(uri:string,options:{upright?:{width:number;height:number};crop?:CropRegion;rotate?:number;maxEdge?:number}={}):Promise<PreparedImage>{
+export async function preprocessImageForOcr(uri:string,options:{upright?:{width:number;height:number};crop?:CropRegion;rotate?:number;maxEdge?:number;experimentalScale?:number}={}):Promise<PreparedImage>{
   let image:PreparedImage;
   if(options.upright)image={uri,...options.upright,sourceOrientation:1,orientation:1,steps:[]};
   else{
@@ -19,6 +19,12 @@ export async function preprocessImageForOcr(uri:string,options:{upright?:{width:
   }
   if(options.rotate){actions.push({rotate:options.rotate});image.steps.push(`manual_rotate_${options.rotate}`)}
   if(actions.length){const transformed=await manipulateAsync(image.uri,actions,{compress:0.98,format:SaveFormat.JPEG});image={...image,...transformed}}
+  if(options.experimentalScale!==undefined){
+    const scale=options.experimentalScale;
+    if(!Number.isFinite(scale)||scale<1||scale>2)throw new Error("IMAGE_SCALE_INVALID");
+    const resized=await manipulateAsync(image.uri,[{resize:{width:Math.round(image.width*scale),height:Math.round(image.height*scale)}}],{compress:0.98,format:SaveFormat.JPEG});
+    image={...image,...resized};image.steps.push(`experimental_scale_${scale}`);
+  }
   // Only limit dimensions after ROI selection. Upscaling cannot restore missing strokes.
   const limit=options.maxEdge;
   if(limit&&Math.max(image.width,image.height)>limit){const factor=limit/Math.max(image.width,image.height);

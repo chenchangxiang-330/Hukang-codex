@@ -8,7 +8,7 @@ const now = () => new Date().toISOString();
 
 const productSelect = `id,barcode,raw_barcode rawBarcode,normalized_barcode normalizedBarcode,name,brand,variant,category,net_content netContent,net_content_unit netContentUnit,
  nutrition_basis_amount basisAmount,nutrition_basis_unit basisUnit,energy_kcal energyKcal,energy_kj energyKj,
- protein_g proteinG,fat_g fatG,carbohydrate_g carbohydrateG,total_sugar_g totalSugarG,
+ protein_g proteinG,fat_g fatG,saturated_fat_g saturatedFatG,trans_fat_g transFatG,carbohydrate_g carbohydrateG,total_sugar_g totalSugarG,
  added_sugar_g addedSugarG,fiber_g fiberG,sodium_mg sodiumMg,ingredients,image_uri imageUri,ingredients_raw_text ingredientsRawText,ingredients_json ingredientsJson,ocr_raw_text ocrRawText,data_source dataSource,last_verified_at lastVerifiedAt,
  created_at createdAt,updated_at updatedAt`;
 
@@ -17,19 +17,21 @@ export async function initializeDatabase() {
   await d.execAsync(`PRAGMA journal_mode=WAL; PRAGMA foreign_keys=ON;
     CREATE TABLE IF NOT EXISTS products(id INTEGER PRIMARY KEY AUTOINCREMENT,barcode TEXT UNIQUE,name TEXT NOT NULL,brand TEXT,
       net_content REAL,net_content_unit TEXT,nutrition_basis_amount REAL NOT NULL DEFAULT 100,nutrition_basis_unit TEXT NOT NULL DEFAULT 'g',
-      energy_kcal REAL,energy_kj REAL,protein_g REAL,fat_g REAL,carbohydrate_g REAL,total_sugar_g REAL,
+      energy_kcal REAL,energy_kj REAL,protein_g REAL,fat_g REAL,saturated_fat_g REAL,trans_fat_g REAL,carbohydrate_g REAL,total_sugar_g REAL,
       added_sugar_g REAL,fiber_g REAL,sodium_mg REAL,ingredients TEXT,image_uri TEXT,created_at TEXT NOT NULL,updated_at TEXT NOT NULL);
     CREATE TABLE IF NOT EXISTS inventory(id INTEGER PRIMARY KEY AUTOINCREMENT,product_id INTEGER NOT NULL,quantity REAL NOT NULL DEFAULT 1,
       purchase_date TEXT,production_date TEXT,expiry_date TEXT,opened INTEGER NOT NULL DEFAULT 0,opened_at TEXT,storage_type TEXT NOT NULL DEFAULT '常温',photo_uri TEXT,
       FOREIGN KEY(product_id) REFERENCES products(id) ON DELETE CASCADE);
     CREATE TABLE IF NOT EXISTS nutrition_logs(id INTEGER PRIMARY KEY AUTOINCREMENT,product_id INTEGER NOT NULL,date TEXT NOT NULL,time TEXT NOT NULL,
-      amount REAL NOT NULL,amount_unit TEXT NOT NULL,energy_kcal REAL,energy_kj REAL,protein_g REAL,fat_g REAL,carbohydrate_g REAL,
+      amount REAL NOT NULL,amount_unit TEXT NOT NULL,energy_kcal REAL,energy_kj REAL,protein_g REAL,fat_g REAL,saturated_fat_g REAL,trans_fat_g REAL,carbohydrate_g REAL,
       total_sugar_g REAL,added_sugar_g REAL,fiber_g REAL,sodium_mg REAL,FOREIGN KEY(product_id) REFERENCES products(id) ON DELETE RESTRICT);
     CREATE INDEX IF NOT EXISTS logs_date_idx ON nutrition_logs(date);
     CREATE INDEX IF NOT EXISTS inventory_expiry_idx ON inventory(expiry_date);`);
   const cols=await d.getAllAsync<{name:string}>("PRAGMA table_info(products)"),names=new Set(cols.map(x=>x.name));
-  const migrations:Array<[string,string]>=[["raw_barcode","TEXT"],["normalized_barcode","TEXT"],["variant","TEXT"],["category","TEXT"],["ingredients_raw_text","TEXT"],["ingredients_json","TEXT"],["ocr_raw_text","TEXT"],["data_source","TEXT NOT NULL DEFAULT 'manual'"],["last_verified_at","TEXT"]];
+  const migrations:Array<[string,string]>=[["raw_barcode","TEXT"],["normalized_barcode","TEXT"],["variant","TEXT"],["category","TEXT"],["ingredients_raw_text","TEXT"],["ingredients_json","TEXT"],["ocr_raw_text","TEXT"],["data_source","TEXT NOT NULL DEFAULT 'manual'"],["last_verified_at","TEXT"],["saturated_fat_g","REAL"],["trans_fat_g","REAL"]];
   for(const [name,type] of migrations)if(!names.has(name))await d.execAsync(`ALTER TABLE products ADD COLUMN ${name} ${type}`);
+  const logCols=await d.getAllAsync<{name:string}>("PRAGMA table_info(nutrition_logs)"),logNames=new Set(logCols.map(value=>value.name));
+  for(const name of ["saturated_fat_g","trans_fat_g"])if(!logNames.has(name))await d.execAsync(`ALTER TABLE nutrition_logs ADD COLUMN ${name} REAL`);
   await d.execAsync("CREATE UNIQUE INDEX IF NOT EXISTS products_normalized_barcode_idx ON products(normalized_barcode) WHERE normalized_barcode IS NOT NULL");
   const legacy=await d.getAllAsync<{id:number;barcode:string}>("SELECT id,barcode FROM products WHERE barcode IS NOT NULL AND normalized_barcode IS NULL");
   for(const p of legacy){const n=normalizeBarcode(p.barcode);await d.runAsync("UPDATE products SET raw_barcode=?,normalized_barcode=? WHERE id=?",p.barcode,n.normalized,p.id)}
@@ -46,9 +48,9 @@ async function seedProducts() {
 type ProductInput = Omit<Product,"id"|"createdAt"|"updatedAt"|"rawBarcode"|"normalizedBarcode"|"variant"|"category"|"ingredientsRawText"|"ingredientsJson"|"ocrRawText"|"dataSource"|"lastVerifiedAt"> & Partial<Pick<Product,"rawBarcode"|"normalizedBarcode"|"variant"|"category"|"ingredientsRawText"|"ingredientsJson"|"ocrRawText"|"dataSource"|"lastVerifiedAt">>;
 export async function saveProduct(p: ProductInput, id?: number) {
   const d=await db(),t=now(),raw=p.rawBarcode??p.barcode??null,norm=p.normalizedBarcode??(raw?normalizeBarcode(raw).normalized:null);
-  const vals=[p.barcode||raw,raw,norm,p.name,p.brand||null,p.variant||null,p.category||null,p.netContent,p.netContentUnit,p.basisAmount,p.basisUnit,p.energyKcal,p.energyKj,p.proteinG,p.fatG,p.carbohydrateG,p.totalSugarG,p.addedSugarG,p.fiberG,p.sodiumMg,p.ingredients||null,p.imageUri||null,p.ingredientsRawText??p.ingredients??null,p.ingredientsJson??null,p.ocrRawText??null,p.dataSource??"manual",p.lastVerifiedAt??t];
-  if(id){await d.runAsync(`UPDATE products SET barcode=?,raw_barcode=?,normalized_barcode=?,name=?,brand=?,variant=?,category=?,net_content=?,net_content_unit=?,nutrition_basis_amount=?,nutrition_basis_unit=?,energy_kcal=?,energy_kj=?,protein_g=?,fat_g=?,carbohydrate_g=?,total_sugar_g=?,added_sugar_g=?,fiber_g=?,sodium_mg=?,ingredients=?,image_uri=?,ingredients_raw_text=?,ingredients_json=?,ocr_raw_text=?,data_source=?,last_verified_at=?,updated_at=? WHERE id=?`,...[...vals,t,id]);return id}
-  const r=await d.runAsync(`INSERT INTO products(barcode,raw_barcode,normalized_barcode,name,brand,variant,category,net_content,net_content_unit,nutrition_basis_amount,nutrition_basis_unit,energy_kcal,energy_kj,protein_g,fat_g,carbohydrate_g,total_sugar_g,added_sugar_g,fiber_g,sodium_mg,ingredients,image_uri,ingredients_raw_text,ingredients_json,ocr_raw_text,data_source,last_verified_at,created_at,updated_at) VALUES(?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)`,...[...vals,t,t]);return r.lastInsertRowId;
+  const vals=[p.barcode||raw,raw,norm,p.name,p.brand||null,p.variant||null,p.category||null,p.netContent,p.netContentUnit,p.basisAmount,p.basisUnit,p.energyKcal,p.energyKj,p.proteinG,p.fatG,p.saturatedFatG??null,p.transFatG??null,p.carbohydrateG,p.totalSugarG,p.addedSugarG,p.fiberG,p.sodiumMg,p.ingredients||null,p.imageUri||null,p.ingredientsRawText??p.ingredients??null,p.ingredientsJson??null,p.ocrRawText??null,p.dataSource??"manual",p.lastVerifiedAt??t];
+  if(id){await d.runAsync(`UPDATE products SET barcode=?,raw_barcode=?,normalized_barcode=?,name=?,brand=?,variant=?,category=?,net_content=?,net_content_unit=?,nutrition_basis_amount=?,nutrition_basis_unit=?,energy_kcal=?,energy_kj=?,protein_g=?,fat_g=?,saturated_fat_g=?,trans_fat_g=?,carbohydrate_g=?,total_sugar_g=?,added_sugar_g=?,fiber_g=?,sodium_mg=?,ingredients=?,image_uri=?,ingredients_raw_text=?,ingredients_json=?,ocr_raw_text=?,data_source=?,last_verified_at=?,updated_at=? WHERE id=?`,...[...vals,t,id]);return id}
+  const r=await d.runAsync(`INSERT INTO products(barcode,raw_barcode,normalized_barcode,name,brand,variant,category,net_content,net_content_unit,nutrition_basis_amount,nutrition_basis_unit,energy_kcal,energy_kj,protein_g,fat_g,saturated_fat_g,trans_fat_g,carbohydrate_g,total_sugar_g,added_sugar_g,fiber_g,sodium_mg,ingredients,image_uri,ingredients_raw_text,ingredients_json,ocr_raw_text,data_source,last_verified_at,created_at,updated_at) VALUES(?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)`,...[...vals,t,t]);return r.lastInsertRowId;
 }
 export async function getProducts(){ return (await db()).getAllAsync<Product>(`SELECT ${productSelect} FROM products ORDER BY updated_at DESC`); }
 export async function getProduct(id:number){ return (await db()).getFirstAsync<Product>(`SELECT ${productSelect} FROM products WHERE id=?`,id); }
@@ -62,12 +64,21 @@ export async function deleteInventory(id:number){ await (await db()).runAsync("D
 export async function toggleOpened(id:number,opened:boolean){ await (await db()).runAsync("UPDATE inventory SET opened=?,opened_at=? WHERE id=?",opened?1:0,opened?now():null,id); }
 
 export async function addLog(product:Product,amount:number,unit:string,date:string,time:string){
-  const ratio=amount/product.basisAmount; const n=(v:number|null)=>v==null?null:Math.round(v*ratio*100)/100;
-  await (await db()).runAsync(`INSERT INTO nutrition_logs(product_id,date,time,amount,amount_unit,energy_kcal,energy_kj,protein_g,fat_g,carbohydrate_g,total_sugar_g,added_sugar_g,fiber_g,sodium_mg) VALUES(?,?,?,?,?,?,?,?,?,?,?,?,?,?)`,product.id,date,time,amount,unit,n(product.energyKcal),n(product.energyKj),n(product.proteinG),n(product.fatG),n(product.carbohydrateG),n(product.totalSugarG),n(product.addedSugarG),n(product.fiberG),n(product.sodiumMg));
+  const ratio=amount/product.basisAmount; const n=(v:number|null|undefined)=>v==null?null:Math.round(v*ratio*100)/100;
+  await (await db()).runAsync(`INSERT INTO nutrition_logs(product_id,date,time,amount,amount_unit,energy_kcal,energy_kj,protein_g,fat_g,saturated_fat_g,trans_fat_g,carbohydrate_g,total_sugar_g,added_sugar_g,fiber_g,sodium_mg) VALUES(?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)`,product.id,date,time,amount,unit,n(product.energyKcal),n(product.energyKj),n(product.proteinG),n(product.fatG),n(product.saturatedFatG),n(product.transFatG),n(product.carbohydrateG),n(product.totalSugarG),n(product.addedSugarG),n(product.fiberG),n(product.sodiumMg));
 }
-export async function getLogs(date:string){ return (await db()).getAllAsync<NutritionLog>(`SELECT l.id,l.product_id productId,p.name productName,l.date,l.time,l.amount,l.amount_unit amountUnit,l.energy_kcal energyKcal,l.energy_kj energyKj,l.protein_g proteinG,l.fat_g fatG,l.carbohydrate_g carbohydrateG,l.total_sugar_g totalSugarG,l.added_sugar_g addedSugarG,l.fiber_g fiberG,l.sodium_mg sodiumMg FROM nutrition_logs l JOIN products p ON p.id=l.product_id WHERE date=? ORDER BY time DESC`,date); }
-export async function updateLog(id:number,amount:number,unit:string,time:string){ const l=await (await db()).getFirstAsync<any>("SELECT * FROM nutrition_logs WHERE id=?",id); const p=l?await getProduct(l.product_id):null; if(!p)return; const ratio=amount/p.basisAmount,n=(v:number|null)=>v==null?null:Math.round(v*ratio*100)/100; await (await db()).runAsync("UPDATE nutrition_logs SET time=?,amount=?,amount_unit=?,energy_kcal=?,energy_kj=?,protein_g=?,fat_g=?,carbohydrate_g=?,total_sugar_g=?,added_sugar_g=?,fiber_g=?,sodium_mg=? WHERE id=?",time,amount,unit,n(p.energyKcal),n(p.energyKj),n(p.proteinG),n(p.fatG),n(p.carbohydrateG),n(p.totalSugarG),n(p.addedSugarG),n(p.fiberG),n(p.sodiumMg),id); }
+export async function getLogs(date:string){ return (await db()).getAllAsync<NutritionLog>(`SELECT l.id,l.product_id productId,p.name productName,l.date,l.time,l.amount,l.amount_unit amountUnit,l.energy_kcal energyKcal,l.energy_kj energyKj,l.protein_g proteinG,l.fat_g fatG,l.saturated_fat_g saturatedFatG,l.trans_fat_g transFatG,l.carbohydrate_g carbohydrateG,l.total_sugar_g totalSugarG,l.added_sugar_g addedSugarG,l.fiber_g fiberG,l.sodium_mg sodiumMg FROM nutrition_logs l JOIN products p ON p.id=l.product_id WHERE date=? ORDER BY time DESC`,date); }
+export async function updateLog(id:number,amount:number,unit:string,time:string){ const l=await (await db()).getFirstAsync<any>("SELECT * FROM nutrition_logs WHERE id=?",id); const p=l?await getProduct(l.product_id):null; if(!p)return; const ratio=amount/p.basisAmount,n=(v:number|null|undefined)=>v==null?null:Math.round(v*ratio*100)/100; await (await db()).runAsync("UPDATE nutrition_logs SET time=?,amount=?,amount_unit=?,energy_kcal=?,energy_kj=?,protein_g=?,fat_g=?,saturated_fat_g=?,trans_fat_g=?,carbohydrate_g=?,total_sugar_g=?,added_sugar_g=?,fiber_g=?,sodium_mg=? WHERE id=?",time,amount,unit,n(p.energyKcal),n(p.energyKj),n(p.proteinG),n(p.fatG),n(p.saturatedFatG),n(p.transFatG),n(p.carbohydrateG),n(p.totalSugarG),n(p.addedSugarG),n(p.fiberG),n(p.sodiumMg),id); }
 export async function deleteLog(id:number){ await (await db()).runAsync("DELETE FROM nutrition_logs WHERE id=?",id); }
-export function totalLogs(logs:NutritionLog[]):Nutrients { const out=zeroNutrients(); for(const l of logs) for(const k of Object.keys(out) as (keyof Nutrients)[]) if(l[k]!=null) out[k]=(out[k]??0)+(l[k]??0); return out; }
+export function totalLogs(logs:NutritionLog[]):Nutrients {
+  const out=zeroNutrients();
+  for(const key of Object.keys(out) as (keyof Nutrients)[]){
+    // With no entries there is no recorded consumption. Once food is logged,
+    // a missing nutrient in any entry makes its complete daily total unknown.
+    if(logs.some(log=>log[key]==null||!Number.isFinite(log[key])))out[key]=null;
+    else out[key]=logs.reduce((total,log)=>total+(log[key] as number),0);
+  }
+  return out;
+}
 export async function exportAll(){ const d=await db(); return {version:1,exportedAt:now(),products:await d.getAllAsync("SELECT * FROM products"),inventory:await d.getAllAsync("SELECT * FROM inventory"),nutritionLogs:await d.getAllAsync("SELECT * FROM nutrition_logs")}; }
 export async function clearDatabase(){ const d=await db(); await d.execAsync("DELETE FROM nutrition_logs; DELETE FROM inventory; DELETE FROM products;"); await seedProducts(); }

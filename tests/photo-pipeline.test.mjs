@@ -34,10 +34,15 @@ test("photo pipeline records ready inputs and stage-aware errors", () => {
 });
 
 test("OCR call failures are not swallowed", () => {
-  for (const file of ["ProductRecognitionScreen.tsx", "RecognitionScreen.tsx"]) {
+  for (const file of ["ProductRecognitionScreen.tsx", "textLabelRecognition.ts", "nutritionRecognition.ts"]) {
     const source = readSource(file);
     assert.match(source, /OCR_CALL_FAILED/, file);
     assert.match(source, /logScanError\([^\n]*ocr/i, file);
   }
 });
-
+test('an ingredients-only draft cannot silently become a per-100g nutrition table',()=>{
+  const app=readFileSync(new URL('../App.tsx',import.meta.url),'utf8');
+  assert.match(app,/basisAmount:'',basisUnit:''/);
+  assert.match(app,/Number\.isFinite\(Number\(f\.basisAmount\)\)/);
+  assert.match(app,/Number\(f\.basisAmount\)<=0/);
+});

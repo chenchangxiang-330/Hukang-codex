@@ -1,6 +1,7 @@
 import { Asset } from "expo-asset";
 import { NativeModules,Platform } from "react-native";
 import { recognizeDetailed } from "./ocr";
+import {estimateNutritionSlope,type OcrLine} from "./ocrGeometry";
 import { preprocessImageForOcr } from "./imagePreprocessing";
 import { parseNutritionLabel } from "./parser";
 import { mergeRecognitionResults,nutritionVisionKeys } from "./recognitionMerge";
@@ -15,12 +16,12 @@ const fixtures=[
 ];
 type Stage={status:"ok"|"error"|"not_run";reason?:string;rawText?:string;fields?:Record<string,number|null>;basis?:{amount:number|null;unit:string|null};scope?:string;[key:string]:unknown};
 type Run={fixtureId:string;evidence:string;platform:string;stages:Record<string,Stage>};
-const mapped=(n:Nutrients)=>Object.fromEntries((Object.keys(nutritionVisionKeys) as (keyof Nutrients)[]).map(k=>[nutritionVisionKeys[k],n[k]]));
+const mapped=(n:Nutrients)=>Object.fromEntries((Object.keys(nutritionVisionKeys) as (keyof Nutrients)[]).map(k=>[nutritionVisionKeys[k],n[k]??null]));
 const errorText=(error:unknown)=>error instanceof Error?error.message:String(error);
 export async function runRealNutritionBenchmark(progress:(label:string)=>void,options:{vision?:boolean}={}){
   const runs:Run[]=[];
   for(const fixture of fixtures){
-    const stages:Record<string,Stage>=Object.fromEntries(["original","preprocessed","parser","vision","merged","experimental_gray"].map(name=>[name,{status:"not_run",reason:"Stage not reached"}]));
+    const stages:Record<string,Stage>=Object.fromEntries(["original","preprocessed","parser","vision","merged","experimental_gray","experimental_upscaled","experimental_deskew"].map(name=>[name,{status:"not_run",reason:"Stage not reached"}]));
     if(options.vision===false)stages.vision={status:"not_run",reason:"CI_NO_VISION_KEY"};
     const run:Run={fixtureId:fixture.fixtureId,evidence:"device_mlkit_image_execution",platform:Platform.OS,stages};runs.push(run);
     try{
@@ -31,7 +32,7 @@ export async function runRealNutritionBenchmark(progress:(label:string)=>void,op
       await asset.downloadAsync();const uri=asset.localUri??asset.uri;
       const read=async(imageUri:string,name:string)=>{
         progress(`${fixture.fixtureId} · ${name}`);
-        try{const ocr=await recognizeDetailed(imageUri),parsed=parseNutritionLabel(ocr.parserText);
+        try{const ocr=await recognizeDetailed(imageUri,"nutrition"),parsed=parseNutritionLabel(ocr.parserText);
           stages[name]={status:"ok",rawText:ocr.text,parserInput:ocr.parserText,fields:mapped(parsed.nutrients),basis:{amount:parsed.basisAmount,unit:parsed.basisUnit},durationMs:ocr.durationMs,provider:ocr.provider,lines:ocr.lines};return parsed;
         }catch(error){stages[name]={status:"error",reason:errorText(error)};return null}
       };
@@ -52,6 +53,11 @@ export async function runRealNutritionBenchmark(progress:(label:string)=>void,op
       const merged=mergeRecognitionResults(parsed??parseNutritionLabel(""),vision);
       stages.merged={status:"ok",fields:mapped(merged.nutrients),basis:{amount:merged.basisAmount,unit:merged.basisUnit},scope:vision?"ocr_plus_vision":"local_only",result:merged};
       try{const variant=await NativeModules.HuKangOcr.createOcrVariant(prepared.uri);await read(variant.uri,"experimental_gray");stages.experimental_gray.preprocessing=variant}catch(error){stages.experimental_gray={status:"error",reason:errorText(error)}}
+      try{const variant=await preprocessImageForOcr(prepared.uri,{upright:prepared,experimentalScale:2,maxEdge:4096});await read(variant.uri,"experimental_upscaled");stages.experimental_upscaled.preprocessing=variant}catch(error){stages.experimental_upscaled={status:"error",reason:errorText(error)}}
+      const slope=estimateNutritionSlope(stages.preprocessed.lines as OcrLine[]??[]);
+      if(Math.abs(slope)>.015){
+        try{const variant=await preprocessImageForOcr(prepared.uri,{upright:prepared,rotate:-Math.atan(slope)*180/Math.PI,maxEdge:4096});await read(variant.uri,"experimental_deskew");stages.experimental_deskew.preprocessing=variant}catch(error){stages.experimental_deskew={status:"error",reason:errorText(error)}}
+      }else stages.experimental_deskew={status:"not_run",reason:"NO_RELIABLE_TILT_DETECTED"};
     }catch(error){stages.preprocessed={status:"error",reason:errorText(error)}}
     await saveScanDebug({ab:{runs,completedAt:new Date().toISOString()}});
   }

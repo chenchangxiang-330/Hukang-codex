@@ -35,6 +35,7 @@ test("unreadable image is not sent; unauthorized, network failure and invalid re
     {read:async()=>{throw new Error("disk")},fetch:async()=>{assert.fail("must not send")},code:"VISION_IMAGE_UNREADABLE",sent:false},
     {read:async()=>image,fetch:async()=>new Response("",{status:401}),code:"VISION_AUTH_ERROR",sent:true},
     {read:async()=>image,fetch:async()=>{throw new Error("Network request failed")},code:"VISION_NETWORK_ERROR",sent:true},
+    {read:async()=>image,fetch:async()=>{throw new DOMException("Timed out","AbortError")},code:"VISION_TIMEOUT",sent:true},
     {read:async()=>image,fetch:async()=>new Response("{}"),code:"VISION_INVALID_RESPONSE",sent:true},
     {read:async()=>image,fetch:async()=>new Response(JSON.stringify({choices:[{message:{content:"not json"}}]})),code:"VISION_INVALID_RESPONSE",sent:true},
   ];

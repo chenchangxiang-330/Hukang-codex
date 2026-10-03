@@ -19,6 +19,7 @@ export type StructuredResult={
   nutrition?:Record<string,number|null>|null;
   ingredients?:string[]|null;
   dates?:string[]|null;
+  date_label?:{production_date:string|null;expiry_date:string|null;shelf_life:string|null;batch:string|null}|null;
   uncertain_fields:string[];
   confidence?:Record<string,number>;
 };

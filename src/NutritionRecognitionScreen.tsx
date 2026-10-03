@@ -5,11 +5,12 @@ import{recognizeNutrition}from"./nutritionRecognition";
 import{mergeRecognitionResults}from"./recognitionMerge";
 import{parseNutritionLabel}from"./parser";
 import{logScanEvent,logScanError,saveScanDebug}from"./scanMetrics";
+import{visionSkipMessage}from"./textRecognitionEvidence";
 import type{Nutrients}from"./types";
 type CreateArgs={photo:string;barcode?:string;source:"local_ocr"|"online_vision"|"mixed";rawText:string;draft:Record<string,string>};
 type Props={photo:string;barcode?:string;scanMeta?:string;back:()=>void;onCreate:(value:CreateArgs)=>void};
 type Recognition=Awaited<ReturnType<typeof recognizeNutrition>>;
-const fields:[keyof Nutrients,string,string][]=[["energyKj","能量","kJ"],["energyKcal","能量","kcal"],["proteinG","蛋白质","g"],["fatG","脂肪","g"],["carbohydrateG","碳水化合物","g"],["sodiumMg","钠","mg"],["totalSugarG","总糖","g"],["addedSugarG","添加糖","g"],["fiberG","膳食纤维","g"]];
+const fields:[keyof Nutrients,string,string][]=[["energyKj","能量","kJ"],["energyKcal","能量","kcal"],["proteinG","蛋白质","g"],["fatG","脂肪","g"],["saturatedFatG","饱和脂肪","g"],["transFatG","反式脂肪","g"],["carbohydrateG","碳水化合物","g"],["sodiumMg","钠","mg"],["totalSugarG","总糖","g"],["addedSugarG","添加糖","g"],["fiberG","膳食纤维","g"]];
 const blocked=new Set(["conflict","basis_conflict","basis_unverified","uncertain"]);
 const color="#168F86";
 export default function NutritionRecognitionScreen(props:Props){
@@ -39,7 +40,7 @@ function NutritionResult({photo,barcode,back,onCreate}:Props){
     if(!Number.isFinite(Number(basis.amount))||Number(basis.amount)<=0||!["g","mL","份","包装"].includes(basis.unit)){Alert.alert("请填写计量基准","例如每100 mL。包装没有写清时请重新拍摄，不会自动补成100g。");return}
     const unresolved=fields.filter(([key])=>blocked.has(merged.fields[key].status)&&edits[key]===undefined);
     if(unresolved.length){Alert.alert("部分数值需要确认","请对照照片选择本地/联网候选，或手动填写；留空表示未知。");return}
-    const draft:Record<string,string>={basisAmount:basis.amount,basisUnit:basis.unit,name:result.vision?.product_name??""};
+    const draft:Record<string,string>={basisAmount:basis.amount,basisUnit:basis.unit,name:choice==="local"?"":result.vision?.product_name??""};
     for(const[key]of fields){const value=edits[key]??(merged.nutrients[key]==null?"":String(merged.nutrients[key]));
       if(value.trim()&&(!/^\d+(?:\.\d+)?$/.test(value)||!Number.isFinite(Number(value)))){Alert.alert("请核对数字","营养值只能填写非负数字，未知请留空。");return}draft[key]=value;
     }
@@ -53,6 +54,7 @@ function NutritionResult({photo,barcode,back,onCreate}:Props){
     <Text style={{fontSize:20,fontWeight:"700"}}>营养成分 · 请对照照片确认</Text>
     {working?<><ActivityIndicator/><Text>{status}</Text></>:<>
       {(failure||result?.needsReview)&&<Text>{failure?"识别没有完成，请重新拍摄。":"部分内容没有识别清楚。你可以重新拍摄，或手动修改后确认。"}</Text>}
+      {!!result?.visionReason&&<Text>{visionSkipMessage(result.visionReason)}</Text>}
       {result?.merged.basisConflict&&<View><Text>计量基准冲突，请选择与照片相符的一组（可重新选择）：</Text>{button(`本地：每${result?.parsed.basisAmount}${result?.parsed.basisUnit}`,()=>selectBasis("local"))}{button(`联网：每${result?.vision?.basis?.amount}${result?.vision?.basis?.unit}`,()=>selectBasis("vision"))}</View>}
       {merged&&<>
         <Text>计量基准（必须与照片一致）</Text><View style={{flexDirection:"row",gap:12}}>

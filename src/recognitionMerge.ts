@@ -3,6 +3,7 @@ import type { ParsedLabel } from "./parser";
 
 export const nutritionVisionKeys:Record<keyof Nutrients,string>={
   energyKj:"energy_kj",energyKcal:"energy_kcal",proteinG:"protein_g",fatG:"fat_g",
+  saturatedFatG:"saturated_fat_g",transFatG:"trans_fat_g",
   carbohydrateG:"carbohydrate_g",totalSugarG:"total_sugar_g",addedSugarG:"added_sugar_g",
   fiberG:"fiber_g",sodiumMg:"sodium_mg",
 };
