@@ -3,13 +3,27 @@ import assert from "node:assert/strict";
 import fs from "node:fs";
 import {parseNutritionLabel} from "../src/parser.ts";
 import {textInNutritionRows} from "../src/ocrGeometry.ts";
-import {mergeLocalOcrCandidates} from "../src/localOcrEvidence.ts";
+import {mergeLocalOcrCandidates,preserveLocalOcrConflicts} from "../src/localOcrEvidence.ts";
+import {mergeRecognitionResults} from "../src/recognitionMerge.ts";
 
 // Replay archived Android ML Kit outputs. This tests evidence handling; it does
 // not claim new on-device OCR execution or feed ground truth into recognition.
 const baseline=JSON.parse(fs.readFileSync(new URL("./fixtures/ocr/results/20261003-baseline-ba77a7e.json",import.meta.url),"utf8"));
 const sample=(id,stage)=>parseNutritionLabel(textInNutritionRows(baseline.runs.find(run=>run.fixtureId===id).stages[stage].lines));
 const core=["energyKj","proteinG","fatG","carbohydrateG","sodiumMg"];
+test('choosing local basis cannot hide unresolved original/ROI numeric conflicts',()=>{
+  const evidence=mergeLocalOcrCandidates(parseNutritionLabel('每100g 蛋白质32g'),parseNutritionLabel('每100g 蛋白质3.2g'));
+  const initial=mergeRecognitionResults(evidence.parsed,{basis:{amount:30,unit:'g'},nutrition:{protein_g:3.2}});
+  assert.equal(initial.basisConflict,true);
+  const recalculated=mergeRecognitionResults(evidence.parsed),before=JSON.stringify(recalculated);
+  const localChoice=preserveLocalOcrConflicts(recalculated,evidence);
+  assert.equal(localChoice.fields.proteinG.status,'conflict');
+  assert.equal(localChoice.nutrients.proteinG,null);
+  assert.equal(localChoice.needsConfirmation,true);
+  assert.equal(JSON.stringify(recalculated),before);
+  assert.equal(evidence.fields.proteinG.primary,32);
+  assert.equal(evidence.fields.proteinG.original,3.2);
+});
 
 test("same-basis original image fills real cropped-table gaps as review candidates",()=>{
   const primary=sample("6937003117814","preprocessed"),original=sample("6937003117814","original");

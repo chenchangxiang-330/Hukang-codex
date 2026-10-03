@@ -1,5 +1,6 @@
 import type {ParsedLabel} from "./parser";
 import type {Nutrients} from "./types";
+import type {MergedRecognition} from "./recognitionMerge";
 
 export type LocalOcrFieldStatus="agreed"|"primary_only"|"original_only"|"conflict"|"unknown"|"basis_conflict";
 export type LocalOcrField={primary:number|null;original:number|null;value:number|null;status:LocalOcrFieldStatus;source:"primary"|"original"|"both"|null};
@@ -49,4 +50,13 @@ export function mergeLocalOcrCandidates(primary:ParsedLabel,original?:ParsedLabe
     basisAmount:basisConflict?null:primary.basisAmount,basisUnit:basisConflict?null:primary.basisUnit,
     quality:{...primary.quality,issues:[...issues],correctedFields:[...primary.quality.correctedFields],ambiguousFields:[...ambiguousFields],suspectFields:[...suspectFields]}};
   return{parsed,fields,basisConflict};
+}
+
+export function preserveLocalOcrConflicts(merged:MergedRecognition,evidence:LocalOcrEvidence):MergedRecognition{
+  const result={...merged,nutrients:{...merged.nutrients},fields:{...merged.fields}};
+  for(const key of keys)if(evidence.fields[key].status==="conflict"){
+    result.fields[key]={...result.fields[key],status:"conflict",value:null};
+    result.nutrients[key]=null;result.needsConfirmation=true;
+  }
+  return result;
 }

@@ -3,6 +3,7 @@ import{ActivityIndicator,Alert,Image,Pressable,ScrollView,Text,TextInput,View}fr
 import ImageCropper from"./ImageCropper";
 import{recognizeNutrition}from"./nutritionRecognition";
 import{mergeRecognitionResults}from"./recognitionMerge";
+import{preserveLocalOcrConflicts}from"./localOcrEvidence";
 import{parseNutritionLabel}from"./parser";
 import{logScanEvent,logScanError,saveScanDebug}from"./scanMetrics";
 import{visionSkipMessage}from"./textRecognitionEvidence";
@@ -16,7 +17,7 @@ const color="#168F86";
 export default function NutritionRecognitionScreen(props:Props){
   const[size,setSize]=useState<{width:number;height:number}|null>(null),[selected,setSelected]=useState<string|null>(null),[error,setError]=useState(false);
   useEffect(()=>{let active=true;Image.getSize(props.photo,(width,height)=>{if(active)setSize({width,height})},()=>{if(active)setError(true)});return()=>{active=false}},[props.photo]);
-  let originalPhoto=props.photo;try{originalPhoto=JSON.parse(props.scanMeta??"{}").originalUri||props.photo}catch{/* keep the stable uncropped image */}
+  let originalPhoto=props.photo;try{const meta=JSON.parse(props.scanMeta??"{}");if(Number(meta.orientation)===1)originalPhoto=meta.originalUri||props.photo}catch{/* use the already-upright uncropped image for EXIF/mirrored cases */}
   if(selected)return <NutritionResult {...props} photo={selected} originalPhoto={originalPhoto}/>;
   if(error)return <View><Text>照片无法读取，请重新拍摄。</Text><Pressable onPress={props.back}><Text>重新拍摄</Text></Pressable></View>;
   if(!size)return <ActivityIndicator/>;
@@ -34,7 +35,11 @@ function NutritionResult({photo,originalPhoto,barcode,back,onCreate}:Props){
     return()=>{cancelled=true};
   },[photo,originalPhoto]);
   const selectedParsed=!result?null:localChoice==="primary"?result.primaryParsed:localChoice==="original"?result.originalParsed:result.parsed;
-  const merged=useMemo(()=>!result||!selectedParsed?null:choice==="local"?mergeRecognitionResults(selectedParsed):choice==="vision"?mergeRecognitionResults(parseNutritionLabel(""),result.vision):localChoice?mergeRecognitionResults(selectedParsed,result.vision):result.merged,[result,choice,selectedParsed,localChoice]);
+  const merged=useMemo(()=>{
+    if(!result||!selectedParsed)return null;
+    const value=choice==="local"?mergeRecognitionResults(selectedParsed):choice==="vision"?mergeRecognitionResults(parseNutritionLabel(""),result.vision):localChoice?mergeRecognitionResults(selectedParsed,result.vision):result.merged;
+    return !localChoice&&choice!=="vision"?preserveLocalOcrConflicts(value,result.localEvidence):value;
+  },[result,choice,selectedParsed,localChoice]);
   const selectBasis=(next:"local"|"vision")=>{setChoice(next);setEdits({});setBasisEdit(null)};
   const basis=basisEdit??{amount:merged?.basisAmount==null?"":String(merged.basisAmount),unit:merged?.basisUnit??""};
   const confirm=()=>{
@@ -62,6 +67,7 @@ function NutritionResult({photo,originalPhoto,barcode,back,onCreate}:Props){
       {result?.localEvidence.basisConflict&&<View><Text>原图与裁剪图的计量基准不同或不完整，请明确选择整组：</Text>
         {button(`裁剪：每${result.primaryParsed.basisAmount??"?"}${result.primaryParsed.basisUnit??"?"}`,()=>{setLocalChoice("primary");setChoice(null);setEdits({});setBasisEdit(null)})}
         {result.originalParsed&&button(`原图：每${result.originalParsed.basisAmount??"?"}${result.originalParsed.basisUnit??"?"}`,()=>{setLocalChoice("original");setChoice(null);setEdits({});setBasisEdit(null)})}
+        {result.vision?.basis&&button(`联网：每${result.vision.basis.amount}${result.vision.basis.unit}`,()=>{setLocalChoice(null);selectBasis("vision")})}
       </View>}
       {merged?.basisConflict&&<View><Text>计量基准冲突，请选择与照片相符的一组（可重新选择）：</Text>{button(`本地：每${selectedParsed?.basisAmount}${selectedParsed?.basisUnit}`,()=>selectBasis("local"))}{button(`联网：每${result?.vision?.basis?.amount}${result?.vision?.basis?.unit}`,()=>selectBasis("vision"))}</View>}
       {merged&&<>

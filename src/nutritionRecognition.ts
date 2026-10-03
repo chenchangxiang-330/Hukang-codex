@@ -1,7 +1,7 @@
 import { inspectImage,recognizeDetailed,type OcrResult } from "./ocr";
 import { parseNutritionLabel,nutritionCompleteness } from "./parser";
 import { mergeRecognitionResults } from "./recognitionMerge";
-import {mergeLocalOcrCandidates} from "./localOcrEvidence";
+import {mergeLocalOcrCandidates,preserveLocalOcrConflicts} from "./localOcrEvidence";
 import { runVisionFallback } from "./visionFallback";
 import { logScanEvent,logScanError,saveScanDebug,countScanMetric,loadScanDebug } from "./scanMetrics";
 
@@ -41,13 +41,8 @@ export async function recognizeNutrition(photo:string,onStatus:(text:string)=>vo
   const vision=isCancelled()||options.vision===false?null:await runVisionFallback(photo,"nutrition_label",needed,reason,isCancelled);
   const debug=await loadScanDebug(),diagnostic=debug.vision as {reason?:string}|undefined;
   if(vision)await countScanMetric("visionSuccess");
-  const merged=mergeRecognitionResults(parsed,vision);
   // A third candidate must not erase an unresolved original/ROI disagreement.
-  for(const key of Object.keys(localEvidence.fields) as (keyof typeof merged.fields)[]){
-    if(localEvidence.fields[key].status==="conflict"){
-      merged.fields[key].status="conflict";merged.fields[key].value=null;merged.nutrients[key]=null;merged.needsConfirmation=true;
-    }
-  }
+  const merged=preserveLocalOcrConflicts(mergeRecognitionResults(parsed,vision),localEvidence);
   await saveScanDebug({rawText:ocr?.text??"",parse:{input,local:parsed,merged},detectedType:"nutrition_label"});
   await logScanEvent("RESULT_STATE_UPDATED",{stage:"merged",value:merged,visionUsed:!!vision});
   return{ocr,originalOcr,primaryParsed,originalParsed,localEvidence,parsed,vision,merged,needsReview:needed||merged.needsConfirmation||localEvidence.basisConflict,visionReason:needed&&!vision?diagnostic?.reason:undefined};
