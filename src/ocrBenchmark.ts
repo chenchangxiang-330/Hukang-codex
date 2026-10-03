@@ -24,7 +24,11 @@ export async function runRealNutritionBenchmark(progress:(label:string)=>void,op
     if(options.vision===false)stages.vision={status:"not_run",reason:"CI_NO_VISION_KEY"};
     const run:Run={fixtureId:fixture.fixtureId,evidence:"device_mlkit_image_execution",platform:Platform.OS,stages};runs.push(run);
     try{
-      const asset=await Asset.fromModule(fixture.asset).downloadAsync();const uri=asset.localUri??asset.uri;
+      const asset=Asset.fromModule(fixture.asset);
+      // Bare RN Android drawable names render in <Image> but are not disk paths.
+      // Force Expo's resource-stream copy before passing a real file URI to ML Kit.
+      if(Platform.OS==="android"&&!asset.uri.includes(":")){asset.downloaded=false;asset.localUri=null}
+      await asset.downloadAsync();const uri=asset.localUri??asset.uri;
       const read=async(imageUri:string,name:string)=>{
         progress(`${fixture.fixtureId} · ${name}`);
         try{const ocr=await recognizeDetailed(imageUri),parsed=parseNutritionLabel(ocr.parserText);
