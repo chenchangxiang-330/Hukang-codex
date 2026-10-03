@@ -18,7 +18,7 @@
 
 ## 真实运行与评分
 
-设备导出每张图的 `fixtureId` 及主要五阶段 `stages`：`original`、`preprocessed`、`parser`、`vision`、`merged`，另单独保留非默认的 `experimental_gray`（灰度＋温和对比度）实验结果。每阶段包含：
+设备导出每张图的 `fixtureId` 及主要阶段 `stages`：`original`、`preprocessed`、`parser`、`vision`、`merged`。2026-10-03另保存 `production`（结果页同一recognizeNutrition链）、`experimental_gray`（灰度＋温和对比度）、`experimental_upscaled`和`experimental_deskew`。后面三个为非默认A/B；无法可靠判断倾斜时deskew为not_run。每阶段包含：
 
 ```json
 {
@@ -45,8 +45,12 @@ node scripts/score-ocr-benchmark.mjs device-export-1.json device-export-2.json
 
 ## 当前证据边界
 
-此批次只有两张照片、10 个核心营养字段，不代表真实使用场景的总体准确率。目前缺少 Android 执行环境与有效 Vision Key，图片 OCR、预处理 A/B、Vision 和最终真实融合的准确率均尚未测得。
+此批次只有两张照片、10 个核心营养字段，不代表真实使用场景的总体准确率。2026-10-03已经在云端Android35运行真实中文ML Kit：旧ba77a7e原图2正确/0错/8缺，ROI及融合1/0/9；最终a49e85d原图7/1/2，ROI4/1/5，实际生产链本地融合7/0/3（70%）。两图基准正确，无不可见字段额外断言。这些是用户确认前候选，未验证确认保存或手机相机效果。
 
-`tests/nutrition-transcription.test.mjs` 仅验证人工正确文字能否被 Parser 解析，不能证明 OCR 识图准确。旧提交 `7077f1a` 的 Parser 对这两段人工文字本来就能解析 10/10 核心字段，因此不能把修复后同样 10/10 说成图像识别率由低变高。新的基准可暴露原图 OCR 错字、裁剪收益、网络是否真正执行、以及融合冲突，但必须等待真实设备输出。
+全部真实raw text、Parser、几何信息和阶段结果见 `results/` 三份未经改写的JSON及README。灰度/对比度5/10、放大4/10；像素deskew只运行一图2/5，另一图not_run。没有稳定增益，不默认启用。云端每次重跑原图/ROI及实际生产链，要求本固定集合至少7/10正确、无错填、无额外断言、无错误基准，防止回归；并非总体准确率承诺。
+
+没有有效Vision Key。两图Vision仍是 `not_run: CI_NO_VISION_KEY`，准确率null；HTTP商品查询不等于图片Vision。用户手机拍照/裁剪/确认与有效Key联网仍待实测。
+
+`tests/nutrition-transcription.test.mjs` 仅验证人工正确文字能否被 Parser 解析，不能证明 OCR 识图准确。旧提交 `7077f1a` 的 Parser 对这两段人工文字本来就能解析 10/10 核心字段，因此不能把修复后同样 10/10 说成图像识别率由低变高。本轮量化结果来自Android真实识图输出，而不是人工文字或数据库字段回放。
 
 `ingredients/`、`date/`、`product/` 仅保留目录说明，本轮没有声称这些类别已有真实基准或完成验证。

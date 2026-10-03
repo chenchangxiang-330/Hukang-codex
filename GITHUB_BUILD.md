@@ -4,7 +4,13 @@
 
 源码已于2026-10-02正常推送到 `main`，原有规划文档和Git历史均保留。2026-10-03 已从GitHub纯净克隆核对最新构建提交的全部125个文件及执行权限。后续开发以该仓库为准；本地正式目录暂时保留。无需现有密钥的云端Debug首轮构建、下载、模拟器安装和独立启动均已实际通过。
 
-## 首轮真实结果：PASS
+## 最新识别测试包（2026-10-03）
+
+识别改进源码 `a49e85d87c308ef513a7bd0cb09124ba43459a9c` 已在 [run 37114803456](https://github.com/chenchangxiang-330/Hukang-codex/actions/runs/37114803456) 通过114项测试、类型检查、Debug原生构建、Android35安装/启动和真实中文ML Kit图片回归。下载 [APK artifact](https://github.com/chenchangxiang-330/Hukang-codex/actions/runs/37114803456/artifacts/11270849346)；本机副本为 `/Users/yangbing/Downloads/HuKang-OCR-Debug-20261003-a49e85d/HuKang-cloud-debug.apk`。135335951 bytes，SHA256 `a3f58a26d239036a9e585094c189c4d77c8b2e3e58f5b3d98bf959d6ee441db1`，已核验。
+
+同两张真实图10字段，最终本地候选7正确/0错/3缺，仍需用户确认。牛奶三字段未可靠读出，有效Key Vision、手机拍摄/确认及配料/喷码实图均未通过验收，不能把可安装当成功能完成。完整对比见 `TEST_REPORT.md`。本地源码、旧APK和签名文件继续保留；不做迁移清理。
+
+## 首轮真实结果（历史）：PASS
 
 - 构建源码commit：`48979814c8d20063d29719f3ae29aedc80c01f4f`，由main推送自动触发。
 - [GitHub Actions运行37082741142](https://github.com/chenchangxiang-330/Hukang-codex/actions/runs/37082741142)，2026-10-03 08:36–08:46（Asia/Shanghai），两个job均SUCCESS。
@@ -31,7 +37,7 @@
 4. 第二个job下载同一APK，在Android35模拟器安装、启动，检查App进程和实际中文页面，保存安装日志、截图、UI和崩溃日志。这是安装/启动验证，不等于用户真机OCR验收。
 5. 运行成功后下载 `HuKang-Cloud-Debug-APK` artifact，解压获得 `HuKang-cloud-debug.apk`；在手机文件管理器点击并允许该来源安装。产物保留30天，需要的APK应另存。`HuKang-Debug-Install-Evidence` 是云端安装证据。
 
-构建与模拟器安装完成只证明编译、下载、安装和启动。中文营养表的原图/预处理OCR、Vision和融合字段准确率仍须在真机按 `TEST_REPORT.md` 测量；无有效Vision Key不能记为联网通过。
+构建与模拟器安装完成本身只证明编译、下载、安装和启动。新版另外实际运行了固定两图的中文ML Kit和生产链回归，但仍须在用户真机按 `TEST_REPORT.md` 扩展测量；无有效Vision Key不能记为联网通过。
 
 ## 本地清理
 

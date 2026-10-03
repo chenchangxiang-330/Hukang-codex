@@ -2,7 +2,49 @@
 
 更新日期：2026-10-03。只记录已经发生的测试；未执行明确标记NOT TESTED/not_run。较早构建记录为历史，不替代最新验收。
 
-## 2026-10-03 云端Debug：构建、下载和安装启动PASS
+## 2026-10-03 第一轮真实识别改进：最新验证
+
+源码：`a49e85d87c308ef513a7bd0cb09124ba43459a9c`（main）。[云端run 37114803456](https://github.com/chenchangxiang-330/Hukang-codex/actions/runs/37114803456)：构建5m22s、安装/实际OCR验证4m04s，两个job SUCCESS。114项Node自动测试、TypeScript、原生Debug构建和签名检查均PASS。本机不编译Android，不重新安装SDK/JDK。
+
+测试图片继续使用已有两张真实中文营养标签，未搜索/替换样本：`6923644266066.jpg`（1280×1700，每100mL）和 `6937003117814.jpg`（3024×4032，每100g）。固定人工ROI；CC-BY-SA-3.0归属/原图hash/人工真值见fixtures。真值只用于离线评分，不进入识别输入。
+
+### 定量结果
+
+分母均为10个真实可见核心数值：能量kJ、蛋白质、脂肪、碳水、钠。缺失仍进入分母。原图/ROI字段结果也经过Parser，因此不是OCR字符正确率。
+
+| 同批真实Android执行 | 正确 | 错误值 | 未识别 | 字段准确率 |
+| --- | ---: | ---: | ---: | ---: |
+| 基线原图OCR＋旧Parser（ba77a7e） | 2 | 0 | 8 | 20% |
+| 最新原图OCR＋新Parser | 7 | 1 | 2 | 70% |
+| 基线ROI＋旧Parser / 本地融合 | 1 | 0 | 9 | 10% |
+| 最新ROI＋新Parser | 4 | 1 | 5 | 40% |
+| 最新生产链原图＋ROI安全融合候选 | 7 | 0 | 3 | 70% |
+
+两图计量基准正确，额外补造不可见字段为0。最新融合为 `local_only`、用户确认前的候选，**没有Vision增益，也不是已确认入库结果**。最新测试真实调用结果页使用的 `recognizeNutrition()`，不是用旧文本回放代替识图。
+
+- 牛奶：仅309kJ和58mg可靠；OCR仍为36g/449/509。NRV矛盾仅将36g标疑似，不猜3.6；最终蛋白、脂肪、碳水留空。该图2/5。
+- 第二图：全图明确读出2075kJ/21g/37.7g/19g/1248mg；ROI多读3/5且千焦变干焦。实际从独立原图证据补候选，没有删除错误数字造答案。该图5/5，仍要求用户核对。
+- A/B：灰度＋对比度5正确/0错/5缺（50%）；2倍放大4/1/5（40%）。像素deskew只对有可靠倾斜证据的牛奶执行：2/2/1（2/5、40%，集合覆盖50%），第二图not_run。均无稳定收益，不默认启用。几何重排行序与像素deskew不是同一处理。
+- 有效基线run 37101850839；中间A/B run 37112218555；最终run 37114803456。首个harness run 37096923317是drawable文件路径读取失败，不用于准确率；e44a966运行被新确认补丁替换而取消，不计成功。
+
+### 网络与确认验证边界
+
+修复后的公开查询模块在Mac实际发送GET（不是mock）：6930487920475→404/status0/无记录，2929ms；6923644266066→200/正确牛奶资料，3923ms；6937003117814→200/名称缺失及112g异常营养，2390ms，标不完整并过滤异常值。这不等于Android完整扫码端到端PASS，也不是图片Vision。
+
+Vision实际状态：**NOT TESTED WITH VALID KEY / CI_NO_VISION_KEY**。mock传输证明真实fixture JPEG字节进入请求、独立Prompt及错误分支，不证明服务器收到图片或模型准确。当前默认Key为空；用户手机当时配置未知。未配置/未发送/请求失败/返回差/冲突使用已分层记录。
+
+配料顺序/括号/换行、日期角色/保质期单位、数值/基准冲突、SQLite新列/旧库迁移、未知不作0、网络错误和确认分支有自动测试。真实配料、喷码、独立条码拍摄测试集仍没有图片；不能报它们的识别准确率或可靠过敏原/添加剂分析通过。
+
+### 新APK、安装和证据
+
+- [下载最终APK artifact](https://github.com/chenchangxiang-330/Hukang-codex/actions/runs/37114803456/artifacts/11270849346)，30天保留。内含APK/BUILD_INFO/SHA256SUMS，不含私钥。
+- 本机已下载：`/Users/yangbing/Downloads/HuKang-OCR-Debug-20261003-a49e85d/HuKang-cloud-debug.apk`，135335951 bytes；SHA256 `a3f58a26d239036a9e585094c189c4d77c8b2e3e58f5b3d98bf959d6ee441db1`，实际字节核对PASS。checksum文件保留runner的cloud-apk相对路径；下载解压后按APK实际位置核对，不改校验文件。
+- Android35 x86_64：adb install Success、am start Status: ok、进程/UI检查通过、启动截图已人工查看（健康档案页）、crash.txt为0字节。离线独立JS启动不依赖Metro。图片回归通过固定集合的7正确/0错填/无补造/正确基准守卫。
+- 包名 `com.hukang.local.clouddebug`，含arm64-v8a真机及x86_64；每次runner生成临时测试签名，不上传/缓存用户或临时私钥。可与旧正式包并存；同包名的旧云Debug签名可能不同，不能保证直接覆盖安装，需先保留旧测试数据。
+- 三份未经改写的JSON均已放入 `tests/fixtures/ocr/results/`。最终下载的完整logcat/截图/启动证据在 `/private/tmp/hukang-ocr-final-a49e85d`；长期原始记录已入Git，安装证据另在Actions artifact。
+- 用户真实手机相机/图库、裁剪操作、点击确认/入库/重启、有效Key Vision：**NOT TESTED**。P0尚未全面验收；源码、签名、旧APK均保留。
+
+## 2026-10-03 较早云端Debug记录（历史）：构建、下载和安装启动PASS
 
 - 用户要求不上传任何现有签名/keystore/凭据；仓库签名Secret为空，新工作流不引用Secret。临时Debug签名只在runner生成，不上传或缓存。
 - main代码推送自动触发 [run37082741142](https://github.com/chenchangxiang-330/Hukang-codex/actions/runs/37082741142)；构建源码 `48979814c8d20063d29719f3ae29aedc80c01f4f`。2026-10-03 08:46（Asia/Shanghai）完成，两个job均SUCCESS。
