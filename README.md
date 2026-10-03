@@ -61,4 +61,6 @@ V1.4 扫描系统的验证范围和真机测试表见 [`SCAN_QA_V1.4.md`](./SCAN
 
 目标仓库：[chenchangxiang-330/Hukang-codex](https://github.com/chenchangxiang-330/Hukang-codex)。正式工程沿用已有代码和 Git 历史，不新建 Android 工程。远端原有的 `docs/`、`design/`、`research/` 文档作为规划资料保留；当前实现和测试状态以根目录 `HANDOFF.md`、`BUGS.md`、`TEST_REPORT.md`、`ARCHITECTURE.md` 为准。
 
-云端 APK 构建步骤与签名配置见 [GITHUB_BUILD.md](./GITHUB_BUILD.md)。`node_modules/`、Gradle 缓存、SDK/JDK、构建目录和签名密钥不上传到源码仓库；云端按锁文件安装依赖，缓存 Gradle 下载。`android/` 中的手写 ML Kit 模块和 Gradle 配置必须保留。
+云端 Debug 构建与下载步骤见 [GITHUB_BUILD.md](./GITHUB_BUILD.md)。向 `main` 推送代码自动构建无需Metro的 `com.hukang.local.clouddebug` 测试包，runner仅使用新生成的临时Debug签名，无需上传任何现有keystore或凭据。APK包含arm64真机和x86_64模拟器架构；可与旧护康同时安装。
+
+`node_modules/`、Gradle缓存、SDK/JDK、构建目录和签名密钥不上传到源码仓库；云端按锁文件安装依赖。`android/` 中的手写ML Kit模块和Gradle配置必须保留。清理源码目录前还需保留本地签名和APK，并核实云端构建及安装结果。

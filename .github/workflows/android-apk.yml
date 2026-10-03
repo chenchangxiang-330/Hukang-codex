@@ -1,10 +1,28 @@
-name: Build HuKang Android APK
+name: Build HuKang Android Debug APK
 
 on:
+  push:
+    branches: [main]
+    paths:
+      - '.github/workflows/android-apk.yml'
+      - 'android/**'
+      - 'src/**'
+      - 'assets/**'
+      - 'tests/**'
+      - 'scripts/**'
+      - 'App.tsx'
+      - 'index.ts'
+      - 'app.json'
+      - 'package*.json'
+      - 'tsconfig.json'
   workflow_dispatch:
 
 permissions:
   contents: read
+
+concurrency:
+  group: android-debug-${{ github.ref }}
+  cancel-in-progress: true
 
 jobs:
   android-apk:
@@ -13,15 +31,6 @@ jobs:
     steps:
       - name: Check out source
         uses: actions/checkout@v7
-
-      - name: Check signing configuration before installing tools
-        env:
-          HUKANG_DEBUG_KEYSTORE_B64: ${{ secrets.HUKANG_DEBUG_KEYSTORE_B64 }}
-        run: |
-          if [ -z "$HUKANG_DEBUG_KEYSTORE_B64" ]; then
-            echo 'Missing HUKANG_DEBUG_KEYSTORE_B64 repository secret; refusing to build an APK with a different signing key.' >&2
-            exit 1
-          fi
 
       - name: Set up Node.js
         uses: actions/setup-node@v7
@@ -54,30 +63,68 @@ jobs:
           npm run typecheck
           npm test
 
-      - name: Restore existing APK signing key
-        env:
-          HUKANG_DEBUG_KEYSTORE_B64: ${{ secrets.HUKANG_DEBUG_KEYSTORE_B64 }}
+      - name: Generate temporary test-only debug key on runner
         run: |
-          printf '%s' "$HUKANG_DEBUG_KEYSTORE_B64" | base64 --decode > android/app/debug.keystore
+          test ! -e android/app/debug.keystore
+          keytool -genkeypair -noprompt -keystore android/app/debug.keystore \
+            -storepass android -keypass android -alias androiddebugkey \
+            -keyalg RSA -keysize 2048 -validity 10000 \
+            -dname 'CN=HuKang Cloud Debug,O=Android,C=CN'
           chmod 600 android/app/debug.keystore
-          echo '221e0a3106aa4c3ccc154e0a418b55020b3f9ea6e84f92e8749cd9e2f39f5e58  android/app/debug.keystore' | sha256sum --check --status
 
-      - name: Build signed release APK
+      - name: Build standalone Debug APK for phone and emulator
         env:
           NODE_ENV: production
         working-directory: android
-        run: ./gradlew --no-daemon assembleRelease
+        run: ./gradlew --no-daemon --max-workers=2 assembleDebug -PcloudDebugBuild=true -PreactNativeArchitectures=arm64-v8a,x86_64
 
       - name: Verify APK
         run: |
-          test -s android/app/build/outputs/apk/release/app-release.apk
-          "$ANDROID_HOME/build-tools/36.0.0/apksigner" verify --verbose android/app/build/outputs/apk/release/app-release.apk
-          sha256sum android/app/build/outputs/apk/release/app-release.apk
+          test -s android/app/build/outputs/apk/debug/app-debug.apk
+          "$ANDROID_HOME/build-tools/36.0.0/apksigner" verify --verbose android/app/build/outputs/apk/debug/app-debug.apk
+          unzip -l android/app/build/outputs/apk/debug/app-debug.apk | grep 'assets/index.android.bundle'
+          mkdir -p cloud-apk
+          cp android/app/build/outputs/apk/debug/app-debug.apk cloud-apk/HuKang-cloud-debug.apk
+          sha256sum cloud-apk/HuKang-cloud-debug.apk > cloud-apk/SHA256SUMS
+          printf 'source_commit=%s\npackage=com.hukang.local.clouddebug\nabis=arm64-v8a,x86_64\nsigning=ephemeral-debug\n' "$GITHUB_SHA" > cloud-apk/BUILD_INFO.txt
 
       - name: Upload APK
         uses: actions/upload-artifact@v6
         with:
-          name: HuKang-OCR-Android-APK
-          path: android/app/build/outputs/apk/release/app-release.apk
+          name: HuKang-Cloud-Debug-APK
+          path: cloud-apk/
           if-no-files-found: error
+          retention-days: 30
+
+  install-smoke-test:
+    needs: android-apk
+    runs-on: ubuntu-24.04
+    timeout-minutes: 25
+    steps:
+      - uses: actions/checkout@v7
+      - name: Download the built APK
+        uses: actions/download-artifact@v6
+        with:
+          name: HuKang-Cloud-Debug-APK
+          path: cloud-apk
+      - name: Enable KVM
+        run: |
+          echo 'KERNEL=="kvm", GROUP="kvm", MODE="0666", OPTIONS+="static_node=kvm"' | sudo tee /etc/udev/rules.d/99-kvm4all.rules
+          sudo udevadm control --reload-rules
+          sudo udevadm trigger --name-match=kvm
+      - name: Install and launch without Metro on Android 35
+        uses: reactivecircus/android-emulator-runner@4c44018e59b437e86cdfc41da381398f93ed8808 # v2
+        with:
+          api-level: 35
+          arch: x86_64
+          target: google_apis
+          disable-animations: true
+          script: bash scripts/smoke-android-apk.sh cloud-apk/HuKang-cloud-debug.apk
+      - name: Upload installation evidence
+        if: always()
+        uses: actions/upload-artifact@v6
+        with:
+          name: HuKang-Debug-Install-Evidence
+          path: smoke-evidence/
+          if-no-files-found: warn
           retention-days: 30
