@@ -1,0 +1,2274 @@
+{
+  "schemaVersion": 1,
+  "runs": [
+    {
+      "fixtureId": "6923644266066",
+      "evidence": "device_mlkit_image_execution",
+      "platform": "android",
+      "stages": {
+        "original": {
+          "status": "ok",
+          "rawText": "项目\n|能量\n蛋白质\n|脂肪\n碳水化合物\n钠\n配\n特仑苏”\n营养成分表\n每100mL\nTetra Pak\n309 kJ\n36g\n449\n509\n58mg\n120 mg\n料:生牛乳\n产品类型: 全脂灭菌乳\n开启前,无業冷藏:\n产品标准号: GB 25190\n生产日期: 见包装喷码\n保质期: 6个月\n贮存条件:常温闭保存。\n开启后,请立都饮用。\n講勿连同包装在微波炉中加热。\n类者热线: 400-6603333\nNRV%\n请勿乱扔空包保,环晚需洁\nPLEASE DISPOSE PROPERLY\n4%\n生产「商及产地:具体见喷码前两位代码\n6%\n7%\n2%\n3%\n15%\n包",
+          "parserInput": "Tetra Pak 包\n特仑苏”\n营养成分表\n项目 每100mL NRV%\n|能量 309 kJ 4%\n蛋白质 36g 6%\n|脂肪 449 7%\n碳水化合物 509 2%\n钠 58mg 3%\n120 mg 15%\n配 料:生牛乳\n产品类型: 全脂灭菌乳\n产品标准号: GB 25190\n生产日期: 见包装喷码\n保质期: 6个月\n生产「商及产地:具体见喷码前两位代码\n贮存条件:常温闭保存。\n开启前,无業冷藏:\n开启后,请立都饮用。\n講勿连同包装在微波炉中加热。\n类者热线: 400-6603333\n请勿乱扔空包保,环晚需洁\nPLEASE DISPOSE PROPERLY",
+          "fields": {
+            "energy_kj": 309,
+            "energy_kcal": null,
+            "protein_g": 36,
+            "fat_g": null,
+            "saturated_fat_g": null,
+            "trans_fat_g": null,
+            "carbohydrate_g": null,
+            "total_sugar_g": null,
+            "added_sugar_g": null,
+            "fiber_g": null,
+            "sodium_mg": 58
+          },
+          "basis": {
+            "amount": 100,
+            "unit": "mL"
+          },
+          "durationMs": 17474,
+          "provider": "mlkit-chinese-bundled-16.0.1",
+          "lines": [
+            {
+              "left": 324,
+              "text": "项目",
+              "right": 384,
+              "top": 772,
+              "bottom": 806,
+              "confidence": 0.607421875
+            },
+            {
+              "left": 323,
+              "text": "|能量",
+              "right": 382,
+              "top": 828,
+              "bottom": 862,
+              "confidence": 0.4934895932674408
+            },
+            {
+              "left": 320,
+              "text": "蛋白质",
+              "right": 411,
+              "top": 868,
+              "bottom": 902,
+              "confidence": 0.6927083134651184
+            },
+            {
+              "left": 320,
+              "text": "|脂肪",
+              "right": 379,
+              "top": 908,
+              "bottom": 942,
+              "confidence": 0.3645833432674408
+            },
+            {
+              "left": 317,
+              "text": "碳水化合物",
+              "right": 467,
+              "top": 946,
+              "bottom": 985,
+              "confidence": 0.737500011920929
+            },
+            {
+              "left": 317,
+              "text": "钠",
+              "right": 345,
+              "top": 985,
+              "bottom": 1016,
+              "confidence": 0.31640625
+            },
+            {
+              "left": 302,
+              "text": "配",
+              "right": 329,
+              "top": 1088,
+              "bottom": 1118,
+              "confidence": 0.578125
+            },
+            {
+              "left": 429,
+              "text": "特仑苏”",
+              "right": 770,
+              "top": 441,
+              "bottom": 557,
+              "confidence": 0.5537109375
+            },
+            {
+              "left": 483,
+              "text": "营养成分表",
+              "right": 649,
+              "top": 719,
+              "bottom": 766,
+              "confidence": 0.6468750238418579
+            },
+            {
+              "left": 510,
+              "text": "每100mL",
+              "right": 638,
+              "top": 778,
+              "bottom": 825,
+              "confidence": 0.626953125
+            },
+            {
+              "left": 561,
+              "text": "Tetra Pak",
+              "right": 691,
+              "top": 240,
+              "bottom": 275,
+              "confidence": 0.779296875
+            },
+            {
+              "left": 522,
+              "text": "309 kJ",
+              "right": 606,
+              "top": 839,
+              "bottom": 874,
+              "confidence": 0.8304687738418579
+            },
+            {
+              "left": 528,
+              "text": "36g",
+              "right": 592,
+              "top": 877,
+              "bottom": 927,
+              "confidence": 0.7291666865348816
+            },
+            {
+              "left": 524,
+              "text": "449",
+              "right": 589,
+              "top": 915,
+              "bottom": 961,
+              "confidence": 0.6796875
+            },
+            {
+              "left": 521,
+              "text": "509",
+              "right": 581,
+              "top": 956,
+              "bottom": 1000,
+              "confidence": 0.80859375
+            },
+            {
+              "left": 519,
+              "text": "58mg",
+              "right": 604,
+              "top": 994,
+              "bottom": 1041,
+              "confidence": 0.755859375
+            },
+            {
+              "left": 511,
+              "text": "120 mg",
+              "right": 597,
+              "top": 1033,
+              "bottom": 1076,
+              "confidence": 0.8671875
+            },
+            {
+              "left": 418,
+              "text": "料:生牛乳",
+              "right": 556,
+              "top": 1096,
+              "bottom": 1138,
+              "confidence": 0.7289062738418579
+            },
+            {
+              "left": 299,
+              "text": "产品类型: 全脂灭菌乳",
+              "right": 612,
+              "top": 1129,
+              "bottom": 1186,
+              "confidence": 0.6363281011581421
+            },
+            {
+              "left": 293,
+              "text": "开启前,无業冷藏:",
+              "right": 516,
+              "top": 1365,
+              "bottom": 1422,
+              "confidence": 0.3658854067325592
+            },
+            {
+              "left": 299,
+              "text": "产品标准号: GB 25190",
+              "right": 593,
+              "top": 1172,
+              "bottom": 1229,
+              "confidence": 0.6868990659713745
+            },
+            {
+              "left": 297,
+              "text": "生产日期: 见包装喷码",
+              "right": 605,
+              "top": 1212,
+              "bottom": 1273,
+              "confidence": 0.68359375
+            },
+            {
+              "left": 282,
+              "text": "保质期: 6个月",
+              "right": 538,
+              "top": 1247,
+              "bottom": 1313,
+              "confidence": 0.6026785969734192
+            },
+            {
+              "left": 293,
+              "text": "贮存条件:常温闭保存。",
+              "right": 633,
+              "top": 1328,
+              "bottom": 1396,
+              "confidence": 0.5465198755264282
+            },
+            {
+              "left": 291,
+              "text": "开启后,请立都饮用。",
+              "right": 541,
+              "top": 1401,
+              "bottom": 1463,
+              "confidence": 0.30781251192092896
+            },
+            {
+              "left": 291,
+              "text": "講勿连同包装在微波炉中加热。",
+              "right": 655,
+              "top": 1439,
+              "bottom": 1508,
+              "confidence": 0.3445870578289032
+            },
+            {
+              "left": 291,
+              "text": "类者热线: 400-6603333",
+              "right": 603,
+              "top": 1473,
+              "bottom": 1538,
+              "confidence": 0.5458984375
+            },
+            {
+              "left": 697,
+              "text": "NRV%",
+              "right": 794,
+              "top": 798,
+              "bottom": 839,
+              "confidence": 0.86328125
+            },
+            {
+              "left": 374,
+              "text": "请勿乱扔空包保,环晚需洁",
+              "right": 677,
+              "top": 1537,
+              "bottom": 1590,
+              "confidence": 0.2903645932674408
+            },
+            {
+              "left": 372,
+              "text": "PLEASE DISPOSE PROPERLY",
+              "right": 673,
+              "top": 1565,
+              "bottom": 1618,
+              "confidence": 0.820684552192688
+            },
+            {
+              "left": 714,
+              "text": "4%",
+              "right": 763,
+              "top": 855,
+              "bottom": 891,
+              "confidence": 0.828125
+            },
+            {
+              "left": 294,
+              "text": "生产「商及产地:具体见喷码前两位代码",
+              "right": 740,
+              "top": 1292,
+              "bottom": 1364,
+              "confidence": 0.3470052182674408
+            },
+            {
+              "left": 710,
+              "text": "6%",
+              "right": 758,
+              "top": 896,
+              "bottom": 932,
+              "confidence": 0.794921875
+            },
+            {
+              "left": 705,
+              "text": "7%",
+              "right": 755,
+              "top": 934,
+              "bottom": 972,
+              "confidence": 0.900390625
+            },
+            {
+              "left": 700,
+              "text": "2%",
+              "right": 748,
+              "top": 974,
+              "bottom": 1011,
+              "confidence": 0.91796875
+            },
+            {
+              "left": 696,
+              "text": "3%",
+              "right": 743,
+              "top": 1013,
+              "bottom": 1049,
+              "confidence": 0.904296875
+            },
+            {
+              "left": 679,
+              "text": "15%",
+              "right": 738,
+              "top": 1050,
+              "bottom": 1087,
+              "confidence": 0.9231770634651184
+            },
+            {
+              "left": 1055,
+              "text": "包",
+              "right": 1156,
+              "top": 242,
+              "bottom": 358,
+              "confidence": 0.19921875
+            }
+          ]
+        },
+        "preprocessed": {
+          "status": "ok",
+          "rawText": "项目\n|能量\n|蛋白质\n|脂肪\n碳水化合物\n鈉\n配\n营养成分表\n每100mL\n309 kJ\n36g\n449\n509\n58mg\n120mg\nNRV%\n4%\n6%\n7%\n2%\n3%\n15%",
+          "parserInput": "营养成分表\n项目 每100mL NRV%\n|能量 309 kJ 4%\n|蛋白质 36g 6%\n|脂肪 449 7%\n碳水化合物 509 2%\n鈉 58mg 3%\n120mg 15%\n配",
+          "fields": {
+            "energy_kj": 309,
+            "energy_kcal": null,
+            "protein_g": 36,
+            "fat_g": null,
+            "saturated_fat_g": null,
+            "trans_fat_g": null,
+            "carbohydrate_g": null,
+            "total_sugar_g": null,
+            "added_sugar_g": null,
+            "fiber_g": null,
+            "sodium_mg": 58
+          },
+          "basis": {
+            "amount": 100,
+            "unit": "mL"
+          },
+          "durationMs": 9221,
+          "provider": "mlkit-chinese-bundled-16.0.1",
+          "lines": [
+            {
+              "left": 45,
+              "text": "项目",
+              "right": 104,
+              "top": 74,
+              "bottom": 106,
+              "confidence": 0.509765625
+            },
+            {
+              "left": 34,
+              "text": "|能量",
+              "right": 96,
+              "top": 126,
+              "bottom": 162,
+              "confidence": 0.1822916716337204
+            },
+            {
+              "left": 40,
+              "text": "|蛋白质",
+              "right": 131,
+              "top": 167,
+              "bottom": 203,
+              "confidence": 0.45703125
+            },
+            {
+              "left": 39,
+              "text": "|脂肪",
+              "right": 99,
+              "top": 206,
+              "bottom": 241,
+              "confidence": 0.3151041567325592
+            },
+            {
+              "left": 37,
+              "text": "碳水化合物",
+              "right": 187,
+              "top": 246,
+              "bottom": 283,
+              "confidence": 0.72265625
+            },
+            {
+              "left": 37,
+              "text": "鈉",
+              "right": 65,
+              "top": 285,
+              "bottom": 316,
+              "confidence": 0.25390625
+            },
+            {
+              "left": 22,
+              "text": "配",
+              "right": 49,
+              "top": 389,
+              "bottom": 417,
+              "confidence": 0.2109375
+            },
+            {
+              "left": 203,
+              "text": "营养成分表",
+              "right": 359,
+              "top": 18,
+              "bottom": 70,
+              "confidence": 0.608593761920929
+            },
+            {
+              "left": 230,
+              "text": "每100mL",
+              "right": 354,
+              "top": 79,
+              "bottom": 122,
+              "confidence": 0.6803385615348816
+            },
+            {
+              "left": 242,
+              "text": "309 kJ",
+              "right": 324,
+              "top": 140,
+              "bottom": 174,
+              "confidence": 0.7906249761581421
+            },
+            {
+              "left": 247,
+              "text": "36g",
+              "right": 309,
+              "top": 177,
+              "bottom": 221,
+              "confidence": 0.66796875
+            },
+            {
+              "left": 245,
+              "text": "449",
+              "right": 307,
+              "top": 218,
+              "bottom": 261,
+              "confidence": 0.6927083134651184
+            },
+            {
+              "left": 242,
+              "text": "509",
+              "right": 304,
+              "top": 255,
+              "bottom": 300,
+              "confidence": 0.8828125
+            },
+            {
+              "left": 240,
+              "text": "58mg",
+              "right": 323,
+              "top": 295,
+              "bottom": 340,
+              "confidence": 0.7998046875
+            },
+            {
+              "left": 230,
+              "text": "120mg",
+              "right": 321,
+              "top": 333,
+              "bottom": 377,
+              "confidence": 0.8492187261581421
+            },
+            {
+              "left": 414,
+              "text": "NRV%",
+              "right": 515,
+              "top": 91,
+              "bottom": 141,
+              "confidence": 0.8134765625
+            },
+            {
+              "left": 435,
+              "text": "4%",
+              "right": 482,
+              "top": 157,
+              "bottom": 191,
+              "confidence": 0.8359375
+            },
+            {
+              "left": 429,
+              "text": "6%",
+              "right": 478,
+              "top": 196,
+              "bottom": 232,
+              "confidence": 0.814453125
+            },
+            {
+              "left": 426,
+              "text": "7%",
+              "right": 473,
+              "top": 236,
+              "bottom": 270,
+              "confidence": 0.89453125
+            },
+            {
+              "left": 421,
+              "text": "2%",
+              "right": 468,
+              "top": 275,
+              "bottom": 311,
+              "confidence": 0.76953125
+            },
+            {
+              "left": 419,
+              "text": "3%",
+              "right": 462,
+              "top": 316,
+              "bottom": 348,
+              "confidence": 0.90625
+            },
+            {
+              "left": 401,
+              "text": "15%",
+              "right": 458,
+              "top": 352,
+              "bottom": 385,
+              "confidence": 0.91015625
+            }
+          ],
+          "preprocessing": {
+            "uri": "file:///data/user/0/com.hukang.local.clouddebug/files/scans/prepared-1791019090963-9k0c7f.jpg",
+            "steps": [
+              "manual_crop"
+            ],
+            "sourceOrientation": 1,
+            "height": 420,
+            "orientation": 1,
+            "width": 590,
+            "base64": null
+          }
+        },
+        "parser": {
+          "status": "ok",
+          "rawText": "营养成分表\n项目 每100mL NRV%\n|能量 309 kJ 4%\n|蛋白质 36g 6%\n|脂肪 449 7%\n碳水化合物 509 2%\n鈉 58mg 3%\n120mg 15%\n配",
+          "fields": {
+            "energy_kj": 309,
+            "energy_kcal": null,
+            "protein_g": 36,
+            "fat_g": null,
+            "saturated_fat_g": null,
+            "trans_fat_g": null,
+            "carbohydrate_g": null,
+            "total_sugar_g": null,
+            "added_sugar_g": null,
+            "fiber_g": null,
+            "sodium_mg": 58
+          },
+          "basis": {
+            "amount": 100,
+            "unit": "mL"
+          },
+          "quality": {
+            "confidence": 0.6666666666666666,
+            "issues": [
+              "MISSING_CORE:fatG",
+              "MISSING_CORE:carbohydrateG"
+            ],
+            "correctedFields": [],
+            "ambiguousFields": []
+          }
+        },
+        "vision": {
+          "status": "not_run",
+          "reason": "CI_NO_VISION_KEY"
+        },
+        "merged": {
+          "status": "ok",
+          "fields": {
+            "energy_kj": 309,
+            "energy_kcal": null,
+            "protein_g": 36,
+            "fat_g": null,
+            "saturated_fat_g": null,
+            "trans_fat_g": null,
+            "carbohydrate_g": null,
+            "total_sugar_g": null,
+            "added_sugar_g": null,
+            "fiber_g": null,
+            "sodium_mg": 58
+          },
+          "basis": {
+            "amount": 100,
+            "unit": "mL"
+          },
+          "scope": "local_only",
+          "result": {
+            "nutrients": {
+              "energyKj": 309,
+              "energyKcal": null,
+              "proteinG": 36,
+              "fatG": null,
+              "saturatedFatG": null,
+              "transFatG": null,
+              "carbohydrateG": null,
+              "totalSugarG": null,
+              "addedSugarG": null,
+              "fiberG": null,
+              "sodiumMg": 58
+            },
+            "basisAmount": 100,
+            "basisUnit": "mL",
+            "fields": {
+              "energyKj": {
+                "local": 309,
+                "vision": null,
+                "value": 309,
+                "status": "local_only"
+              },
+              "energyKcal": {
+                "local": null,
+                "vision": null,
+                "value": null,
+                "status": "unknown"
+              },
+              "proteinG": {
+                "local": 36,
+                "vision": null,
+                "value": 36,
+                "status": "local_only"
+              },
+              "fatG": {
+                "local": null,
+                "vision": null,
+                "value": null,
+                "status": "unknown"
+              },
+              "saturatedFatG": {
+                "local": null,
+                "vision": null,
+                "value": null,
+                "status": "unknown"
+              },
+              "transFatG": {
+                "local": null,
+                "vision": null,
+                "value": null,
+                "status": "unknown"
+              },
+              "carbohydrateG": {
+                "local": null,
+                "vision": null,
+                "value": null,
+                "status": "unknown"
+              },
+              "totalSugarG": {
+                "local": null,
+                "vision": null,
+                "value": null,
+                "status": "unknown"
+              },
+              "addedSugarG": {
+                "local": null,
+                "vision": null,
+                "value": null,
+                "status": "unknown"
+              },
+              "fiberG": {
+                "local": null,
+                "vision": null,
+                "value": null,
+                "status": "unknown"
+              },
+              "sodiumMg": {
+                "local": 58,
+                "vision": null,
+                "value": 58,
+                "status": "local_only"
+              }
+            },
+            "basisConflict": false,
+            "needsConfirmation": true
+          }
+        },
+        "experimental_gray": {
+          "status": "ok",
+          "rawText": "项目\n能量\n|蛋白质\n|脂肪\n碳水化合物\n钠\n配\n营养成分表\n每100mL\n309 kJ\n369\n449\n509\n58mg\n120mg\n.生午R\nNRV%\n4%\n6%\n7%\n2%\n3%\n15%",
+          "parserInput": "营养成分表\n项目 每100mL NRV%\n能量 309 kJ 4%\n|蛋白质 369 6%\n|脂肪 449 7%\n碳水化合物 509 2%\n钠 58mg 3%\n120mg 15%\n配 .生午R",
+          "fields": {
+            "energy_kj": 309,
+            "energy_kcal": null,
+            "protein_g": null,
+            "fat_g": null,
+            "saturated_fat_g": null,
+            "trans_fat_g": null,
+            "carbohydrate_g": null,
+            "total_sugar_g": null,
+            "added_sugar_g": null,
+            "fiber_g": null,
+            "sodium_mg": 58
+          },
+          "basis": {
+            "amount": 100,
+            "unit": "mL"
+          },
+          "durationMs": 8348,
+          "provider": "mlkit-chinese-bundled-16.0.1",
+          "lines": [
+            {
+              "left": 45,
+              "text": "项目",
+              "right": 104,
+              "top": 73,
+              "bottom": 106,
+              "confidence": 0.51171875
+            },
+            {
+              "left": 38,
+              "text": "能量",
+              "right": 98,
+              "top": 126,
+              "bottom": 162,
+              "confidence": 0.27734375
+            },
+            {
+              "left": 40,
+              "text": "|蛋白质",
+              "right": 132,
+              "top": 167,
+              "bottom": 202,
+              "confidence": 0.6025390625
+            },
+            {
+              "left": 40,
+              "text": "|脂肪",
+              "right": 99,
+              "top": 207,
+              "bottom": 240,
+              "confidence": 0.3489583432674408
+            },
+            {
+              "left": 37,
+              "text": "碳水化合物",
+              "right": 187,
+              "top": 245,
+              "bottom": 284,
+              "confidence": 0.7914062738418579
+            },
+            {
+              "left": 35,
+              "text": "钠",
+              "right": 66,
+              "top": 285,
+              "bottom": 315,
+              "confidence": 0.27734375
+            },
+            {
+              "left": 22,
+              "text": "配",
+              "right": 49,
+              "top": 389,
+              "bottom": 418,
+              "confidence": 0.19140625
+            },
+            {
+              "left": 203,
+              "text": "营养成分表",
+              "right": 359,
+              "top": 18,
+              "bottom": 69,
+              "confidence": 0.6421874761581421
+            },
+            {
+              "left": 230,
+              "text": "每100mL",
+              "right": 357,
+              "top": 80,
+              "bottom": 122,
+              "confidence": 0.6901041865348816
+            },
+            {
+              "left": 242,
+              "text": "309 kJ",
+              "right": 326,
+              "top": 139,
+              "bottom": 173,
+              "confidence": 0.809374988079071
+            },
+            {
+              "left": 248,
+              "text": "369",
+              "right": 311,
+              "top": 177,
+              "bottom": 221,
+              "confidence": 0.69140625
+            },
+            {
+              "left": 244,
+              "text": "449",
+              "right": 308,
+              "top": 217,
+              "bottom": 262,
+              "confidence": 0.66015625
+            },
+            {
+              "left": 242,
+              "text": "509",
+              "right": 304,
+              "top": 255,
+              "bottom": 300,
+              "confidence": 0.875
+            },
+            {
+              "left": 241,
+              "text": "58mg",
+              "right": 323,
+              "top": 293,
+              "bottom": 339,
+              "confidence": 0.818359375
+            },
+            {
+              "left": 229,
+              "text": "120mg",
+              "right": 321,
+              "top": 333,
+              "bottom": 378,
+              "confidence": 0.7835937738418579
+            },
+            {
+              "left": 140,
+              "text": ".生午R",
+              "right": 270,
+              "top": 399,
+              "bottom": 425,
+              "confidence": 0.119140625
+            },
+            {
+              "left": 414,
+              "text": "NRV%",
+              "right": 515,
+              "top": 93,
+              "bottom": 143,
+              "confidence": 0.837890625
+            },
+            {
+              "left": 436,
+              "text": "4%",
+              "right": 481,
+              "top": 157,
+              "bottom": 191,
+              "confidence": 0.853515625
+            },
+            {
+              "left": 429,
+              "text": "6%",
+              "right": 478,
+              "top": 195,
+              "bottom": 232,
+              "confidence": 0.791015625
+            },
+            {
+              "left": 426,
+              "text": "7%",
+              "right": 474,
+              "top": 235,
+              "bottom": 271,
+              "confidence": 0.916015625
+            },
+            {
+              "left": 422,
+              "text": "2%",
+              "right": 468,
+              "top": 275,
+              "bottom": 309,
+              "confidence": 0.919921875
+            },
+            {
+              "left": 419,
+              "text": "3%",
+              "right": 461,
+              "top": 316,
+              "bottom": 347,
+              "confidence": 0.84375
+            },
+            {
+              "left": 402,
+              "text": "15%",
+              "right": 458,
+              "top": 352,
+              "bottom": 384,
+              "confidence": 0.8997395634651184
+            }
+          ],
+          "preprocessing": {
+            "steps": [
+              "experimental_grayscale",
+              "experimental_contrast_1.1",
+              "jpeg_quality_97"
+            ],
+            "sourceOrientation": 1,
+            "height": 420,
+            "orientation": 1,
+            "width": 590,
+            "uri": "file:///data/user/0/com.hukang.local.clouddebug/files/scans/ocr-gray-5549919711544246023.jpg"
+          }
+        },
+        "experimental_upscaled": {
+          "status": "ok",
+          "rawText": "项目\n|能量\n|蛋白质\n|脂肪\n|碳水化合物\n納\n配\n营养成分表\n每100mL\n309 kJ\n36g\n449\n509\n58 mg\n120mg\n,生午R\nNRV%\n4%\n6%\n7%\n2%\n3%\n15%",
+          "parserInput": "营养成分表\n项目 每100mL NRV%\n|能量 309 kJ 4%\n|蛋白质 36g 6%\n|脂肪 449 7%\n|碳水化合物 509 2%\n納 58 mg 3%\n120mg 15%\n配 ,生午R",
+          "fields": {
+            "energy_kj": 309,
+            "energy_kcal": null,
+            "protein_g": 36,
+            "fat_g": null,
+            "saturated_fat_g": null,
+            "trans_fat_g": null,
+            "carbohydrate_g": null,
+            "total_sugar_g": null,
+            "added_sugar_g": null,
+            "fiber_g": null,
+            "sodium_mg": null
+          },
+          "basis": {
+            "amount": 100,
+            "unit": "mL"
+          },
+          "durationMs": 11792,
+          "provider": "mlkit-chinese-bundled-16.0.1",
+          "lines": [
+            {
+              "left": 92,
+              "text": "项目",
+              "right": 208,
+              "top": 148,
+              "bottom": 208,
+              "confidence": 0.591796875
+            },
+            {
+              "left": 68,
+              "text": "|能量",
+              "right": 192,
+              "top": 252,
+              "bottom": 324,
+              "confidence": 0.19140625
+            },
+            {
+              "left": 82,
+              "text": "|蛋白质",
+              "right": 264,
+              "top": 335,
+              "bottom": 408,
+              "confidence": 0.505859375
+            },
+            {
+              "left": 51,
+              "text": "|脂肪",
+              "right": 220,
+              "top": 407,
+              "bottom": 487,
+              "confidence": 0.2291666716337204
+            },
+            {
+              "left": 75,
+              "text": "|碳水化合物",
+              "right": 375,
+              "top": 491,
+              "bottom": 567,
+              "confidence": 0.6119791865348816
+            },
+            {
+              "left": 74,
+              "text": "納",
+              "right": 130,
+              "top": 570,
+              "bottom": 632,
+              "confidence": 0.234375
+            },
+            {
+              "left": 19,
+              "text": "配",
+              "right": 117,
+              "top": 778,
+              "bottom": 839,
+              "confidence": 0.265625
+            },
+            {
+              "left": 406,
+              "text": "营养成分表",
+              "right": 734,
+              "top": 36,
+              "bottom": 133,
+              "confidence": 0.610156238079071
+            },
+            {
+              "left": 461,
+              "text": "每100mL",
+              "right": 711,
+              "top": 158,
+              "bottom": 246,
+              "confidence": 0.6712239384651184
+            },
+            {
+              "left": 483,
+              "text": "309 kJ",
+              "right": 652,
+              "top": 277,
+              "bottom": 349,
+              "confidence": 0.83984375
+            },
+            {
+              "left": 497,
+              "text": "36g",
+              "right": 621,
+              "top": 355,
+              "bottom": 444,
+              "confidence": 0.7434895634651184
+            },
+            {
+              "left": 490,
+              "text": "449",
+              "right": 614,
+              "top": 436,
+              "bottom": 521,
+              "confidence": 0.7994791865348816
+            },
+            {
+              "left": 485,
+              "text": "509",
+              "right": 609,
+              "top": 511,
+              "bottom": 600,
+              "confidence": 0.8684895634651184
+            },
+            {
+              "left": 494,
+              "text": "58 mg",
+              "right": 647,
+              "top": 591,
+              "bottom": 692,
+              "confidence": 0.8017578125
+            },
+            {
+              "left": 461,
+              "text": "120mg",
+              "right": 641,
+              "top": 667,
+              "bottom": 757,
+              "confidence": 0.860156238079071
+            },
+            {
+              "left": 280,
+              "text": ",生午R",
+              "right": 542,
+              "top": 801,
+              "bottom": 850,
+              "confidence": 0.1123046875
+            },
+            {
+              "left": 831,
+              "text": "NRV%",
+              "right": 1030,
+              "top": 189,
+              "bottom": 288,
+              "confidence": 0.8388671875
+            },
+            {
+              "left": 870,
+              "text": "4%",
+              "right": 967,
+              "top": 313,
+              "bottom": 384,
+              "confidence": 0.861328125
+            },
+            {
+              "left": 862,
+              "text": "6%",
+              "right": 956,
+              "top": 393,
+              "bottom": 464,
+              "confidence": 0.814453125
+            },
+            {
+              "left": 853,
+              "text": "7%",
+              "right": 947,
+              "top": 473,
+              "bottom": 543,
+              "confidence": 0.9375
+            },
+            {
+              "left": 843,
+              "text": "2%",
+              "right": 935,
+              "top": 552,
+              "bottom": 619,
+              "confidence": 0.90625
+            },
+            {
+              "left": 838,
+              "text": "3%",
+              "right": 926,
+              "top": 630,
+              "bottom": 696,
+              "confidence": 0.87890625
+            },
+            {
+              "left": 804,
+              "text": "15%",
+              "right": 917,
+              "top": 704,
+              "bottom": 771,
+              "confidence": 0.9075520634651184
+            }
+          ],
+          "preprocessing": {
+            "uri": "file:///data/user/0/com.hukang.local.clouddebug/files/scans/prepared-1791019109327-5ns3zc.jpg",
+            "steps": [
+              "experimental_scale_2"
+            ],
+            "sourceOrientation": 1,
+            "height": 840,
+            "orientation": 1,
+            "width": 1180,
+            "base64": null
+          }
+        },
+        "experimental_deskew": {
+          "status": "ok",
+          "rawText": "项目\n|能量\n|蛋白质\n|脂肪\n|碳水化合物\n钠\n配\n营养成分表\n每100mL\n309 kJ\n36g\n44g\n509\n58mg\n120mg\n劉.生干日\nNRV%\n4%\n6%\n7%\n2%\n3%\n15%",
+          "parserInput": "营养成分表\n项目 每100mL NRV%\n|能量 309 kJ 4%\n|蛋白质 36g 6%\n|脂肪 44g 7%\n|碳水化合物 509 2%\n钠 58mg 3%\n120mg 15%\n配 劉.生干日",
+          "fields": {
+            "energy_kj": 309,
+            "energy_kcal": null,
+            "protein_g": 36,
+            "fat_g": 44,
+            "saturated_fat_g": null,
+            "trans_fat_g": null,
+            "carbohydrate_g": null,
+            "total_sugar_g": null,
+            "added_sugar_g": null,
+            "fiber_g": null,
+            "sodium_mg": 58
+          },
+          "basis": {
+            "amount": 100,
+            "unit": "mL"
+          },
+          "durationMs": 11539,
+          "provider": "mlkit-chinese-bundled-16.0.1",
+          "lines": [
+            {
+              "left": 52,
+              "text": "项目",
+              "right": 110,
+              "top": 111,
+              "bottom": 142,
+              "confidence": 0.693359375
+            },
+            {
+              "left": 53,
+              "text": "|能量",
+              "right": 112,
+              "top": 168,
+              "bottom": 199,
+              "confidence": 0.375
+            },
+            {
+              "left": 55,
+              "text": "|蛋白质",
+              "right": 143,
+              "top": 205,
+              "bottom": 238,
+              "confidence": 0.630859375
+            },
+            {
+              "left": 57,
+              "text": "|脂肪",
+              "right": 115,
+              "top": 247,
+              "bottom": 278,
+              "confidence": 0.3111979067325592
+            },
+            {
+              "left": 57,
+              "text": "|碳水化合物",
+              "right": 204,
+              "top": 282,
+              "bottom": 316,
+              "confidence": 0.6673176884651184
+            },
+            {
+              "left": 59,
+              "text": "钠",
+              "right": 88,
+              "top": 324,
+              "bottom": 354,
+              "confidence": 0.29296875
+            },
+            {
+              "left": 52,
+              "text": "配",
+              "right": 79,
+              "top": 430,
+              "bottom": 456,
+              "confidence": 0.515625
+            },
+            {
+              "left": 208,
+              "text": "营养成分表",
+              "right": 373,
+              "top": 45,
+              "bottom": 84,
+              "confidence": 0.624218761920929
+            },
+            {
+              "left": 238,
+              "text": "每100mL",
+              "right": 362,
+              "top": 106,
+              "bottom": 139,
+              "confidence": 0.634765625
+            },
+            {
+              "left": 254,
+              "text": "309 kJ",
+              "right": 337,
+              "top": 165,
+              "bottom": 194,
+              "confidence": 0.850781261920929
+            },
+            {
+              "left": 265,
+              "text": "36g",
+              "right": 323,
+              "top": 202,
+              "bottom": 241,
+              "confidence": 0.7317708134651184
+            },
+            {
+              "left": 264,
+              "text": "44g",
+              "right": 321,
+              "top": 244,
+              "bottom": 282,
+              "confidence": 0.7421875
+            },
+            {
+              "left": 262,
+              "text": "509",
+              "right": 322,
+              "top": 281,
+              "bottom": 320,
+              "confidence": 0.7903645634651184
+            },
+            {
+              "left": 264,
+              "text": "58mg",
+              "right": 344,
+              "top": 320,
+              "bottom": 359,
+              "confidence": 0.8271484375
+            },
+            {
+              "left": 256,
+              "text": "120mg",
+              "right": 345,
+              "top": 358,
+              "bottom": 397,
+              "confidence": 0.854687511920929
+            },
+            {
+              "left": 170,
+              "text": "劉.生干日",
+              "right": 299,
+              "top": 426,
+              "bottom": 451,
+              "confidence": 0.15156249701976776
+            },
+            {
+              "left": 425,
+              "text": "NRV%",
+              "right": 522,
+              "top": 110,
+              "bottom": 144,
+              "confidence": 0.8310546875
+            },
+            {
+              "left": 447,
+              "text": "4%",
+              "right": 494,
+              "top": 166,
+              "bottom": 198,
+              "confidence": 0.869140625
+            },
+            {
+              "left": 446,
+              "text": "6%",
+              "right": 491,
+              "top": 207,
+              "bottom": 238,
+              "confidence": 0.853515625
+            },
+            {
+              "left": 447,
+              "text": "7%",
+              "right": 490,
+              "top": 249,
+              "bottom": 279,
+              "confidence": 0.916015625
+            },
+            {
+              "left": 444,
+              "text": "2%",
+              "right": 487,
+              "top": 288,
+              "bottom": 317,
+              "confidence": 0.912109375
+            },
+            {
+              "left": 442,
+              "text": "3%",
+              "right": 485,
+              "top": 325,
+              "bottom": 355,
+              "confidence": 0.8359375
+            },
+            {
+              "left": 429,
+              "text": "15%",
+              "right": 484,
+              "top": 366,
+              "bottom": 394,
+              "confidence": 0.94921875
+            }
+          ],
+          "preprocessing": {
+            "uri": "file:///data/user/0/com.hukang.local.clouddebug/files/scans/prepared-1791019121396-38sght.jpg",
+            "steps": [
+              "manual_rotate_-4.218082125447311"
+            ],
+            "sourceOrientation": 1,
+            "height": 462,
+            "orientation": 1,
+            "width": 619,
+            "base64": null
+          }
+        }
+      }
+    },
+    {
+      "fixtureId": "6937003117814",
+      "evidence": "device_mlkit_image_execution",
+      "platform": "android",
+      "stages": {
+        "original": {
+          "status": "ok",
+          "rawText": "[项目\n「能量\n|蛋白质\n脂肪\n1碳水化合物\n|鈉\n营养成分表\n每100克(g)\n2075千焦(k)\n21.0 (g)\n37.7 (g)\n19.0克g)\n1248毫克(mg)\nNRV%\n25%\n35%\n63%\n6%\n62%\n6 i9\n商业信息中心心《 2022年中国休闲零食市场报告》",
+          "parserInput": "营养成分表\n[项目 每100克(g) NRV%\n「能量 2075千焦(k) 25%\n|蛋白质 21.0 (g) 35%\n脂肪 37.7 (g) 63%\n1碳水化合物 19.0克g) 6%\n|鈉 1248毫克(mg) 62%\n6 i9\n商业信息中心心《 2022年中国休闲零食市场报告》",
+          "fields": {
+            "energy_kj": 2075,
+            "energy_kcal": null,
+            "protein_g": 21,
+            "fat_g": 37.7,
+            "saturated_fat_g": null,
+            "trans_fat_g": null,
+            "carbohydrate_g": 19,
+            "total_sugar_g": null,
+            "added_sugar_g": null,
+            "fiber_g": null,
+            "sodium_mg": 1248
+          },
+          "basis": {
+            "amount": 100,
+            "unit": "g"
+          },
+          "durationMs": 6135,
+          "provider": "mlkit-chinese-bundled-16.0.1",
+          "lines": [
+            {
+              "left": 424,
+              "text": "[项目",
+              "right": 635,
+              "top": 301,
+              "bottom": 432,
+              "confidence": 0.18359375
+            },
+            {
+              "left": 413,
+              "text": "「能量",
+              "right": 629,
+              "top": 497,
+              "bottom": 644,
+              "confidence": 0.2513020932674408
+            },
+            {
+              "left": 415,
+              "text": "|蛋白质",
+              "right": 727,
+              "top": 627,
+              "bottom": 785,
+              "confidence": 0.4375
+            },
+            {
+              "left": 420,
+              "text": "脂肪",
+              "right": 606,
+              "top": 775,
+              "bottom": 925,
+              "confidence": 0.197265625
+            },
+            {
+              "left": 409,
+              "text": "1碳水化合物",
+              "right": 931,
+              "top": 894,
+              "bottom": 1060,
+              "confidence": 0.615234375
+            },
+            {
+              "left": 342,
+              "text": "|鈉",
+              "right": 535,
+              "top": 1076,
+              "bottom": 1218,
+              "confidence": 0.234375
+            },
+            {
+              "left": 1083,
+              "text": "营养成分表",
+              "right": 1743,
+              "top": 117,
+              "bottom": 265,
+              "confidence": 0.628125011920929
+            },
+            {
+              "left": 1177,
+              "text": "每100克(g)",
+              "right": 1825,
+              "top": 296,
+              "bottom": 452,
+              "confidence": 0.6318359375
+            },
+            {
+              "left": 1161,
+              "text": "2075千焦(k)",
+              "right": 1877,
+              "top": 494,
+              "bottom": 649,
+              "confidence": 0.62890625
+            },
+            {
+              "left": 1187,
+              "text": "21.0 (g)",
+              "right": 1691,
+              "top": 628,
+              "bottom": 788,
+              "confidence": 0.6830357313156128
+            },
+            {
+              "left": 1145,
+              "text": "37.7 (g)",
+              "right": 1680,
+              "top": 768,
+              "bottom": 938,
+              "confidence": 0.6780133843421936
+            },
+            {
+              "left": 1132,
+              "text": "19.0克g)",
+              "right": 1680,
+              "top": 920,
+              "bottom": 1083,
+              "confidence": 0.63671875
+            },
+            {
+              "left": 1124,
+              "text": "1248毫克(mg)",
+              "right": 1934,
+              "top": 1059,
+              "bottom": 1225,
+              "confidence": 0.686328113079071
+            },
+            {
+              "left": 2119,
+              "text": "NRV%",
+              "right": 2456,
+              "top": 325,
+              "bottom": 441,
+              "confidence": 0.830078125
+            },
+            {
+              "left": 2219,
+              "text": "25%",
+              "right": 2448,
+              "top": 535,
+              "bottom": 644,
+              "confidence": 0.9270833134651184
+            },
+            {
+              "left": 2212,
+              "text": "35%",
+              "right": 2437,
+              "top": 680,
+              "bottom": 791,
+              "confidence": 0.9114583134651184
+            },
+            {
+              "left": 2208,
+              "text": "63%",
+              "right": 2437,
+              "top": 825,
+              "bottom": 932,
+              "confidence": 0.92578125
+            },
+            {
+              "left": 2271,
+              "text": "6%",
+              "right": 2441,
+              "top": 971,
+              "bottom": 1078,
+              "confidence": 0.927734375
+            },
+            {
+              "left": 2186,
+              "text": "62%",
+              "right": 2441,
+              "top": 1095,
+              "bottom": 1254,
+              "confidence": 0.8372395634651184
+            },
+            {
+              "left": 2661,
+              "text": "6 i9",
+              "right": 2985,
+              "top": 1137,
+              "bottom": 1291,
+              "confidence": 0.47265625
+            },
+            {
+              "left": -36,
+              "text": "商业信息中心心《 2022年中国休闲零食市场报告》",
+              "right": 3002,
+              "top": 1447,
+              "bottom": 1681,
+              "confidence": 0.6181640625
+            }
+          ]
+        },
+        "preprocessed": {
+          "status": "ok",
+          "rawText": "「项归\n能量\n|蛋白质\n脂肪\n|碳水化合物\n|鈉\n营养成分表\n每100克(g)\n2075干焦(k)\n21.0 3 (g)\n37.7 5 (g)\n19.0 (g)\n1248毫克 (mg)\nNRV%\n25%\n35%\n63%\n6%\n62%",
+          "parserInput": "营养成分表\n「项归 每100克(g) NRV%\n能量 2075干焦(k) 25%\n|蛋白质 21.0 3 (g) 35%\n脂肪 37.7 5 (g) 63%\n|碳水化合物 19.0 (g) 6%\n|鈉 1248毫克 (mg) 62%",
+          "fields": {
+            "energy_kj": null,
+            "energy_kcal": null,
+            "protein_g": null,
+            "fat_g": null,
+            "saturated_fat_g": null,
+            "trans_fat_g": null,
+            "carbohydrate_g": 19,
+            "total_sugar_g": null,
+            "added_sugar_g": null,
+            "fiber_g": null,
+            "sodium_mg": 1248
+          },
+          "basis": {
+            "amount": 100,
+            "unit": "g"
+          },
+          "durationMs": 3788,
+          "provider": "mlkit-chinese-bundled-16.0.1",
+          "lines": [
+            {
+              "left": 123,
+              "text": "「项归",
+              "right": 332,
+              "top": 250,
+              "bottom": 381,
+              "confidence": 0.1979166716337204
+            },
+            {
+              "left": 118,
+              "text": "能量",
+              "right": 326,
+              "top": 447,
+              "bottom": 594,
+              "confidence": 0.611328125
+            },
+            {
+              "left": 111,
+              "text": "|蛋白质",
+              "right": 428,
+              "top": 571,
+              "bottom": 736,
+              "confidence": 0.53515625
+            },
+            {
+              "left": 104,
+              "text": "脂肪",
+              "right": 317,
+              "top": 730,
+              "bottom": 878,
+              "confidence": 0.498046875
+            },
+            {
+              "left": 110,
+              "text": "|碳水化合物",
+              "right": 629,
+              "top": 848,
+              "bottom": 1011,
+              "confidence": 0.6061198115348816
+            },
+            {
+              "left": 100,
+              "text": "|鈉",
+              "right": 192,
+              "top": 1027,
+              "bottom": 1152,
+              "confidence": 0.234375
+            },
+            {
+              "left": 802,
+              "text": "营养成分表",
+              "right": 1440,
+              "top": 66,
+              "bottom": 203,
+              "confidence": 0.6929687261581421
+            },
+            {
+              "left": 876,
+              "text": "每100克(g)",
+              "right": 1519,
+              "top": 242,
+              "bottom": 399,
+              "confidence": 0.59521484375
+            },
+            {
+              "left": 863,
+              "text": "2075干焦(k)",
+              "right": 1578,
+              "top": 448,
+              "bottom": 598,
+              "confidence": 0.6371527910232544
+            },
+            {
+              "left": 891,
+              "text": "21.0 3 (g)",
+              "right": 1386,
+              "top": 576,
+              "bottom": 735,
+              "confidence": 0.64501953125
+            },
+            {
+              "left": 842,
+              "text": "37.7 5 (g)",
+              "right": 1386,
+              "top": 717,
+              "bottom": 880,
+              "confidence": 0.6513671875
+            },
+            {
+              "left": 856,
+              "text": "19.0 (g)",
+              "right": 1376,
+              "top": 864,
+              "bottom": 1027,
+              "confidence": 0.7645089030265808
+            },
+            {
+              "left": 823,
+              "text": "1248毫克 (mg)",
+              "right": 1633,
+              "top": 1010,
+              "bottom": 1182,
+              "confidence": 0.742968738079071
+            },
+            {
+              "left": 1819,
+              "text": "NRV%",
+              "right": 2156,
+              "top": 278,
+              "bottom": 388,
+              "confidence": 0.76171875
+            },
+            {
+              "left": 1918,
+              "text": "25%",
+              "right": 2135,
+              "top": 486,
+              "bottom": 592,
+              "confidence": 0.9283854365348816
+            },
+            {
+              "left": 1913,
+              "text": "35%",
+              "right": 2142,
+              "top": 629,
+              "bottom": 738,
+              "confidence": 0.93359375
+            },
+            {
+              "left": 1904,
+              "text": "63%",
+              "right": 2129,
+              "top": 775,
+              "bottom": 886,
+              "confidence": 0.9049479365348816
+            },
+            {
+              "left": 1973,
+              "text": "6%",
+              "right": 2139,
+              "top": 921,
+              "bottom": 1032,
+              "confidence": 0.849609375
+            },
+            {
+              "left": 1895,
+              "text": "62%",
+              "right": 2125,
+              "top": 1069,
+              "bottom": 1179,
+              "confidence": 0.8893229365348816
+            }
+          ],
+          "preprocessing": {
+            "uri": "file:///data/user/0/com.hukang.local.clouddebug/files/scans/prepared-1791019139638-tzx8ff.jpg",
+            "steps": [
+              "manual_crop"
+            ],
+            "sourceOrientation": 1,
+            "height": 1280,
+            "orientation": 1,
+            "width": 2350,
+            "base64": null
+          }
+        },
+        "parser": {
+          "status": "ok",
+          "rawText": "营养成分表\n「项归 每100克(g) NRV%\n能量 2075干焦(k) 25%\n|蛋白质 21.0 3 (g) 35%\n脂肪 37.7 5 (g) 63%\n|碳水化合物 19.0 (g) 6%\n|鈉 1248毫克 (mg) 62%",
+          "fields": {
+            "energy_kj": null,
+            "energy_kcal": null,
+            "protein_g": null,
+            "fat_g": null,
+            "saturated_fat_g": null,
+            "trans_fat_g": null,
+            "carbohydrate_g": 19,
+            "total_sugar_g": null,
+            "added_sugar_g": null,
+            "fiber_g": null,
+            "sodium_mg": 1248
+          },
+          "basis": {
+            "amount": 100,
+            "unit": "g"
+          },
+          "quality": {
+            "confidence": 0.5,
+            "issues": [
+              "PRINTED_UNIT_ALIAS:sodiumMg",
+              "MISSING_CORE:energy",
+              "MISSING_CORE:proteinG",
+              "MISSING_CORE:fatG"
+            ],
+            "correctedFields": [],
+            "ambiguousFields": []
+          }
+        },
+        "vision": {
+          "status": "not_run",
+          "reason": "CI_NO_VISION_KEY"
+        },
+        "merged": {
+          "status": "ok",
+          "fields": {
+            "energy_kj": null,
+            "energy_kcal": null,
+            "protein_g": null,
+            "fat_g": null,
+            "saturated_fat_g": null,
+            "trans_fat_g": null,
+            "carbohydrate_g": 19,
+            "total_sugar_g": null,
+            "added_sugar_g": null,
+            "fiber_g": null,
+            "sodium_mg": 1248
+          },
+          "basis": {
+            "amount": 100,
+            "unit": "g"
+          },
+          "scope": "local_only",
+          "result": {
+            "nutrients": {
+              "energyKj": null,
+              "energyKcal": null,
+              "proteinG": null,
+              "fatG": null,
+              "saturatedFatG": null,
+              "transFatG": null,
+              "carbohydrateG": 19,
+              "totalSugarG": null,
+              "addedSugarG": null,
+              "fiberG": null,
+              "sodiumMg": 1248
+            },
+            "basisAmount": 100,
+            "basisUnit": "g",
+            "fields": {
+              "energyKj": {
+                "local": null,
+                "vision": null,
+                "value": null,
+                "status": "unknown"
+              },
+              "energyKcal": {
+                "local": null,
+                "vision": null,
+                "value": null,
+                "status": "unknown"
+              },
+              "proteinG": {
+                "local": null,
+                "vision": null,
+                "value": null,
+                "status": "unknown"
+              },
+              "fatG": {
+                "local": null,
+                "vision": null,
+                "value": null,
+                "status": "unknown"
+              },
+              "saturatedFatG": {
+                "local": null,
+                "vision": null,
+                "value": null,
+                "status": "unknown"
+              },
+              "transFatG": {
+                "local": null,
+                "vision": null,
+                "value": null,
+                "status": "unknown"
+              },
+              "carbohydrateG": {
+                "local": 19,
+                "vision": null,
+                "value": 19,
+                "status": "local_only"
+              },
+              "totalSugarG": {
+                "local": null,
+                "vision": null,
+                "value": null,
+                "status": "unknown"
+              },
+              "addedSugarG": {
+                "local": null,
+                "vision": null,
+                "value": null,
+                "status": "unknown"
+              },
+              "fiberG": {
+                "local": null,
+                "vision": null,
+                "value": null,
+                "status": "unknown"
+              },
+              "sodiumMg": {
+                "local": 1248,
+                "vision": null,
+                "value": 1248,
+                "status": "local_only"
+              }
+            },
+            "basisConflict": false,
+            "needsConfirmation": true
+          }
+        },
+        "experimental_gray": {
+          "status": "ok",
+          "rawText": "「项归\n能量\n蛋白质\n(脂肪\n|碳水化合物\n|鈉\n营养成分表\n每100克(g) NRV%\n2075千焦(k)\n21.0 3 (g)\n37.7 5 (g)\n19.0 (g)\n1248毫克(mg)\n25%\n35%\n63%\n6%\n62%",
+          "parserInput": "营养成分表\n「项归 每100克(g) NRV%\n能量 2075千焦(k) 25%\n蛋白质 21.0 3 (g) 35%\n(脂肪 37.7 5 (g) 63%\n|碳水化合物 19.0 (g)\n6%\n|鈉 1248毫克(mg) 62%",
+          "fields": {
+            "energy_kj": 2075,
+            "energy_kcal": null,
+            "protein_g": null,
+            "fat_g": null,
+            "saturated_fat_g": null,
+            "trans_fat_g": null,
+            "carbohydrate_g": 19,
+            "total_sugar_g": null,
+            "added_sugar_g": null,
+            "fiber_g": null,
+            "sodium_mg": 1248
+          },
+          "basis": {
+            "amount": 100,
+            "unit": "g"
+          },
+          "durationMs": 4013,
+          "provider": "mlkit-chinese-bundled-16.0.1",
+          "lines": [
+            {
+              "left": 123,
+              "text": "「项归",
+              "right": 331,
+              "top": 251,
+              "bottom": 381,
+              "confidence": 0.1966145783662796
+            },
+            {
+              "left": 117,
+              "text": "能量",
+              "right": 326,
+              "top": 446,
+              "bottom": 594,
+              "confidence": 0.61328125
+            },
+            {
+              "left": 113,
+              "text": "蛋白质",
+              "right": 427,
+              "top": 573,
+              "bottom": 733,
+              "confidence": 0.6236979365348816
+            },
+            {
+              "left": 105,
+              "text": "(脂肪",
+              "right": 318,
+              "top": 727,
+              "bottom": 877,
+              "confidence": 0.2877604067325592
+            },
+            {
+              "left": 110,
+              "text": "|碳水化合物",
+              "right": 630,
+              "top": 845,
+              "bottom": 1011,
+              "confidence": 0.6119791865348816
+            },
+            {
+              "left": 100,
+              "text": "|鈉",
+              "right": 192,
+              "top": 1029,
+              "bottom": 1151,
+              "confidence": 0.19140625
+            },
+            {
+              "left": 778,
+              "text": "营养成分表",
+              "right": 1443,
+              "top": 55,
+              "bottom": 213,
+              "confidence": 0.734375
+            },
+            {
+              "left": 877,
+              "text": "每100克(g) NRV%",
+              "right": 2164,
+              "top": 240,
+              "bottom": 425,
+              "confidence": 0.6806640625
+            },
+            {
+              "left": 863,
+              "text": "2075千焦(k)",
+              "right": 1577,
+              "top": 447,
+              "bottom": 598,
+              "confidence": 0.6605902910232544
+            },
+            {
+              "left": 891,
+              "text": "21.0 3 (g)",
+              "right": 1386,
+              "top": 576,
+              "bottom": 735,
+              "confidence": 0.64599609375
+            },
+            {
+              "left": 841,
+              "text": "37.7 5 (g)",
+              "right": 1386,
+              "top": 717,
+              "bottom": 882,
+              "confidence": 0.6611328125
+            },
+            {
+              "left": 885,
+              "text": "19.0 (g)",
+              "right": 1381,
+              "top": 862,
+              "bottom": 1025,
+              "confidence": 0.7477678656578064
+            },
+            {
+              "left": 820,
+              "text": "1248毫克(mg)",
+              "right": 1632,
+              "top": 1010,
+              "bottom": 1184,
+              "confidence": 0.688281238079071
+            },
+            {
+              "left": 1918,
+              "text": "25%",
+              "right": 2148,
+              "top": 486,
+              "bottom": 595,
+              "confidence": 0.9440104365348816
+            },
+            {
+              "left": 1914,
+              "text": "35%",
+              "right": 2130,
+              "top": 633,
+              "bottom": 739,
+              "confidence": 0.9114583134651184
+            },
+            {
+              "left": 1904,
+              "text": "63%",
+              "right": 2125,
+              "top": 775,
+              "bottom": 885,
+              "confidence": 0.8971354365348816
+            },
+            {
+              "left": 1973,
+              "text": "6%",
+              "right": 2130,
+              "top": 926,
+              "bottom": 1032,
+              "confidence": 0.91015625
+            },
+            {
+              "left": 1895,
+              "text": "62%",
+              "right": 2125,
+              "top": 1069,
+              "bottom": 1179,
+              "confidence": 0.8880208134651184
+            }
+          ],
+          "preprocessing": {
+            "steps": [
+              "experimental_grayscale",
+              "experimental_contrast_1.1",
+              "jpeg_quality_97"
+            ],
+            "sourceOrientation": 1,
+            "height": 1280,
+            "orientation": 1,
+            "width": 2350,
+            "uri": "file:///data/user/0/com.hukang.local.clouddebug/files/scans/ocr-gray-5184404533581403079.jpg"
+          }
+        },
+        "experimental_upscaled": {
+          "status": "ok",
+          "rawText": "「项目\n能量\n蛋白质\n脂肪\n|碳水化台物\n|鈉\n营养成分表\n每100克(g) NRV%\n2075千焦(k)\n21.0 3 (g)\n37.7 (g)\n19.0 (g)\n1248毫克 (mg)\n25%\n35%\n63%\n6%\n62%",
+          "parserInput": "营养成分表\n「项目 每100克(g) NRV%\n能量 2075千焦(k) 25%\n蛋白质 21.0 3 (g) 35%\n脂肪 37.7 (g) 63%\n|碳水化台物 19.0 (g)\n6%\n|鈉 1248毫克 (mg) 62%",
+          "fields": {
+            "energy_kj": 2075,
+            "energy_kcal": null,
+            "protein_g": null,
+            "fat_g": 37.7,
+            "saturated_fat_g": null,
+            "trans_fat_g": null,
+            "carbohydrate_g": null,
+            "total_sugar_g": null,
+            "added_sugar_g": null,
+            "fiber_g": null,
+            "sodium_mg": 1248
+          },
+          "basis": {
+            "amount": 100,
+            "unit": "g"
+          },
+          "durationMs": 3890,
+          "provider": "mlkit-chinese-bundled-16.0.1",
+          "lines": [
+            {
+              "left": 217,
+              "text": "「项目",
+              "right": 584,
+              "top": 441,
+              "bottom": 666,
+              "confidence": 0.2122395783662796
+            },
+            {
+              "left": 205,
+              "text": "能量",
+              "right": 570,
+              "top": 779,
+              "bottom": 1037,
+              "confidence": 0.47265625
+            },
+            {
+              "left": 200,
+              "text": "蛋白质",
+              "right": 748,
+              "top": 1003,
+              "bottom": 1282,
+              "confidence": 0.7317708134651184
+            },
+            {
+              "left": 216,
+              "text": "脂肪",
+              "right": 528,
+              "top": 1288,
+              "bottom": 1520,
+              "confidence": 0.408203125
+            },
+            {
+              "left": 192,
+              "text": "|碳水化台物",
+              "right": 1094,
+              "top": 1488,
+              "bottom": 1756,
+              "confidence": 0.55078125
+            },
+            {
+              "left": 176,
+              "text": "|鈉",
+              "right": 336,
+              "top": 1796,
+              "bottom": 2008,
+              "confidence": 0.19140625
+            },
+            {
+              "left": 1412,
+              "text": "营养成分表",
+              "right": 2518,
+              "top": 112,
+              "bottom": 375,
+              "confidence": 0.7562500238418579
+            },
+            {
+              "left": 1528,
+              "text": "每100克(g) NRV%",
+              "right": 3768,
+              "top": 432,
+              "bottom": 731,
+              "confidence": 0.6608073115348816
+            },
+            {
+              "left": 1504,
+              "text": "2075千焦(k)",
+              "right": 2743,
+              "top": 777,
+              "bottom": 1044,
+              "confidence": 0.625
+            },
+            {
+              "left": 1486,
+              "text": "21.0 3 (g)",
+              "right": 2431,
+              "top": 1019,
+              "bottom": 1295,
+              "confidence": 0.6826171875
+            },
+            {
+              "left": 1471,
+              "text": "37.7 (g)",
+              "right": 2409,
+              "top": 1273,
+              "bottom": 1554,
+              "confidence": 0.7717633843421936
+            },
+            {
+              "left": 1500,
+              "text": "19.0 (g)",
+              "right": 2406,
+              "top": 1509,
+              "bottom": 1802,
+              "confidence": 0.6707589030265808
+            },
+            {
+              "left": 1436,
+              "text": "1248毫克 (mg)",
+              "right": 2844,
+              "top": 1766,
+              "bottom": 2071,
+              "confidence": 0.751171886920929
+            },
+            {
+              "left": 3344,
+              "text": "25%",
+              "right": 3728,
+              "top": 848,
+              "bottom": 1032,
+              "confidence": 0.9309895634651184
+            },
+            {
+              "left": 3333,
+              "text": "35%",
+              "right": 3727,
+              "top": 1096,
+              "bottom": 1288,
+              "confidence": 0.9036458134651184
+            },
+            {
+              "left": 3328,
+              "text": "63%",
+              "right": 3728,
+              "top": 1352,
+              "bottom": 1544,
+              "confidence": 0.8763020634651184
+            },
+            {
+              "left": 3440,
+              "text": "6%",
+              "right": 3728,
+              "top": 1616,
+              "bottom": 1792,
+              "confidence": 0.9375
+            },
+            {
+              "left": 3304,
+              "text": "62%",
+              "right": 3712,
+              "top": 1864,
+              "bottom": 2056,
+              "confidence": 0.92578125
+            }
+          ],
+          "preprocessing": {
+            "uri": "file:///data/user/0/com.hukang.local.clouddebug/files/scans/prepared-1791019148079-yfmqcj.jpg",
+            "steps": [
+              "experimental_scale_2",
+              "max_edge_4096"
+            ],
+            "sourceOrientation": 1,
+            "height": 2231,
+            "orientation": 1,
+            "width": 4096,
+            "base64": null
+          }
+        },
+        "experimental_deskew": {
+          "status": "not_run",
+          "reason": "NO_RELIABLE_TILT_DETECTED"
+        }
+      }
+    }
+  ],
+  "completedAt": "2026-10-03T09:19:12.041Z",
+  "status": "completed",
+  "mode": "ci_local_only",
+  "providers": [
+    "mlkit-chinese-bundled-16.0.1"
+  ],
+  "documentDirectory": "file:///data/user/0/com.hukang.local.clouddebug/files/",
+  "vision": {
+    "status": "not_run",
+    "reason": "CI_NO_VISION_KEY"
+  }
+}

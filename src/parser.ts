@@ -1,6 +1,6 @@
 import type { Nutrients } from "./types";
 
-export type ParsedLabel = { basisAmount:number|null; basisUnit:string|null; nutrients:Nutrients; rawText:string; quality:{confidence:number;issues:string[];correctedFields:string[];ambiguousFields:string[]} };
+export type ParsedLabel = { basisAmount:number|null; basisUnit:string|null; nutrients:Nutrients; rawText:string; quality:{confidence:number;issues:string[];correctedFields:string[];ambiguousFields:string[];suspectFields?:string[]} };
 export type FoodImageType="nutrition_label"|"ingredients"|"expiry"|"general_packaging";
 export const emptyParsedNutrients = ():Nutrients => ({energyKj:null,energyKcal:null,proteinG:null,fatG:null,saturatedFatG:null,transFatG:null,carbohydrateG:null,totalSugarG:null,addedSugarG:null,fiberG:null,sodiumMg:null});
 const coreKeys = ["proteinG","fatG","carbohydrateG","sodiumMg"] as const;
@@ -27,7 +27,12 @@ export function parseNutritionLabel(rawText:string):ParsedLabel {
     text=text.replace(new RegExp(name.split("").join("[ \\t]*") ,"g"),value=>{if(value!==name)normalizedLabels.add(name);return name});
   }
   const basis=readBasis(text),nutrients=emptyParsedNutrients();
-  const issues:string[]=[],correctedFields=new Set<string>(),ambiguousFields=new Set<string>();
+  const issues:string[]=[],correctedFields=new Set<string>(),ambiguousFields=new Set<string>(),suspectFields=new Set<string>();
+  // Chinese label NRV is a consistency warning only, never a source of values.
+  // GB 28050 Appendix A (2011/2025), core references unchanged. Allow generous
+  // rounding/OCR tolerance and never "restore" decimals from the printed percent.
+  const nrvReference:Partial<Record<keyof Nutrients,number>>={energyKj:8400,proteinG:60,fatG:60,carbohydrateG:300,sodiumMg:2000};
+  const hasNrvHeader=/NRV\s*%|营养素参考值[^\n]{0,10}%/i.test(text);
   const candidates:Partial<Record<keyof Nutrients,number[]>>={};
   if(!text.trim())issues.push("OCR_NO_TEXT");
   if(!basis.value)issues.push(basis.ambiguous?"MULTIPLE_BASIS":"BASIS_MISSING");
@@ -47,6 +52,7 @@ export function parseNutritionLabel(rawText:string):ParsedLabel {
     // unlabelled quantity (e.g. a missed calcium label). Same-row extra numbers remain ambiguous.
     const firstBreak=body.indexOf("\n");
     if(firstBreak>=0&&/%/.test(body.slice(0,firstBreak)))body=body.slice(0,firstBreak);
+    const printedPercent=[...body.split(/\r?\n/)[0].matchAll(/(\d+(?:\.\d+)?)\s*%/g)];
     const headerUnit=body.match(/^\s*\(\s*(千焦|千卡|毫克|kcal|kJ|mq|mg|g|q|克)\s*\)\s*[:：]?\s*([+-]?[0-9OoIl|]+(?:[ \t]*[.,][ \t]*[0-9OoIl|]+)?)(?![0-9OoIl|.,])/i);
     if(headerUnit){const remaining=body.slice(headerUnit[0].length);body=headerUnit[2]+(/^[ \t]*(?:千焦|千卡|毫克|kcal|kJ|mq|mg|g|q|克)(?![a-z])/i.test(remaining)?"":headerUnit[1])+remaining}
     const found=[...body.matchAll(valuePattern)],values:RegExpMatchArray[]=[];
@@ -73,6 +79,13 @@ export function parseNutritionLabel(rawText:string):ParsedLabel {
       if(!Number.isFinite(number)||number<0){ambiguousFields.add(field);issues.push(`INVALID_VALUE:${field}`);continue;}
       if(corrected!==value[1]||/q/i.test(value[2]))correctedFields.add(field);
       (candidates[field]??=[]).push(number);
+      const reference=nrvReference[field];
+      if(hasNrvHeader&&reference&&printedPercent.length===1){
+        const percent=Number(printedPercent[0][1]);
+        if(Math.abs(number/reference*100-percent)>Math.max(2,percent*.2)){
+          suspectFields.add(field);issues.push(`NRV_INCONSISTENT:${field}`);
+        }
+      }
     }
     // Bare second-column numbers (not NRV percentages) cannot be assigned safely.
     const remainder=body.slice((values[0].index??0)+values[0][0].length).split(/\r?\n/)[0]
@@ -93,7 +106,7 @@ export function parseNutritionLabel(rawText:string):ParsedLabel {
   // This measures structural completeness, NOT the accuracy of OCR against the image.
   const confidence=Math.max(0,Math.min(1,(corePresent(nutrients)+Number(!!basis.value))/6-correctedFields.size*.1-ambiguousFields.size*.15));
   return {basisAmount:basis.value?.amount??null,basisUnit:basis.value?.unit??null,nutrients,rawText,
-    quality:{confidence,issues:[...new Set(issues)],correctedFields:[...correctedFields],ambiguousFields:[...ambiguousFields]}};
+    quality:{confidence,issues:[...new Set(issues)],correctedFields:[...correctedFields],ambiguousFields:[...ambiguousFields],suspectFields:[...suspectFields]}};
 }
 export const sugarKeywords=["白砂糖","蔗糖","果葡糖浆","葡萄糖","麦芽糖","蜂蜜"];
 export function findSugarKeywords(text:string){ return sugarKeywords.filter(k=>text.includes(k)); }
@@ -131,7 +144,7 @@ export function parseIngredientsLabel(rawText:string):ParsedIngredientsLabel{
 export function parseIngredients(text:string){return parseIngredientsLabel(text).ingredients}
 export function nutritionCompleteness(result:ParsedLabel){
   const count=corePresent(result.nutrients),basis=result.basisAmount!=null&&result.basisUnit!=null;
-  const clean=result.quality.correctedFields.length===0&&result.quality.ambiguousFields.length===0;
+  const clean=result.quality.correctedFields.length===0&&result.quality.ambiguousFields.length===0&&!result.quality.suspectFields?.length;
   return{score:Math.round(result.quality.confidence*100),complete:basis&&count===5&&clean,fieldCount:count,basisFound:basis};
 }
 const datePattern=/(?<!\d)20\d{2}(?:(?:年|[.\/-])\s*\d{1,2}(?:月|[.\/-])\s*\d{1,2}日?|\d{4})(?!\d)/g;

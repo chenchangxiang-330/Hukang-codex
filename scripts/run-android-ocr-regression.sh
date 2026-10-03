@@ -32,11 +32,15 @@ node --input-type=module -e '
   if(result.runs?.length!==2) throw new Error("Expected both real nutrition images");
   for(const run of result.runs) {
     if(run.evidence!=="device_mlkit_image_execution") throw new Error("OCR evidence not from device");
-    for(const stage of ["original","preprocessed"])
+    for(const stage of ["original","preprocessed","production"])
       if(run.stages[stage].status!=="ok" || !run.stages[stage].rawText)
         throw new Error(`${run.fixtureId}/${stage}: OCR did not return real text`);
     if(run.stages.vision.status!=="not_run" || run.stages.vision.reason!=="CI_NO_VISION_KEY")
       throw new Error("CI must not claim Vision execution without a real key");
   }
-  console.log("Both real images executed through Chinese ML Kit; scores saved separately.");
+  const score=JSON.parse(readFileSync("smoke-evidence/ocr-score.json","utf8")).summaries.merged;
+  // Guard this exact two-photo regression set, not a claim of general accuracy.
+  if(score.correct<7||score.wrong!==0||score.unsupportedVisibleClaims!==0||score.wrongBasisImages!==0||score.missingBasisImages!==0)
+    throw new Error(`Real nutrition regression worsened: ${JSON.stringify(score)}`);
+  console.log("Both real images executed through the production Chinese OCR chain; quantitative guard passed.");
 '

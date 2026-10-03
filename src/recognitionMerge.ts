@@ -38,7 +38,7 @@ export function mergeRecognitionResults(local:ParsedLabel,vision?:VisionMergeInp
   const basisConflict=!!localBasis&&!!visionBasis&&!comparable,selectedBasis=basisConflict?null:localBasis??visionBasis;
   const fields={} as Record<keyof Nutrients,RecognitionField>,nutrients={} as Nutrients;
   const uncertain=new Set(vision?.uncertain_fields??[]);
-  let needsConfirmation=!selectedBasis||local.quality.correctedFields.length>0||local.quality.ambiguousFields.length>0;
+  let needsConfirmation=!selectedBasis||local.quality.correctedFields.length>0||local.quality.ambiguousFields.length>0||!!local.quality.suspectFields?.length;
   for(const key of Object.keys(nutritionVisionKeys) as (keyof Nutrients)[]){
     const remoteKey=nutritionVisionKeys[key],localValue=validNumber(local.nutrients[key]),visionValue=validNumber(vision?.nutrition?.[remoteKey]);
     const field:RecognitionField={local:localValue,vision:visionValue,value:null,status:"unknown"};
@@ -48,13 +48,13 @@ export function mergeRecognitionResults(local:ParsedLabel,vision?:VisionMergeInp
     if(basisConflict&&(localValue!=null||visionValue!=null))field.status="basis_conflict";
     else if(localValue!=null&&visionValue!=null){
       if(!comparable)field.status="basis_unverified";
-      else if(remoteUncertain)field.status="uncertain";
+      else if(remoteUncertain||local.quality.suspectFields?.includes(key))field.status="uncertain";
       else if(localValue===visionValue){field.value=localValue;field.status="agreed";}
       else field.status="conflict";
     }else if(localValue!=null){
       // A Vision-only basis must not silently relabel existing local numbers.
       if(!localBasis&&visionBasis)field.status="basis_unverified";
-      else if(local.quality.correctedFields.includes(key))field.status="uncertain";
+      else if(local.quality.correctedFields.includes(key)||local.quality.ambiguousFields.includes(key)||local.quality.suspectFields?.includes(key))field.status="uncertain";
       else{field.value=localValue;field.status="local_only";}
     }else if(visionValue!=null){
       if(remoteUncertain)field.status="uncertain";

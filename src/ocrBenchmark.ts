@@ -4,8 +4,8 @@ import { recognizeDetailed } from "./ocr";
 import {estimateNutritionSlope,type OcrLine} from "./ocrGeometry";
 import { preprocessImageForOcr } from "./imagePreprocessing";
 import { parseNutritionLabel } from "./parser";
-import { mergeRecognitionResults,nutritionVisionKeys } from "./recognitionMerge";
-import { runVisionFallback } from "./visionFallback";
+import { nutritionVisionKeys } from "./recognitionMerge";
+import {recognizeNutrition} from "./nutritionRecognition";
 import { loadScanDebug,saveScanDebug } from "./scanMetrics";
 import type { Nutrients } from "./types";
 
@@ -21,7 +21,7 @@ const errorText=(error:unknown)=>error instanceof Error?error.message:String(err
 export async function runRealNutritionBenchmark(progress:(label:string)=>void,options:{vision?:boolean}={}){
   const runs:Run[]=[];
   for(const fixture of fixtures){
-    const stages:Record<string,Stage>=Object.fromEntries(["original","preprocessed","parser","vision","merged","experimental_gray","experimental_upscaled","experimental_deskew"].map(name=>[name,{status:"not_run",reason:"Stage not reached"}]));
+    const stages:Record<string,Stage>=Object.fromEntries(["original","preprocessed","parser","production","vision","merged","experimental_gray","experimental_upscaled","experimental_deskew"].map(name=>[name,{status:"not_run",reason:"Stage not reached"}]));
     if(options.vision===false)stages.vision={status:"not_run",reason:"CI_NO_VISION_KEY"};
     const run:Run={fixtureId:fixture.fixtureId,evidence:"device_mlkit_image_execution",platform:Platform.OS,stages};runs.push(run);
     try{
@@ -46,11 +46,15 @@ export async function runRealNutritionBenchmark(progress:(label:string)=>void,op
       stages.preprocessed.preprocessing=prepared;
       if(parsed)stages.parser={status:"ok",rawText:parsed.rawText,fields:mapped(parsed.nutrients),basis:{amount:parsed.basisAmount,unit:parsed.basisUnit},quality:parsed.quality};
       progress(`${fixture.fixtureId} · ${options.vision===false?"Vision 未执行（CI 无密钥）":"Vision（需有效配置与授权）"}`);
-      const vision=options.vision===false?null:await runVisionFallback(prepared.uri,"nutrition_label",true,"BENCHMARK_FORCED");
+      // Exercise the same orchestration used by the nutrition confirmation UI,
+      // including original/ROI evidence. Truth is never available to this call.
+      const production=await recognizeNutrition(prepared.uri,progress,()=>false,{originalPhoto:uri,vision:options.vision});
+      const vision=production.vision;
+      stages.production={status:"ok",rawText:production.ocr?.text??"",fields:mapped(production.merged.nutrients),basis:{amount:production.merged.basisAmount,unit:production.merged.basisUnit},scope:vision?"ocr_plus_vision":"local_only",result:production};
       if(vision)stages.vision={status:"ok",rawText:vision.raw_text,fields:vision.nutrition??{},basis:vision.basis??undefined,result:vision};
       else if(options.vision===false)stages.vision={status:"not_run",reason:"CI_NO_VISION_KEY"};
       else{const debug=await loadScanDebug(),diagnostic=debug.vision as {status?:string;reason?:string}|undefined;stages.vision={status:diagnostic?.status==="failed"?"error":"not_run",reason:diagnostic?.reason??"No Vision execution"}}
-      const merged=mergeRecognitionResults(parsed??parseNutritionLabel(""),vision);
+      const merged=production.merged;
       stages.merged={status:"ok",fields:mapped(merged.nutrients),basis:{amount:merged.basisAmount,unit:merged.basisUnit},scope:vision?"ocr_plus_vision":"local_only",result:merged};
       try{const variant=await NativeModules.HuKangOcr.createOcrVariant(prepared.uri);await read(variant.uri,"experimental_gray");stages.experimental_gray.preprocessing=variant}catch(error){stages.experimental_gray={status:"error",reason:errorText(error)}}
       try{const variant=await preprocessImageForOcr(prepared.uri,{upright:prepared,experimentalScale:2,maxEdge:4096});await read(variant.uri,"experimental_upscaled");stages.experimental_upscaled.preprocessing=variant}catch(error){stages.experimental_upscaled={status:"error",reason:errorText(error)}}

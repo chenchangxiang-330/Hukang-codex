@@ -2,7 +2,7 @@ import { readFileSync, readdirSync } from "node:fs";
 import { dirname, resolve } from "node:path";
 import { fileURLToPath } from "node:url";
 
-export const STAGES = ["original", "preprocessed", "parser", "vision", "merged", "experimental_gray", "experimental_upscaled", "experimental_deskew"];
+export const STAGES = ["original", "preprocessed", "parser", "production", "vision", "merged", "experimental_gray", "experimental_upscaled", "experimental_deskew"];
 export const CORE_FIELDS = ["energy_kj", "protein_g", "fat_g", "carbohydrate_g", "sodium_mg"];
 const FIXTURE_DIRECTORY = resolve(dirname(fileURLToPath(import.meta.url)), "../tests/fixtures/ocr/nutrition");
 const percentage = (numerator, denominator) => denominator ? Math.round(numerator / denominator * 10000) / 100 : null;
