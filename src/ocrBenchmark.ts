@@ -17,10 +17,11 @@ type Stage={status:"ok"|"error"|"not_run";reason?:string;rawText?:string;fields?
 type Run={fixtureId:string;evidence:string;platform:string;stages:Record<string,Stage>};
 const mapped=(n:Nutrients)=>Object.fromEntries((Object.keys(nutritionVisionKeys) as (keyof Nutrients)[]).map(k=>[nutritionVisionKeys[k],n[k]]));
 const errorText=(error:unknown)=>error instanceof Error?error.message:String(error);
-export async function runRealNutritionBenchmark(progress:(label:string)=>void){
+export async function runRealNutritionBenchmark(progress:(label:string)=>void,options:{vision?:boolean}={}){
   const runs:Run[]=[];
   for(const fixture of fixtures){
     const stages:Record<string,Stage>=Object.fromEntries(["original","preprocessed","parser","vision","merged","experimental_gray"].map(name=>[name,{status:"not_run",reason:"Stage not reached"}]));
+    if(options.vision===false)stages.vision={status:"not_run",reason:"CI_NO_VISION_KEY"};
     const run:Run={fixtureId:fixture.fixtureId,evidence:"device_mlkit_image_execution",platform:Platform.OS,stages};runs.push(run);
     try{
       const asset=await Asset.fromModule(fixture.asset).downloadAsync();const uri=asset.localUri??asset.uri;
@@ -39,9 +40,10 @@ export async function runRealNutritionBenchmark(progress:(label:string)=>void){
       const parsed=await read(prepared.uri,"preprocessed");
       stages.preprocessed.preprocessing=prepared;
       if(parsed)stages.parser={status:"ok",rawText:parsed.rawText,fields:mapped(parsed.nutrients),basis:{amount:parsed.basisAmount,unit:parsed.basisUnit},quality:parsed.quality};
-      progress(`${fixture.fixtureId} · Vision（需有效配置与授权）`);
-      const vision=await runVisionFallback(prepared.uri,"nutrition_label",true,"BENCHMARK_FORCED");
+      progress(`${fixture.fixtureId} · ${options.vision===false?"Vision 未执行（CI 无密钥）":"Vision（需有效配置与授权）"}`);
+      const vision=options.vision===false?null:await runVisionFallback(prepared.uri,"nutrition_label",true,"BENCHMARK_FORCED");
       if(vision)stages.vision={status:"ok",rawText:vision.raw_text,fields:vision.nutrition??{},basis:vision.basis??undefined,result:vision};
+      else if(options.vision===false)stages.vision={status:"not_run",reason:"CI_NO_VISION_KEY"};
       else{const debug=await loadScanDebug(),diagnostic=debug.vision as {status?:string;reason?:string}|undefined;stages.vision={status:diagnostic?.status==="failed"?"error":"not_run",reason:diagnostic?.reason??"No Vision execution"}}
       const merged=mergeRecognitionResults(parsed??parseNutritionLabel(""),vision);
       stages.merged={status:"ok",fields:mapped(merged.nutrients),basis:{amount:merged.basisAmount,unit:merged.basisUnit},scope:vision?"ocr_plus_vision":"local_only",result:merged};

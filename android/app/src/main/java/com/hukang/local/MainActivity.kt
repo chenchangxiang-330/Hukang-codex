@@ -41,7 +41,15 @@ class MainActivity : ReactActivity() {
               this,
               mainComponentName,
               fabricEnabled
-          ){})
+          ) {
+            override fun getLaunchOptions(): Bundle? {
+              // Only the isolated cloud Debug APK accepts the regression-test intent.
+              if (!BuildConfig.IS_CLOUD_DEBUG || !this@MainActivity.intent.getBooleanExtra("ocrBenchmark", false)) {
+                return null
+              }
+              return Bundle().apply { putBoolean("ocrBenchmark", true) }
+            }
+          })
   }
 
   /**
