@@ -1,6 +1,18 @@
 # HuKang V1.4 Test Report
 
-更新日期：2026-10-02。只记录已经发生的测试；未执行明确标记NOT TESTED/not_run。历史2026-09-22 APK构建不能代表本轮代码。
+更新日期：2026-10-03。只记录已经发生的测试；未执行明确标记NOT TESTED/not_run。较早构建记录为历史，不替代最新验收。
+
+## 2026-10-03 云端Debug：构建、下载和安装启动PASS
+
+- 用户要求不上传任何现有签名/keystore/凭据；仓库签名Secret为空，新工作流不引用Secret。临时Debug签名只在runner生成，不上传或缓存。
+- main代码推送自动触发 [run37082741142](https://github.com/chenchangxiang-330/Hukang-codex/actions/runs/37082741142)；构建源码 `48979814c8d20063d29719f3ae29aedc80c01f4f`。2026-10-03 08:46（Asia/Shanghai）完成，两个job均SUCCESS。
+- GitHub独立克隆恢复125个提交文件，Git blob/hash/执行位与正式构建提交一致；无LFS/子模块遗漏，src/assets/tests/scripts/docs/design/lockfile/Wrapper/原生OCR及注册代码完整。
+- 云端 `npm ci`、类型检查与Node59/59 PASS。Gradle `assembleDebug -PcloudDebugBuild=true -PreactNativeArchitectures=arm64-v8a,x86_64`：BUILD SUCCESSFUL in 6m56s；编译job8m11s。
+- APK签名校验PASS；内置 `assets/index.android.bundle`（1,731,524 bytes）。独立包名com.hukang.local.clouddebug，关闭Metro依赖，含arm64真机和x86_64模拟器架构。
+- 产物 `HuKang-cloud-debug.apk`，135,297,371 bytes，SHA256 `cb3892e8acc63a51872c9c6aff606e8d83421c53a30e4c5808b9e3c296f8e568`；云端产物下载及本机下载校验均PASS。
+- Android35模拟器安装job2m12s：`adb install` Success，`am start -W` Status: ok，20秒后PID非空，UI包名匹配且出现“建立本地健康档案”，crash.txt为空。截图已人工查看确认。
+- 用户Android真机安装、相机、真实ML Kit准确率、有效Key Vision和融合：NOT TESTED。该模拟器测试仅证明新云包可下载安装启动，不能关闭OCR准确率问题。
+- 本机精确清理23路径后：源码、Wrapper、10份旧APK、两份签名保留；Node24.20.0/npm11.19.0/Git2.54.0/gh2.102.0/VSCode1.138.0正常。gh仍登录chenchangxiang-330，新Terminal无Java Runtime自动报错。详见docs/LOCAL_ANDROID_CLEANUP_20261003.md。
 
 ## 2026-10-02 原生构建与迁移检查
 

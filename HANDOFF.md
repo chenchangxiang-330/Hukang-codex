@@ -1,9 +1,11 @@
 # HuKang / 护康 Engineering Handoff
 
-交接更新：2026-10-02（下方2026-09-22内容为历史记录）
+交接更新：2026-10-03（下方较早内容为历史记录）
 当前应用版本：1.4.0（Android versionCode 14）
 
-2026-10-03 云端接续：用户禁止上传现有签名/凭据。Actions改为推送main代码自动构建独立Debug APK（包名com.hukang.local.clouddebug），仅runner新建临时测试签名；JS内置，不依赖Metro。增加下载/Android35模拟器安装启动验证，首轮实际运行结果待记录。原源码/原生模块已从GitHub纯净克隆逐文件核验，Node59/59与类型检查通过。旧本地SDK/JDK/NDK和确定Android缓存已永久精准清理，源码、Wrapper、签名、10份APK保留。此前要求上传签名Secret的说明为历史方案，现已取消；新流程见GITHUB_BUILD.md。
+2026-10-03 云端接续：用户禁止上传现有签名/凭据。Actions改为推送main代码自动构建独立Debug APK（包名com.hukang.local.clouddebug），仅runner新建临时测试签名；JS内置，不依赖Metro。首轮run37082741142的构建、下载和Android35模拟器安装启动均SUCCESS，截图实际显示健康档案页，崩溃日志为空。APK构建commit48979814c8d20063d29719f3ae29aedc80c01f4f；SHA256 cb3892e8acc63a51872c9c6aff606e8d83421c53a30e4c5808b9e3c296f8e568，已取回本机Downloads并校验。用户真机安装/OCR/Vision仍未验收。
+
+最新构建源码/原生模块的125文件已从GitHub纯净克隆逐文件及执行位核验，Node59/59与类型检查通过。旧本地SDK/JDK/NDK和确定Android缓存已永久精准清理，实测可用空间增加5.32GB；源码、Wrapper、原签名、10份旧APK保留，Node/Git/gh/VSCode正常，Terminal Java报错已消失。此前要求上传签名Secret的说明为历史方案，现已取消。整份本地项目仍含不可由Git克隆恢复的签名/APK/ZIP/bundle，未删除；新流程见GITHUB_BUILD.md，清理明细见docs/LOCAL_ANDROID_CLEANUP_20261003.md。
 
 本文只描述当前代码、已经取得的测试证据和已知问题。代码存在不等于真机验收通过。
 

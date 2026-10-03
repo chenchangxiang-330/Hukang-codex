@@ -2,7 +2,16 @@
 
 目标仓库：https://github.com/chenchangxiang-330/Hukang-codex
 
-源码已于2026-10-02正常推送到 `main`，原有规划文档和Git历史均保留。2026-10-03 已从GitHub纯净克隆核对全部124个提交文件及执行权限。后续开发以该仓库为准；本地正式目录暂时保留。当前工作流改为无需现有密钥的云端 Debug，首轮云端构建及安装结果仍待实际运行确认。
+源码已于2026-10-02正常推送到 `main`，原有规划文档和Git历史均保留。2026-10-03 已从GitHub纯净克隆核对最新构建提交的全部125个文件及执行权限。后续开发以该仓库为准；本地正式目录暂时保留。无需现有密钥的云端Debug首轮构建、下载、模拟器安装和独立启动均已实际通过。
+
+## 首轮真实结果：PASS
+
+- 构建源码commit：`48979814c8d20063d29719f3ae29aedc80c01f4f`，由main推送自动触发。
+- [GitHub Actions运行37082741142](https://github.com/chenchangxiang-330/Hukang-codex/actions/runs/37082741142)，2026-10-03 08:36–08:46（Asia/Shanghai），两个job均SUCCESS。
+- 编译job8m11s；Gradle报告 `BUILD SUCCESSFUL in 6m 56s`。类型检查、59项Node测试、签名验证及APK内置JS检查通过。
+- [下载APK artifact](https://github.com/chenchangxiang-330/Hukang-codex/actions/runs/37082741142/artifacts/11258289907)。文件 `HuKang-cloud-debug.apk`，135,297,371 bytes；SHA256 `cb3892e8acc63a51872c9c6aff606e8d83421c53a30e4c5808b9e3c296f8e568`。另已实际下载到本机Downloads新目录并校验一致。
+- 安装job2m12s：下载同一artifact，Android35 x86_64模拟器 `adb install`返回Success，启动返回Status: ok，20秒后进程仍在；UI含“建立本地健康档案”，崩溃日志为空。启动截图已人工查看确认，不依赖Metro。
+- 用户自己的Android真机安装、拍照、OCR和Vision：尚未验证。模拟器启动不能代替这些验收。
 
 源码包括已有 `android/`、手写中文 ML Kit 模块、Gradle Wrapper、锁文件、测试图片和交接文件。不要上传本机 SDK/JDK、node_modules、构建缓存、APK 或签名文件；不要运行 `expo prebuild --clean`。
 
