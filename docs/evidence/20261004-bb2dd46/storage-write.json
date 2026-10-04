@@ -1,0 +1,378 @@
+{
+  "schemaVersion": 1,
+  "status": "completed",
+  "phase": "write",
+  "runId": "storage-1791112326-3618",
+  "launchToken": "storage-launch-1791112327981-zofr9h11d58",
+  "checks": [
+    {
+      "name": "pristine_profile_required",
+      "passed": true
+    },
+    {
+      "name": "pristine_scanner_preferences_required",
+      "passed": true
+    },
+    {
+      "name": "photo_nonempty",
+      "passed": true
+    },
+    {
+      "name": "editing_preserves_saved_evidence",
+      "passed": true
+    },
+    {
+      "name": "product_barcode",
+      "passed": true
+    },
+    {
+      "name": "product_rawBarcode",
+      "passed": true
+    },
+    {
+      "name": "product_normalizedBarcode",
+      "passed": true
+    },
+    {
+      "name": "product_name",
+      "passed": true
+    },
+    {
+      "name": "product_brand",
+      "passed": true
+    },
+    {
+      "name": "product_variant",
+      "passed": true
+    },
+    {
+      "name": "product_category",
+      "passed": true
+    },
+    {
+      "name": "product_netContent",
+      "passed": true
+    },
+    {
+      "name": "product_netContentUnit",
+      "passed": true
+    },
+    {
+      "name": "product_basisAmount",
+      "passed": true
+    },
+    {
+      "name": "product_basisUnit",
+      "passed": true
+    },
+    {
+      "name": "product_energyKcal",
+      "passed": true
+    },
+    {
+      "name": "product_energyKj",
+      "passed": true
+    },
+    {
+      "name": "product_proteinG",
+      "passed": true
+    },
+    {
+      "name": "product_fatG",
+      "passed": true
+    },
+    {
+      "name": "product_carbohydrateG",
+      "passed": true
+    },
+    {
+      "name": "product_saturatedFatG",
+      "passed": true
+    },
+    {
+      "name": "product_transFatG",
+      "passed": true
+    },
+    {
+      "name": "product_totalSugarG",
+      "passed": true
+    },
+    {
+      "name": "product_addedSugarG",
+      "passed": true
+    },
+    {
+      "name": "product_fiberG",
+      "passed": true
+    },
+    {
+      "name": "product_sodiumMg",
+      "passed": true
+    },
+    {
+      "name": "product_ingredients",
+      "passed": true
+    },
+    {
+      "name": "product_imageUri",
+      "passed": true
+    },
+    {
+      "name": "product_ingredientsRawText",
+      "passed": true
+    },
+    {
+      "name": "product_ingredientsJson",
+      "passed": true
+    },
+    {
+      "name": "product_ocrRawText",
+      "passed": true
+    },
+    {
+      "name": "product_dataSource",
+      "passed": true
+    },
+    {
+      "name": "product_recognitionEvidenceJson",
+      "passed": true
+    },
+    {
+      "name": "product_lastVerifiedAt",
+      "passed": true
+    },
+    {
+      "name": "vision_selection_keeps_local_raw_text",
+      "passed": true
+    },
+    {
+      "name": "independent_mock_vision_text",
+      "passed": true
+    },
+    {
+      "name": "independent_original_ocr_text",
+      "passed": true
+    },
+    {
+      "name": "explicit_vision_selection",
+      "passed": true
+    },
+    {
+      "name": "initial_log_nondefault_basis_scaling",
+      "passed": true
+    },
+    {
+      "name": "initial_log_unknowns_remain_null",
+      "passed": true
+    },
+    {
+      "name": "profile_written_exactly",
+      "passed": true
+    },
+    {
+      "name": "preferences_written_exactly",
+      "passed": true
+    },
+    {
+      "name": "inventory_product_relationship",
+      "passed": true
+    },
+    {
+      "name": "inventory_quantity",
+      "passed": true
+    },
+    {
+      "name": "inventory_unknown_expiry",
+      "passed": true
+    },
+    {
+      "name": "inventory_production_date",
+      "passed": true
+    },
+    {
+      "name": "inventory_photo_path",
+      "passed": true
+    },
+    {
+      "name": "inventory_opened",
+      "passed": true
+    },
+    {
+      "name": "inventory_opened_timestamp",
+      "passed": true
+    },
+    {
+      "name": "log_product_relationship",
+      "passed": true
+    },
+    {
+      "name": "log_amount_and_unit",
+      "passed": true
+    },
+    {
+      "name": "log_energyKcal",
+      "passed": true
+    },
+    {
+      "name": "log_energyKj",
+      "passed": true
+    },
+    {
+      "name": "log_proteinG",
+      "passed": true
+    },
+    {
+      "name": "log_fatG",
+      "passed": true
+    },
+    {
+      "name": "log_carbohydrateG",
+      "passed": true
+    },
+    {
+      "name": "log_saturatedFatG",
+      "passed": true
+    },
+    {
+      "name": "log_transFatG",
+      "passed": true
+    },
+    {
+      "name": "log_totalSugarG",
+      "passed": true
+    },
+    {
+      "name": "log_addedSugarG",
+      "passed": true
+    },
+    {
+      "name": "log_fiberG",
+      "passed": true
+    },
+    {
+      "name": "log_sodiumMg",
+      "passed": true
+    },
+    {
+      "name": "only_one_product_added",
+      "passed": true
+    },
+    {
+      "name": "only_one_inventory_added",
+      "passed": true
+    },
+    {
+      "name": "only_one_log_added",
+      "passed": true
+    }
+  ],
+  "writtenAt": "2026-10-04T11:12:08.581Z",
+  "manifestUri": "file:///data/user/0/com.hukang.local.clouddebug/files/storage-regression-storage-1791112326-3618.manifest.json",
+  "snapshot": {
+    "product": {
+      "id": 4,
+      "barcode": null,
+      "rawBarcode": null,
+      "normalizedBarcode": null,
+      "name": "持久化回归 storage-1791112326-3618",
+      "brand": "云端测试",
+      "variant": "确认后编辑",
+      "category": "测试标记",
+      "netContent": 250,
+      "netContentUnit": "mL",
+      "basisAmount": 125,
+      "basisUnit": "mL",
+      "energyKcal": null,
+      "energyKj": 309,
+      "proteinG": null,
+      "fatG": null,
+      "saturatedFatG": 1.1,
+      "transFatG": 0,
+      "carbohydrateG": null,
+      "totalSugarG": null,
+      "addedSugarG": null,
+      "fiberG": 0,
+      "sodiumMg": 58,
+      "ingredients": "生牛乳",
+      "imageUri": "file:///data/user/0/com.hukang.local.clouddebug/files/storage-regression-storage-1791112326-3618.png",
+      "ingredientsRawText": "配料：生牛乳",
+      "ingredientsJson": "[\"生牛乳\"]",
+      "ocrRawText": "原始OCR storage-1791112326-3618\n蛋白质 36g\n不可读小数留空",
+      "recognitionEvidenceJson": "{\"schemaVersion\":1,\"local\":{\"primary\":{\"text\":\"原始OCR storage-1791112326-3618\\n蛋白质 36g\\n不可读小数留空\"},\"original\":{\"text\":\"未裁剪OCR storage-1791112326-3618\\n蛋白质 36g\"}},\"vision\":{\"mock\":true,\"status\":\"MOCK_STORAGE_ONLY_NO_REQUEST\",\"raw_text\":\"MOCK Vision storage-1791112326-3618\\n能量309kJ\",\"basis\":{\"amount\":125,\"unit\":\"mL\"},\"nutrition\":{\"energy_kj\":309,\"protein_g\":null,\"fat_g\":null,\"carbohydrate_g\":null,\"sodium_mg\":58}},\"selection\":{\"basisSource\":\"vision\",\"localSource\":null}}",
+      "dataSource": "online_vision",
+      "lastVerifiedAt": "2026-10-04T00:00:00.000Z",
+      "createdAt": "2026-10-04T11:12:08.514Z",
+      "updatedAt": "2026-10-04T11:12:08.525Z"
+    },
+    "inventory": {
+      "id": 1,
+      "productId": 4,
+      "productName": "持久化回归 storage-1791112326-3618",
+      "quantity": 2.5,
+      "purchaseDate": "2026-10-04",
+      "productionDate": "2026-10-03",
+      "expiryDate": null,
+      "opened": true,
+      "openedAt": "2026-10-04T11:12:08.534Z",
+      "storageType": "冷藏",
+      "photoUri": "file:///data/user/0/com.hukang.local.clouddebug/files/storage-regression-storage-1791112326-3618.png"
+    },
+    "log": {
+      "id": 1,
+      "productId": 4,
+      "productName": "持久化回归 storage-1791112326-3618",
+      "date": "2026-10-04",
+      "time": "13:45",
+      "amount": 125,
+      "amountUnit": "mL",
+      "energyKcal": null,
+      "energyKj": 309,
+      "proteinG": null,
+      "fatG": null,
+      "saturatedFatG": 1.1,
+      "transFatG": 0,
+      "carbohydrateG": null,
+      "totalSugarG": null,
+      "addedSugarG": null,
+      "fiberG": 0,
+      "sodiumMg": 58
+    },
+    "profile": {
+      "completed": true,
+      "age": "35",
+      "sex": "female",
+      "heightCm": "165",
+      "weightKg": "60",
+      "activity": "medium",
+      "goals": [
+        "存储回归 storage-1791112326-3618"
+      ],
+      "sound": false,
+      "notifications": false
+    },
+    "preferences": {
+      "onlineEnhancement": false,
+      "onlineConsentAsked": true,
+      "developerMode": true
+    }
+  },
+  "countsBefore": {
+    "products": 3,
+    "inventory": 0,
+    "nutritionLogs": 0
+  },
+  "countsAfter": {
+    "products": 4,
+    "inventory": 1,
+    "nutritionLogs": 1
+  },
+  "recognitionEvidence": "mock_selection_storage_only_no_vision_request",
+  "scope": "native_api_write_only_requires_external_force_stop_and_offline_verify",
+  "buildInfo": {
+    "sourceCommit": "bb2dd46662fa939afcd3326b53f4a89513a23e1a",
+    "version": "1.4.0",
+    "channel": "clouddebug"
+  },
+  "completedAt": "2026-10-04T11:12:08.587Z",
+  "documentDirectory": "file:///data/user/0/com.hukang.local.clouddebug/files/"
+}

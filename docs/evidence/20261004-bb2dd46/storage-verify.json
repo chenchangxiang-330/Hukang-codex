@@ -1,0 +1,186 @@
+{
+  "schemaVersion": 1,
+  "status": "completed",
+  "phase": "verify",
+  "runId": "storage-1791112326-3618",
+  "launchToken": "storage-launch-1791112335297-vz809zrh3jb",
+  "writeLaunchToken": "storage-launch-1791112327981-zofr9h11d58",
+  "writtenAt": "2026-10-04T11:12:08.581Z",
+  "checks": [
+    {
+      "name": "manifest_version",
+      "passed": true
+    },
+    {
+      "name": "manifest_run_id",
+      "passed": true
+    },
+    {
+      "name": "manifest_written",
+      "passed": true
+    },
+    {
+      "name": "new_js_process",
+      "passed": true
+    },
+    {
+      "name": "read_after_write",
+      "passed": true
+    },
+    {
+      "name": "offline_network_state",
+      "passed": true
+    },
+    {
+      "name": "product_persisted_exactly",
+      "passed": true
+    },
+    {
+      "name": "inventory_persisted_exactly",
+      "passed": true
+    },
+    {
+      "name": "log_persisted_exactly",
+      "passed": true
+    },
+    {
+      "name": "profile_persisted_exactly",
+      "passed": true
+    },
+    {
+      "name": "scanner_preferences_persisted_exactly",
+      "passed": true
+    },
+    {
+      "name": "photo_still_nonempty",
+      "passed": true
+    },
+    {
+      "name": "photo_contents_persisted_exactly",
+      "passed": true
+    },
+    {
+      "name": "product_count_unchanged",
+      "passed": true
+    },
+    {
+      "name": "inventory_count_unchanged",
+      "passed": true
+    },
+    {
+      "name": "log_count_unchanged",
+      "passed": true
+    },
+    {
+      "name": "original_profile_restored",
+      "passed": true
+    },
+    {
+      "name": "original_preferences_restored",
+      "passed": true
+    }
+  ],
+  "snapshot": {
+    "product": {
+      "id": 4,
+      "barcode": null,
+      "rawBarcode": null,
+      "normalizedBarcode": null,
+      "name": "持久化回归 storage-1791112326-3618",
+      "brand": "云端测试",
+      "variant": "确认后编辑",
+      "category": "测试标记",
+      "netContent": 250,
+      "netContentUnit": "mL",
+      "basisAmount": 125,
+      "basisUnit": "mL",
+      "energyKcal": null,
+      "energyKj": 309,
+      "proteinG": null,
+      "fatG": null,
+      "saturatedFatG": 1.1,
+      "transFatG": 0,
+      "carbohydrateG": null,
+      "totalSugarG": null,
+      "addedSugarG": null,
+      "fiberG": 0,
+      "sodiumMg": 58,
+      "ingredients": "生牛乳",
+      "imageUri": "file:///data/user/0/com.hukang.local.clouddebug/files/storage-regression-storage-1791112326-3618.png",
+      "ingredientsRawText": "配料：生牛乳",
+      "ingredientsJson": "[\"生牛乳\"]",
+      "ocrRawText": "原始OCR storage-1791112326-3618\n蛋白质 36g\n不可读小数留空",
+      "recognitionEvidenceJson": "{\"schemaVersion\":1,\"local\":{\"primary\":{\"text\":\"原始OCR storage-1791112326-3618\\n蛋白质 36g\\n不可读小数留空\"},\"original\":{\"text\":\"未裁剪OCR storage-1791112326-3618\\n蛋白质 36g\"}},\"vision\":{\"mock\":true,\"status\":\"MOCK_STORAGE_ONLY_NO_REQUEST\",\"raw_text\":\"MOCK Vision storage-1791112326-3618\\n能量309kJ\",\"basis\":{\"amount\":125,\"unit\":\"mL\"},\"nutrition\":{\"energy_kj\":309,\"protein_g\":null,\"fat_g\":null,\"carbohydrate_g\":null,\"sodium_mg\":58}},\"selection\":{\"basisSource\":\"vision\",\"localSource\":null}}",
+      "dataSource": "online_vision",
+      "lastVerifiedAt": "2026-10-04T00:00:00.000Z",
+      "createdAt": "2026-10-04T11:12:08.514Z",
+      "updatedAt": "2026-10-04T11:12:08.525Z"
+    },
+    "inventory": {
+      "id": 1,
+      "productId": 4,
+      "productName": "持久化回归 storage-1791112326-3618",
+      "quantity": 2.5,
+      "purchaseDate": "2026-10-04",
+      "productionDate": "2026-10-03",
+      "expiryDate": null,
+      "opened": true,
+      "openedAt": "2026-10-04T11:12:08.534Z",
+      "storageType": "冷藏",
+      "photoUri": "file:///data/user/0/com.hukang.local.clouddebug/files/storage-regression-storage-1791112326-3618.png"
+    },
+    "log": {
+      "id": 1,
+      "productId": 4,
+      "productName": "持久化回归 storage-1791112326-3618",
+      "date": "2026-10-04",
+      "time": "13:45",
+      "amount": 125,
+      "amountUnit": "mL",
+      "energyKcal": null,
+      "energyKj": 309,
+      "proteinG": null,
+      "fatG": null,
+      "saturatedFatG": 1.1,
+      "transFatG": 0,
+      "carbohydrateG": null,
+      "totalSugarG": null,
+      "addedSugarG": null,
+      "fiberG": 0,
+      "sodiumMg": 58
+    },
+    "profile": {
+      "completed": true,
+      "age": "35",
+      "sex": "female",
+      "heightCm": "165",
+      "weightKg": "60",
+      "activity": "medium",
+      "goals": [
+        "存储回归 storage-1791112326-3618"
+      ],
+      "sound": false,
+      "notifications": false
+    },
+    "preferences": {
+      "onlineEnhancement": false,
+      "onlineConsentAsked": true,
+      "developerMode": true
+    }
+  },
+  "network": {
+    "isConnected": false,
+    "isInternetReachable": false,
+    "type": "none"
+  },
+  "profileAndPreferencesRestored": true,
+  "recognitionEvidence": "mock_selection_storage_only_no_vision_request",
+  "scope": "native_api_offline_process_restart_durability_not_user_touch_confirmation",
+  "buildInfo": {
+    "sourceCommit": "bb2dd46662fa939afcd3326b53f4a89513a23e1a",
+    "version": "1.4.0",
+    "channel": "clouddebug"
+  },
+  "completedAt": "2026-10-04T11:12:15.776Z",
+  "documentDirectory": "file:///data/user/0/com.hukang.local.clouddebug/files/"
+}

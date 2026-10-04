@@ -1,5 +1,13 @@
 # HuKang V1.4 Test Report
 
+## 2026-10-04 接手修复实测
+
+源码 `bb2dd46662fa939afcd3326b53f4a89513a23e1a`，[run37197334844](https://github.com/chenchangxiang-330/Hukang-codex/actions/runs/37197334844) 两 job SUCCESS：typecheck、128/128 Node、原生 Debug 编译/签名/独立安装启动、本次 runId 真实中文 OCR、生产 API 写入65项及杀进程/断网冷启动读回18项检查 PASS。营养选择 Vision 及商品再次编辑保留 OCR/来源/独立证据；存储测试中的 Vision 明确为 mock，没有真实服务请求。两张营养图最终生产候选仍7正确/0错填/3缺失，牛奶小数点尚未解决；新PNG/JPEG/裁剪对照不默认启用。
+
+APK [artifact11301805339](https://github.com/chenchangxiang-330/Hukang-codex/actions/runs/37197334844/artifacts/11301805339)，本地 `/Users/yangbing/Ai/open ai/我开发的app/护康/测试包/20261004-bb2dd46/HuKang-cloud-debug.apk`；135358111 bytes，SHA256 `1d401b22a76712d18e660679121c543e29be14470e81b09f4b02d9dac5e800f2`。实算与云校验一致，内置 bundle 含精确源码 SHA。包名 com.hukang.local.clouddebug，1.4.0-clouddebug/14，arm64-v8a/x86_64；临时测试签名，无用户私钥上传。
+
+原始 JSON、截图、PID 和来源见 [执行证据](./docs/evidence/20261004-bb2dd46/README.md)；修改、失败重跑说明、清理依据及手机 NOT TESTED 项见 [完整报告](./docs/TAKEOVER_VALIDATION_20261004.md)。此前 run37194216228 的日志采集失败不计完成验收。BUG-009 保持 OPEN。
+
 更新日期：2026-10-03。只记录已经发生的测试；未执行明确标记NOT TESTED/not_run。较早构建记录为历史，不替代最新验收。
 
 ## 2026-10-03 第一轮真实识别改进：最新验证

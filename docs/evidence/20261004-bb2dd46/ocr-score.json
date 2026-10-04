@@ -1,0 +1,1203 @@
+{
+  "schemaVersion": 1,
+  "metric": "Five visible core numeric fields; correct/evaluated. Missing stages are not evaluated. Explicit error attempts count as missing fields. Basis and unsupported claims reported separately.",
+  "warning": "A score is evidence only for the supplied execution records. Manual-transcription parser tests are not image OCR or Vision accuracy.",
+  "summaries": {
+    "original": {
+      "status": "run",
+      "totalImages": 2,
+      "attemptedImages": 2,
+      "completedImages": 2,
+      "failedImages": 0,
+      "notRunImages": 0,
+      "possibleFields": 10,
+      "evaluatedFields": 10,
+      "correct": 7,
+      "wrong": 1,
+      "missing": 2,
+      "fieldAccuracyPercent": 70,
+      "fieldCoveragePercent": 100,
+      "unsupportedVisibleClaims": 0,
+      "wrongBasisImages": 0,
+      "missingBasisImages": 0,
+      "localOnlyImages": 0
+    },
+    "preprocessed": {
+      "status": "run",
+      "totalImages": 2,
+      "attemptedImages": 2,
+      "completedImages": 2,
+      "failedImages": 0,
+      "notRunImages": 0,
+      "possibleFields": 10,
+      "evaluatedFields": 10,
+      "correct": 4,
+      "wrong": 1,
+      "missing": 5,
+      "fieldAccuracyPercent": 40,
+      "fieldCoveragePercent": 100,
+      "unsupportedVisibleClaims": 0,
+      "wrongBasisImages": 0,
+      "missingBasisImages": 0,
+      "localOnlyImages": 0
+    },
+    "parser": {
+      "status": "run",
+      "totalImages": 2,
+      "attemptedImages": 2,
+      "completedImages": 2,
+      "failedImages": 0,
+      "notRunImages": 0,
+      "possibleFields": 10,
+      "evaluatedFields": 10,
+      "correct": 4,
+      "wrong": 1,
+      "missing": 5,
+      "fieldAccuracyPercent": 40,
+      "fieldCoveragePercent": 100,
+      "unsupportedVisibleClaims": 0,
+      "wrongBasisImages": 0,
+      "missingBasisImages": 0,
+      "localOnlyImages": 0
+    },
+    "production": {
+      "status": "run",
+      "totalImages": 2,
+      "attemptedImages": 2,
+      "completedImages": 2,
+      "failedImages": 0,
+      "notRunImages": 0,
+      "possibleFields": 10,
+      "evaluatedFields": 10,
+      "correct": 7,
+      "wrong": 0,
+      "missing": 3,
+      "fieldAccuracyPercent": 70,
+      "fieldCoveragePercent": 100,
+      "unsupportedVisibleClaims": 0,
+      "wrongBasisImages": 0,
+      "missingBasisImages": 0,
+      "localOnlyImages": 2
+    },
+    "vision": {
+      "status": "not_run",
+      "totalImages": 2,
+      "attemptedImages": 0,
+      "completedImages": 0,
+      "failedImages": 0,
+      "notRunImages": 2,
+      "possibleFields": 10,
+      "evaluatedFields": 0,
+      "correct": 0,
+      "wrong": 0,
+      "missing": 0,
+      "fieldAccuracyPercent": null,
+      "fieldCoveragePercent": 0,
+      "unsupportedVisibleClaims": 0,
+      "wrongBasisImages": 0,
+      "missingBasisImages": 0,
+      "localOnlyImages": 0
+    },
+    "merged": {
+      "status": "run",
+      "totalImages": 2,
+      "attemptedImages": 2,
+      "completedImages": 2,
+      "failedImages": 0,
+      "notRunImages": 0,
+      "possibleFields": 10,
+      "evaluatedFields": 10,
+      "correct": 7,
+      "wrong": 0,
+      "missing": 3,
+      "fieldAccuracyPercent": 70,
+      "fieldCoveragePercent": 100,
+      "unsupportedVisibleClaims": 0,
+      "wrongBasisImages": 0,
+      "missingBasisImages": 0,
+      "localOnlyImages": 2
+    },
+    "experimental_gray": {
+      "status": "run",
+      "totalImages": 2,
+      "attemptedImages": 2,
+      "completedImages": 2,
+      "failedImages": 0,
+      "notRunImages": 0,
+      "possibleFields": 10,
+      "evaluatedFields": 10,
+      "correct": 5,
+      "wrong": 0,
+      "missing": 5,
+      "fieldAccuracyPercent": 50,
+      "fieldCoveragePercent": 100,
+      "unsupportedVisibleClaims": 0,
+      "wrongBasisImages": 0,
+      "missingBasisImages": 0,
+      "localOnlyImages": 0
+    },
+    "experimental_upscaled": {
+      "status": "run",
+      "totalImages": 2,
+      "attemptedImages": 2,
+      "completedImages": 2,
+      "failedImages": 0,
+      "notRunImages": 0,
+      "possibleFields": 10,
+      "evaluatedFields": 10,
+      "correct": 4,
+      "wrong": 1,
+      "missing": 5,
+      "fieldAccuracyPercent": 40,
+      "fieldCoveragePercent": 100,
+      "unsupportedVisibleClaims": 0,
+      "wrongBasisImages": 0,
+      "missingBasisImages": 0,
+      "localOnlyImages": 0
+    },
+    "experimental_deskew": {
+      "status": "partial",
+      "totalImages": 2,
+      "attemptedImages": 1,
+      "completedImages": 1,
+      "failedImages": 0,
+      "notRunImages": 1,
+      "possibleFields": 10,
+      "evaluatedFields": 5,
+      "correct": 2,
+      "wrong": 2,
+      "missing": 1,
+      "fieldAccuracyPercent": 40,
+      "fieldCoveragePercent": 50,
+      "unsupportedVisibleClaims": 0,
+      "wrongBasisImages": 0,
+      "missingBasisImages": 0,
+      "localOnlyImages": 0
+    },
+    "experimental_whole_png": {
+      "status": "run",
+      "totalImages": 2,
+      "attemptedImages": 2,
+      "completedImages": 2,
+      "failedImages": 0,
+      "notRunImages": 0,
+      "possibleFields": 10,
+      "evaluatedFields": 10,
+      "correct": 7,
+      "wrong": 1,
+      "missing": 2,
+      "fieldAccuracyPercent": 70,
+      "fieldCoveragePercent": 100,
+      "unsupportedVisibleClaims": 0,
+      "wrongBasisImages": 0,
+      "missingBasisImages": 0,
+      "localOnlyImages": 0
+    },
+    "experimental_roi_png": {
+      "status": "run",
+      "totalImages": 2,
+      "attemptedImages": 2,
+      "completedImages": 2,
+      "failedImages": 0,
+      "notRunImages": 0,
+      "possibleFields": 10,
+      "evaluatedFields": 10,
+      "correct": 6,
+      "wrong": 1,
+      "missing": 3,
+      "fieldAccuracyPercent": 60,
+      "fieldCoveragePercent": 100,
+      "unsupportedVisibleClaims": 0,
+      "wrongBasisImages": 0,
+      "missingBasisImages": 0,
+      "localOnlyImages": 0
+    },
+    "experimental_roi_jpeg": {
+      "status": "run",
+      "totalImages": 2,
+      "attemptedImages": 2,
+      "completedImages": 2,
+      "failedImages": 0,
+      "notRunImages": 0,
+      "possibleFields": 10,
+      "evaluatedFields": 10,
+      "correct": 4,
+      "wrong": 1,
+      "missing": 5,
+      "fieldAccuracyPercent": 40,
+      "fieldCoveragePercent": 100,
+      "unsupportedVisibleClaims": 0,
+      "wrongBasisImages": 0,
+      "missingBasisImages": 0,
+      "localOnlyImages": 0
+    },
+    "experimental_padded_roi_png": {
+      "status": "run",
+      "totalImages": 2,
+      "attemptedImages": 2,
+      "completedImages": 2,
+      "failedImages": 0,
+      "notRunImages": 0,
+      "possibleFields": 10,
+      "evaluatedFields": 10,
+      "correct": 5,
+      "wrong": 2,
+      "missing": 3,
+      "fieldAccuracyPercent": 50,
+      "fieldCoveragePercent": 100,
+      "unsupportedVisibleClaims": 0,
+      "wrongBasisImages": 1,
+      "missingBasisImages": 0,
+      "localOnlyImages": 0
+    }
+  },
+  "details": [
+    {
+      "fixtureId": "6923644266066",
+      "evidence": "device_mlkit_image_execution",
+      "stages": {
+        "original": {
+          "status": "ok",
+          "scope": null,
+          "reason": null,
+          "fields": [
+            {
+              "field": "energy_kj",
+              "expected": 309,
+              "actual": 309,
+              "outcome": "correct"
+            },
+            {
+              "field": "protein_g",
+              "expected": 3.6,
+              "actual": 36,
+              "outcome": "wrong"
+            },
+            {
+              "field": "fat_g",
+              "expected": 4.4,
+              "actual": null,
+              "outcome": "missing"
+            },
+            {
+              "field": "carbohydrate_g",
+              "expected": 5,
+              "actual": null,
+              "outcome": "missing"
+            },
+            {
+              "field": "sodium_mg",
+              "expected": 58,
+              "actual": 58,
+              "outcome": "correct"
+            }
+          ],
+          "unsupportedFields": [],
+          "basisOutcome": "correct",
+          "rawText": "项目\n|能量\n蛋白质\n|脂肪\n碳水化合物\n钠\n配\n特仑苏”\n营养成分表\n每100mL\nTetra Pak\n309 kJ\n36g\n449\n509\n58mg\n120 mg\n料:生牛乳\n产品类型: 全脂灭菌乳\n开启前,无業冷藏:\n产品标准号: GB 25190\n生产日期: 见包装喷码\n保质期: 6个月\n贮存条件:常温闭保存。\n开启后,请立都饮用。\n講勿连同包装在微波炉中加热。\n类者热线: 400-6603333\nNRV%\n请勿乱扔空包保,环晚需洁\nPLEASE DISPOSE PROPERLY\n4%\n生产「商及产地:具体见喷码前两位代码\n6%\n7%\n2%\n3%\n15%\n包"
+        },
+        "preprocessed": {
+          "status": "ok",
+          "scope": null,
+          "reason": null,
+          "fields": [
+            {
+              "field": "energy_kj",
+              "expected": 309,
+              "actual": 309,
+              "outcome": "correct"
+            },
+            {
+              "field": "protein_g",
+              "expected": 3.6,
+              "actual": 36,
+              "outcome": "wrong"
+            },
+            {
+              "field": "fat_g",
+              "expected": 4.4,
+              "actual": null,
+              "outcome": "missing"
+            },
+            {
+              "field": "carbohydrate_g",
+              "expected": 5,
+              "actual": null,
+              "outcome": "missing"
+            },
+            {
+              "field": "sodium_mg",
+              "expected": 58,
+              "actual": 58,
+              "outcome": "correct"
+            }
+          ],
+          "unsupportedFields": [],
+          "basisOutcome": "correct",
+          "rawText": "项目\n|能量\n|蛋白质\n|脂肪\n碳水化合物\n鈉\n配\n营养成分表\n每100mL\n309 kJ\n36g\n449\n509\n58mg\n120mg\nNRV%\n4%\n6%\n7%\n2%\n3%\n15%"
+        },
+        "parser": {
+          "status": "ok",
+          "scope": null,
+          "reason": null,
+          "fields": [
+            {
+              "field": "energy_kj",
+              "expected": 309,
+              "actual": 309,
+              "outcome": "correct"
+            },
+            {
+              "field": "protein_g",
+              "expected": 3.6,
+              "actual": 36,
+              "outcome": "wrong"
+            },
+            {
+              "field": "fat_g",
+              "expected": 4.4,
+              "actual": null,
+              "outcome": "missing"
+            },
+            {
+              "field": "carbohydrate_g",
+              "expected": 5,
+              "actual": null,
+              "outcome": "missing"
+            },
+            {
+              "field": "sodium_mg",
+              "expected": 58,
+              "actual": 58,
+              "outcome": "correct"
+            }
+          ],
+          "unsupportedFields": [],
+          "basisOutcome": "correct",
+          "rawText": "营养成分表\n项目 每100mL NRV%\n|能量 309 kJ 4%\n|蛋白质 36g 6%\n|脂肪 449 7%\n碳水化合物 509 2%\n鈉 58mg 3%\n120mg 15%\n配"
+        },
+        "production": {
+          "status": "ok",
+          "scope": "local_only",
+          "reason": null,
+          "fields": [
+            {
+              "field": "energy_kj",
+              "expected": 309,
+              "actual": 309,
+              "outcome": "correct"
+            },
+            {
+              "field": "protein_g",
+              "expected": 3.6,
+              "actual": null,
+              "outcome": "missing"
+            },
+            {
+              "field": "fat_g",
+              "expected": 4.4,
+              "actual": null,
+              "outcome": "missing"
+            },
+            {
+              "field": "carbohydrate_g",
+              "expected": 5,
+              "actual": null,
+              "outcome": "missing"
+            },
+            {
+              "field": "sodium_mg",
+              "expected": 58,
+              "actual": 58,
+              "outcome": "correct"
+            }
+          ],
+          "unsupportedFields": [],
+          "basisOutcome": "correct",
+          "rawText": "项目\n|能量\n|蛋白质\n|脂肪\n碳水化合物\n鈉\n配\n营养成分表\n每100mL\n309 kJ\n36g\n449\n509\n58mg\n120mg\nNRV%\n4%\n6%\n7%\n2%\n3%\n15%"
+        },
+        "vision": {
+          "status": "not_run",
+          "reason": "CI_NO_VISION_KEY",
+          "fields": []
+        },
+        "merged": {
+          "status": "ok",
+          "scope": "local_only",
+          "reason": null,
+          "fields": [
+            {
+              "field": "energy_kj",
+              "expected": 309,
+              "actual": 309,
+              "outcome": "correct"
+            },
+            {
+              "field": "protein_g",
+              "expected": 3.6,
+              "actual": null,
+              "outcome": "missing"
+            },
+            {
+              "field": "fat_g",
+              "expected": 4.4,
+              "actual": null,
+              "outcome": "missing"
+            },
+            {
+              "field": "carbohydrate_g",
+              "expected": 5,
+              "actual": null,
+              "outcome": "missing"
+            },
+            {
+              "field": "sodium_mg",
+              "expected": 58,
+              "actual": 58,
+              "outcome": "correct"
+            }
+          ],
+          "unsupportedFields": [],
+          "basisOutcome": "correct",
+          "rawText": null
+        },
+        "experimental_gray": {
+          "status": "ok",
+          "scope": null,
+          "reason": null,
+          "fields": [
+            {
+              "field": "energy_kj",
+              "expected": 309,
+              "actual": 309,
+              "outcome": "correct"
+            },
+            {
+              "field": "protein_g",
+              "expected": 3.6,
+              "actual": null,
+              "outcome": "missing"
+            },
+            {
+              "field": "fat_g",
+              "expected": 4.4,
+              "actual": null,
+              "outcome": "missing"
+            },
+            {
+              "field": "carbohydrate_g",
+              "expected": 5,
+              "actual": null,
+              "outcome": "missing"
+            },
+            {
+              "field": "sodium_mg",
+              "expected": 58,
+              "actual": 58,
+              "outcome": "correct"
+            }
+          ],
+          "unsupportedFields": [],
+          "basisOutcome": "correct",
+          "rawText": "项目\n能量\n|蛋白质\n|脂肪\n碳水化合物\n钠\n配\n营养成分表\n每100mL\n309 kJ\n369\n449\n509\n58mg\n120mg\n.生午R\nNRV%\n4%\n6%\n7%\n2%\n3%\n15%"
+        },
+        "experimental_upscaled": {
+          "status": "ok",
+          "scope": null,
+          "reason": null,
+          "fields": [
+            {
+              "field": "energy_kj",
+              "expected": 309,
+              "actual": 309,
+              "outcome": "correct"
+            },
+            {
+              "field": "protein_g",
+              "expected": 3.6,
+              "actual": 36,
+              "outcome": "wrong"
+            },
+            {
+              "field": "fat_g",
+              "expected": 4.4,
+              "actual": null,
+              "outcome": "missing"
+            },
+            {
+              "field": "carbohydrate_g",
+              "expected": 5,
+              "actual": null,
+              "outcome": "missing"
+            },
+            {
+              "field": "sodium_mg",
+              "expected": 58,
+              "actual": null,
+              "outcome": "missing"
+            }
+          ],
+          "unsupportedFields": [],
+          "basisOutcome": "correct",
+          "rawText": "项目\n|能量\n|蛋白质\n|脂肪\n|碳水化合物\n納\n配\n营养成分表\n每100mL\n309 kJ\n36g\n449\n509\n58 mg\n120mg\n,生午R\nNRV%\n4%\n6%\n7%\n2%\n3%\n15%"
+        },
+        "experimental_deskew": {
+          "status": "ok",
+          "scope": null,
+          "reason": null,
+          "fields": [
+            {
+              "field": "energy_kj",
+              "expected": 309,
+              "actual": 309,
+              "outcome": "correct"
+            },
+            {
+              "field": "protein_g",
+              "expected": 3.6,
+              "actual": 36,
+              "outcome": "wrong"
+            },
+            {
+              "field": "fat_g",
+              "expected": 4.4,
+              "actual": 44,
+              "outcome": "wrong"
+            },
+            {
+              "field": "carbohydrate_g",
+              "expected": 5,
+              "actual": null,
+              "outcome": "missing"
+            },
+            {
+              "field": "sodium_mg",
+              "expected": 58,
+              "actual": 58,
+              "outcome": "correct"
+            }
+          ],
+          "unsupportedFields": [],
+          "basisOutcome": "correct",
+          "rawText": "项目\n|能量\n|蛋白质\n|脂肪\n|碳水化合物\n钠\n配\n营养成分表\n每100mL\n309 kJ\n36g\n44g\n509\n58mg\n120mg\n劉.生干日\nNRV%\n4%\n6%\n7%\n2%\n3%\n15%"
+        },
+        "experimental_whole_png": {
+          "status": "ok",
+          "scope": "experimental_parser_only",
+          "reason": null,
+          "fields": [
+            {
+              "field": "energy_kj",
+              "expected": 309,
+              "actual": 309,
+              "outcome": "correct"
+            },
+            {
+              "field": "protein_g",
+              "expected": 3.6,
+              "actual": 36,
+              "outcome": "wrong"
+            },
+            {
+              "field": "fat_g",
+              "expected": 4.4,
+              "actual": null,
+              "outcome": "missing"
+            },
+            {
+              "field": "carbohydrate_g",
+              "expected": 5,
+              "actual": null,
+              "outcome": "missing"
+            },
+            {
+              "field": "sodium_mg",
+              "expected": 58,
+              "actual": 58,
+              "outcome": "correct"
+            }
+          ],
+          "unsupportedFields": [],
+          "basisOutcome": "correct",
+          "rawText": "项目\n|能量\n蛋白质\n|脂肪\n碳水化合物\n钠\n配\n特仑苏”\n营养成分表\n每100mL\nTetra Pak\n309 kJ\n36g\n449\n509\n58mg\n120 mg\n料:生牛乳\n产品类型: 全脂灭菌乳\n开启前,无業冷藏:\n产品标准号: GB 25190\n生产日期: 见包装喷码\n保质期: 6个月\n贮存条件:常温闭保存。\n开启后,请立都饮用。\n講勿连同包装在微波炉中加热。\n类者热线: 400-6603333\nNRV%\n请勿乱扔空包保,环晚需洁\nPLEASE DISPOSE PROPERLY\n4%\n生产「商及产地:具体见喷码前两位代码\n6%\n7%\n2%\n3%\n15%\n包"
+        },
+        "experimental_roi_png": {
+          "status": "ok",
+          "scope": "experimental_parser_only",
+          "reason": null,
+          "fields": [
+            {
+              "field": "energy_kj",
+              "expected": 309,
+              "actual": 309,
+              "outcome": "correct"
+            },
+            {
+              "field": "protein_g",
+              "expected": 3.6,
+              "actual": 36,
+              "outcome": "wrong"
+            },
+            {
+              "field": "fat_g",
+              "expected": 4.4,
+              "actual": null,
+              "outcome": "missing"
+            },
+            {
+              "field": "carbohydrate_g",
+              "expected": 5,
+              "actual": null,
+              "outcome": "missing"
+            },
+            {
+              "field": "sodium_mg",
+              "expected": 58,
+              "actual": 58,
+              "outcome": "correct"
+            }
+          ],
+          "unsupportedFields": [],
+          "basisOutcome": "correct",
+          "rawText": "项目\n|能量\n|蛋白质\n|脂肪\n碳水化合物\n鈉\n配\n营养成分表\n每100mL\n309 kJ\n36g\n449\n509\n58 mg\n120mg\n約.生午R\nNRV%\n4%\n6%\n7%\n2%\n3%\n15%"
+        },
+        "experimental_roi_jpeg": {
+          "status": "ok",
+          "scope": "experimental_parser_only",
+          "reason": null,
+          "fields": [
+            {
+              "field": "energy_kj",
+              "expected": 309,
+              "actual": 309,
+              "outcome": "correct"
+            },
+            {
+              "field": "protein_g",
+              "expected": 3.6,
+              "actual": 36,
+              "outcome": "wrong"
+            },
+            {
+              "field": "fat_g",
+              "expected": 4.4,
+              "actual": null,
+              "outcome": "missing"
+            },
+            {
+              "field": "carbohydrate_g",
+              "expected": 5,
+              "actual": null,
+              "outcome": "missing"
+            },
+            {
+              "field": "sodium_mg",
+              "expected": 58,
+              "actual": 58,
+              "outcome": "correct"
+            }
+          ],
+          "unsupportedFields": [],
+          "basisOutcome": "correct",
+          "rawText": "项目\n|能量\n|蛋白质\n|脂肪\n碳水化合物\n钠\n配\n营养成分表\n每100mL\n309 kJ\n36g\n449\n509\n58mg\n120mg\n數,生午R\nNRV%\n4%\n6%\n7%\n2%\n3%\n15%"
+        },
+        "experimental_padded_roi_png": {
+          "status": "ok",
+          "scope": "experimental_parser_only",
+          "reason": null,
+          "fields": [
+            {
+              "field": "energy_kj",
+              "expected": 309,
+              "actual": 309,
+              "outcome": "correct"
+            },
+            {
+              "field": "protein_g",
+              "expected": 3.6,
+              "actual": 36,
+              "outcome": "wrong"
+            },
+            {
+              "field": "fat_g",
+              "expected": 4.4,
+              "actual": 44,
+              "outcome": "wrong"
+            },
+            {
+              "field": "carbohydrate_g",
+              "expected": 5,
+              "actual": null,
+              "outcome": "missing"
+            },
+            {
+              "field": "sodium_mg",
+              "expected": 58,
+              "actual": null,
+              "outcome": "missing"
+            }
+          ],
+          "unsupportedFields": [],
+          "basisOutcome": "wrong",
+          "rawText": "|项目\n能量\n|蛋白质\n|脂肪\n碳水化合物\n配\n营养成分表\n100mL\n309 kJ\n36g\n44g\n509\n58mg\n120mg\n料:生牛乳\n产品米刑,附面\nNRV%\n4%\n6%\n7%\n2%\n3%\n15%"
+        }
+      }
+    },
+    {
+      "fixtureId": "6937003117814",
+      "evidence": "device_mlkit_image_execution",
+      "stages": {
+        "original": {
+          "status": "ok",
+          "scope": null,
+          "reason": null,
+          "fields": [
+            {
+              "field": "energy_kj",
+              "expected": 2075,
+              "actual": 2075,
+              "outcome": "correct"
+            },
+            {
+              "field": "protein_g",
+              "expected": 21,
+              "actual": 21,
+              "outcome": "correct"
+            },
+            {
+              "field": "fat_g",
+              "expected": 37.7,
+              "actual": 37.7,
+              "outcome": "correct"
+            },
+            {
+              "field": "carbohydrate_g",
+              "expected": 19,
+              "actual": 19,
+              "outcome": "correct"
+            },
+            {
+              "field": "sodium_mg",
+              "expected": 1248,
+              "actual": 1248,
+              "outcome": "correct"
+            }
+          ],
+          "unsupportedFields": [],
+          "basisOutcome": "correct",
+          "rawText": "[项目\n「能量\n|蛋白质\n脂肪\n1碳水化合物\n|鈉\n营养成分表\n每100克(g)\n2075千焦(k)\n21.0 (g)\n37.7 (g)\n19.0克g)\n1248毫克(mg)\nNRV%\n25%\n35%\n63%\n6%\n62%\n6 i9\n商业信息中心心《 2022年中国休闲零食市场报告》"
+        },
+        "preprocessed": {
+          "status": "ok",
+          "scope": null,
+          "reason": null,
+          "fields": [
+            {
+              "field": "energy_kj",
+              "expected": 2075,
+              "actual": null,
+              "outcome": "missing"
+            },
+            {
+              "field": "protein_g",
+              "expected": 21,
+              "actual": null,
+              "outcome": "missing"
+            },
+            {
+              "field": "fat_g",
+              "expected": 37.7,
+              "actual": null,
+              "outcome": "missing"
+            },
+            {
+              "field": "carbohydrate_g",
+              "expected": 19,
+              "actual": 19,
+              "outcome": "correct"
+            },
+            {
+              "field": "sodium_mg",
+              "expected": 1248,
+              "actual": 1248,
+              "outcome": "correct"
+            }
+          ],
+          "unsupportedFields": [],
+          "basisOutcome": "correct",
+          "rawText": "「项归\n能量\n|蛋白质\n脂肪\n|碳水化合物\n|鈉\n营养成分表\n每100克(g)\n2075干焦(k)\n21.0 3 (g)\n37.7 5 (g)\n19.0 (g)\n1248毫克 (mg)\nNRV%\n25%\n35%\n63%\n6%\n62%"
+        },
+        "parser": {
+          "status": "ok",
+          "scope": null,
+          "reason": null,
+          "fields": [
+            {
+              "field": "energy_kj",
+              "expected": 2075,
+              "actual": null,
+              "outcome": "missing"
+            },
+            {
+              "field": "protein_g",
+              "expected": 21,
+              "actual": null,
+              "outcome": "missing"
+            },
+            {
+              "field": "fat_g",
+              "expected": 37.7,
+              "actual": null,
+              "outcome": "missing"
+            },
+            {
+              "field": "carbohydrate_g",
+              "expected": 19,
+              "actual": 19,
+              "outcome": "correct"
+            },
+            {
+              "field": "sodium_mg",
+              "expected": 1248,
+              "actual": 1248,
+              "outcome": "correct"
+            }
+          ],
+          "unsupportedFields": [],
+          "basisOutcome": "correct",
+          "rawText": "营养成分表\n「项归 每100克(g) NRV%\n能量 2075干焦(k) 25%\n|蛋白质 21.0 3 (g) 35%\n脂肪 37.7 5 (g) 63%\n|碳水化合物 19.0 (g) 6%\n|鈉 1248毫克 (mg) 62%"
+        },
+        "production": {
+          "status": "ok",
+          "scope": "local_only",
+          "reason": null,
+          "fields": [
+            {
+              "field": "energy_kj",
+              "expected": 2075,
+              "actual": 2075,
+              "outcome": "correct"
+            },
+            {
+              "field": "protein_g",
+              "expected": 21,
+              "actual": 21,
+              "outcome": "correct"
+            },
+            {
+              "field": "fat_g",
+              "expected": 37.7,
+              "actual": 37.7,
+              "outcome": "correct"
+            },
+            {
+              "field": "carbohydrate_g",
+              "expected": 19,
+              "actual": 19,
+              "outcome": "correct"
+            },
+            {
+              "field": "sodium_mg",
+              "expected": 1248,
+              "actual": 1248,
+              "outcome": "correct"
+            }
+          ],
+          "unsupportedFields": [],
+          "basisOutcome": "correct",
+          "rawText": "「项归\n能量\n|蛋白质\n脂肪\n|碳水化合物\n|鈉\n营养成分表\n每100克(g)\n2075干焦(k)\n21.0 3 (g)\n37.7 5 (g)\n19.0 (g)\n1248毫克 (mg)\nNRV%\n25%\n35%\n63%\n6%\n62%"
+        },
+        "vision": {
+          "status": "not_run",
+          "reason": "CI_NO_VISION_KEY",
+          "fields": []
+        },
+        "merged": {
+          "status": "ok",
+          "scope": "local_only",
+          "reason": null,
+          "fields": [
+            {
+              "field": "energy_kj",
+              "expected": 2075,
+              "actual": 2075,
+              "outcome": "correct"
+            },
+            {
+              "field": "protein_g",
+              "expected": 21,
+              "actual": 21,
+              "outcome": "correct"
+            },
+            {
+              "field": "fat_g",
+              "expected": 37.7,
+              "actual": 37.7,
+              "outcome": "correct"
+            },
+            {
+              "field": "carbohydrate_g",
+              "expected": 19,
+              "actual": 19,
+              "outcome": "correct"
+            },
+            {
+              "field": "sodium_mg",
+              "expected": 1248,
+              "actual": 1248,
+              "outcome": "correct"
+            }
+          ],
+          "unsupportedFields": [],
+          "basisOutcome": "correct",
+          "rawText": null
+        },
+        "experimental_gray": {
+          "status": "ok",
+          "scope": null,
+          "reason": null,
+          "fields": [
+            {
+              "field": "energy_kj",
+              "expected": 2075,
+              "actual": 2075,
+              "outcome": "correct"
+            },
+            {
+              "field": "protein_g",
+              "expected": 21,
+              "actual": null,
+              "outcome": "missing"
+            },
+            {
+              "field": "fat_g",
+              "expected": 37.7,
+              "actual": null,
+              "outcome": "missing"
+            },
+            {
+              "field": "carbohydrate_g",
+              "expected": 19,
+              "actual": 19,
+              "outcome": "correct"
+            },
+            {
+              "field": "sodium_mg",
+              "expected": 1248,
+              "actual": 1248,
+              "outcome": "correct"
+            }
+          ],
+          "unsupportedFields": [],
+          "basisOutcome": "correct",
+          "rawText": "「项归\n能量\n蛋白质\n(脂肪\n|碳水化合物\n|鈉\n营养成分表\n每100克(g) NRV%\n2075千焦(k)\n21.0 3 (g)\n37.7 5 (g)\n19.0 (g)\n1248毫克(mg)\n25%\n35%\n63%\n6%\n62%"
+        },
+        "experimental_upscaled": {
+          "status": "ok",
+          "scope": null,
+          "reason": null,
+          "fields": [
+            {
+              "field": "energy_kj",
+              "expected": 2075,
+              "actual": 2075,
+              "outcome": "correct"
+            },
+            {
+              "field": "protein_g",
+              "expected": 21,
+              "actual": null,
+              "outcome": "missing"
+            },
+            {
+              "field": "fat_g",
+              "expected": 37.7,
+              "actual": 37.7,
+              "outcome": "correct"
+            },
+            {
+              "field": "carbohydrate_g",
+              "expected": 19,
+              "actual": null,
+              "outcome": "missing"
+            },
+            {
+              "field": "sodium_mg",
+              "expected": 1248,
+              "actual": 1248,
+              "outcome": "correct"
+            }
+          ],
+          "unsupportedFields": [],
+          "basisOutcome": "correct",
+          "rawText": "「项目\n能量\n蛋白质\n脂肪\n|碳水化台物\n|鈉\n营养成分表\n每100克(g) NRV%\n2075千焦(k)\n21.0 3 (g)\n37.7 (g)\n19.0 (g)\n1248毫克 (mg)\n25%\n35%\n63%\n6%\n62%"
+        },
+        "experimental_deskew": {
+          "status": "not_run",
+          "reason": "NO_RELIABLE_TILT_DETECTED",
+          "fields": []
+        },
+        "experimental_whole_png": {
+          "status": "ok",
+          "scope": "experimental_parser_only",
+          "reason": null,
+          "fields": [
+            {
+              "field": "energy_kj",
+              "expected": 2075,
+              "actual": 2075,
+              "outcome": "correct"
+            },
+            {
+              "field": "protein_g",
+              "expected": 21,
+              "actual": 21,
+              "outcome": "correct"
+            },
+            {
+              "field": "fat_g",
+              "expected": 37.7,
+              "actual": 37.7,
+              "outcome": "correct"
+            },
+            {
+              "field": "carbohydrate_g",
+              "expected": 19,
+              "actual": 19,
+              "outcome": "correct"
+            },
+            {
+              "field": "sodium_mg",
+              "expected": 1248,
+              "actual": 1248,
+              "outcome": "correct"
+            }
+          ],
+          "unsupportedFields": [],
+          "basisOutcome": "correct",
+          "rawText": "[项目\n「能量\n|蛋白质\n脂肪\n1碳水化合物\n|鈉\n营养成分表\n每100克(g)\n2075千焦(k)\n21.0 (g)\n37.7 (g)\n19.0克g)\n1248毫克(mg)\nNRV%\n25%\n35%\n63%\n6%\n62%\n6 i9\n商业信息中心心《 2022年中国休闲零食市场报告》"
+        },
+        "experimental_roi_png": {
+          "status": "ok",
+          "scope": "experimental_parser_only",
+          "reason": null,
+          "fields": [
+            {
+              "field": "energy_kj",
+              "expected": 2075,
+              "actual": null,
+              "outcome": "missing"
+            },
+            {
+              "field": "protein_g",
+              "expected": 21,
+              "actual": 21,
+              "outcome": "correct"
+            },
+            {
+              "field": "fat_g",
+              "expected": 37.7,
+              "actual": 37.7,
+              "outcome": "correct"
+            },
+            {
+              "field": "carbohydrate_g",
+              "expected": 19,
+              "actual": 19,
+              "outcome": "correct"
+            },
+            {
+              "field": "sodium_mg",
+              "expected": 1248,
+              "actual": 1248,
+              "outcome": "correct"
+            }
+          ],
+          "unsupportedFields": [],
+          "basisOutcome": "correct",
+          "rawText": "「项归\n能量\n|蛋白质\n(脂肪\n|碳水化合物\n|鈉\n营养成分表\n每100克(q)\n2075干焦(k)\n21.0 (g)\n37.7 (g)\n19.0 (g)\n1248毫克 (mg)\nNRV%\n25%\n35%\n63%\n6%\n62%"
+        },
+        "experimental_roi_jpeg": {
+          "status": "ok",
+          "scope": "experimental_parser_only",
+          "reason": null,
+          "fields": [
+            {
+              "field": "energy_kj",
+              "expected": 2075,
+              "actual": 2075,
+              "outcome": "correct"
+            },
+            {
+              "field": "protein_g",
+              "expected": 21,
+              "actual": 21,
+              "outcome": "correct"
+            },
+            {
+              "field": "fat_g",
+              "expected": 37.7,
+              "actual": null,
+              "outcome": "missing"
+            },
+            {
+              "field": "carbohydrate_g",
+              "expected": 19,
+              "actual": null,
+              "outcome": "missing"
+            },
+            {
+              "field": "sodium_mg",
+              "expected": 1248,
+              "actual": null,
+              "outcome": "missing"
+            }
+          ],
+          "unsupportedFields": [],
+          "basisOutcome": "correct",
+          "rawText": "「项归\n|能量\n|蛋白质\n脂肪\n|碳水化合物\n营养成分表\n每100克(g) NRV%\n2075千焦(k)\n21.0 (q)\n37.7 5 (g)\n19.0 (g)\n1248毫克 (mg)\n25%\n35%\n63%\n6%\n62%"
+        },
+        "experimental_padded_roi_png": {
+          "status": "ok",
+          "scope": "experimental_parser_only",
+          "reason": null,
+          "fields": [
+            {
+              "field": "energy_kj",
+              "expected": 2075,
+              "actual": null,
+              "outcome": "missing"
+            },
+            {
+              "field": "protein_g",
+              "expected": 21,
+              "actual": 21,
+              "outcome": "correct"
+            },
+            {
+              "field": "fat_g",
+              "expected": 37.7,
+              "actual": 37.7,
+              "outcome": "correct"
+            },
+            {
+              "field": "carbohydrate_g",
+              "expected": 19,
+              "actual": 19,
+              "outcome": "correct"
+            },
+            {
+              "field": "sodium_mg",
+              "expected": 1248,
+              "actual": 1248,
+              "outcome": "correct"
+            }
+          ],
+          "unsupportedFields": [],
+          "basisOutcome": "correct",
+          "rawText": "「项目\n能量\n蛋白质\n脂肪\n碳水化合物\n钠\n营养成分表\n每100克 (q)\n2075干焦(k)\n21.0克(g)\n37.7克(g)\n19.0克(g)\n1248毫克 (mg)\nNRV%\n25%\n35%\n63%\n6%\n62%\n6"
+        }
+      }
+    }
+  ]
+}

@@ -1,0 +1,7 @@
+Starting: Intent { cmp=com.hukang.local.clouddebug/com.hukang.local.MainActivity (has extras) }
+Status: ok
+LaunchState: COLD
+Activity: com.hukang.local.clouddebug/com.hukang.local.MainActivity
+TotalTime: 1862
+WaitTime: 1895
+Complete
