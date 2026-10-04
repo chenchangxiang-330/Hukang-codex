@@ -24,8 +24,6 @@ for attempt in $(seq 1 120); do
   fi
   sleep 2
 done
-adb logcat -d > smoke-evidence/ocr-logcat.txt
-adb exec-out screencap -p > smoke-evidence/ocr-result.png
 if [ "$completed" != true ]; then
   echo 'Real ML Kit regression did not produce its result within 240 seconds.' >&2
   exit 1
@@ -51,3 +49,11 @@ node --input-type=module -e '
     throw new Error(`Real nutrition regression worsened: ${JSON.stringify(score)}`);
   console.log("Both real images executed through the production Chinese OCR chain; quantitative guard passed.");
 '
+# Diagnostic collection is secondary to the validated native JSON. A failed ADB
+# log stream must not discard completed evidence or prevent the storage check.
+if ! timeout 20s adb logcat -d -t 2000 > smoke-evidence/ocr-logcat.txt 2> smoke-evidence/ocr-logcat-error.txt; then
+  echo 'OCR logcat collection failed; see ocr-logcat-error.txt.' >&2
+fi
+if ! timeout 20s adb exec-out screencap -p > smoke-evidence/ocr-result.png 2> smoke-evidence/ocr-screenshot-error.txt; then
+  echo 'OCR screenshot collection failed; see ocr-screenshot-error.txt.' >&2
+fi

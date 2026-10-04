@@ -27,8 +27,6 @@ run_phase() {
     fi
     sleep 2
   done
-  adb exec-out screencap -p > "smoke-evidence/storage-$phase.png"
-  adb logcat -d > "smoke-evidence/storage-$phase-logcat.txt"
   if [ "$completed" != true ]; then
     echo "Storage $phase did not complete within 180 seconds." >&2
     exit 1
@@ -43,6 +41,12 @@ if(phase==='verify'&&(result.network?.isConnected!==false||result.launchToken===
   throw new Error('Storage verification did not run offline in a fresh JS process');
 console.log(`Storage ${phase}: ${result.checks.length} native checks passed (${runId}).`);
 JS
+  if ! timeout 20s adb logcat -d -t 2000 > "smoke-evidence/storage-$phase-logcat.txt" 2> "smoke-evidence/storage-$phase-logcat-error.txt"; then
+    echo "Storage $phase logcat collection failed; see error artifact." >&2
+  fi
+  if ! timeout 20s adb exec-out screencap -p > "smoke-evidence/storage-$phase.png" 2> "smoke-evidence/storage-$phase-screenshot-error.txt"; then
+    echo "Storage $phase screenshot collection failed; see error artifact." >&2
+  fi
 }
 
 run_phase write
