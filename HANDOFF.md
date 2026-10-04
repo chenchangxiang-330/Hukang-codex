@@ -1,5 +1,7 @@
 # HuKang / 护康 Engineering Handoff
 
+2026-10-04接续开发请先读 [docs/HANDOFF.md](./docs/HANDOFF.md)。该报告重新核对了实际代码、main/PR/云构建、功能状态及未保存工作边界；本文以下保留历史记录，不覆盖新报告。
+
 交接更新：2026-10-03（下方较早内容为历史记录）
 当前应用版本：1.4.0（Android versionCode 14）
 
