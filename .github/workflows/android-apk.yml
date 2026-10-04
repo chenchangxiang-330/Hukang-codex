@@ -72,6 +72,9 @@ jobs:
             -dname 'CN=HuKang Cloud Debug,O=Android,C=CN'
           chmod 600 android/app/debug.keystore
 
+      - name: Embed exact source identity in device diagnostics
+        run: node scripts/stamp-build-info.mjs "$GITHUB_SHA"
+
       - name: Build standalone Debug APK for phone and emulator
         env:
           NODE_ENV: production
@@ -126,6 +129,7 @@ jobs:
           script: |
             bash scripts/smoke-android-apk.sh cloud-apk/HuKang-cloud-debug.apk
             bash scripts/run-android-ocr-regression.sh
+            bash scripts/run-android-storage-regression.sh
       - name: Upload installation evidence
         if: always()
         uses: actions/upload-artifact@v6

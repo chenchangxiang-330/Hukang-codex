@@ -4,9 +4,15 @@ set -euo pipefail
 # This runs real bundled Chinese ML Kit, not a transcription fixture or a mocked OCR.
 # The hidden entry point is enabled only in the standalone cloud Debug variant.
 app_package='com.hukang.local.clouddebug'
+run_id="ocr-$(date +%s)-$$"
 mkdir -p smoke-evidence
 adb shell am force-stop "$app_package"
+# Archive the prior result before polling; React may start after our first poll.
+if adb shell run-as "$app_package" test -e files/ocr-regression.json; then
+  adb shell run-as "$app_package" mv files/ocr-regression.json "files/ocr-regression.before-$run_id.json"
+fi
 adb shell am start -W -n "$app_package/com.hukang.local.MainActivity" --ez ocrBenchmark true \
+  --es ocrRunId "$run_id" \
   | tee smoke-evidence/ocr-launch.txt
 grep -q 'Status: ok' smoke-evidence/ocr-launch.txt
 
@@ -25,6 +31,7 @@ if [ "$completed" != true ]; then
   exit 1
 fi
 adb exec-out run-as "$app_package" cat files/ocr-regression.json > smoke-evidence/ocr-regression.json
+node scripts/validate-ocr-run.mjs smoke-evidence/ocr-regression.json "$run_id"
 node scripts/score-ocr-benchmark.mjs smoke-evidence/ocr-regression.json > smoke-evidence/ocr-score.json
 node --input-type=module -e '
   import {readFileSync} from "node:fs";

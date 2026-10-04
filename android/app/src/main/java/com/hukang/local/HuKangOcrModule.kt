@@ -17,6 +17,8 @@ import com.google.mlkit.vision.text.chinese.ChineseTextRecognizerOptions
 import java.io.File
 import java.io.InputStream
 import java.util.concurrent.Executors
+import kotlin.math.ceil
+import kotlin.math.floor
 class HuKangOcrModule(private val context:ReactApplicationContext):ReactContextBaseJavaModule(context){
  private val imageWorker=Executors.newSingleThreadExecutor()
  private val provider="mlkit-chinese-bundled-16.0.1"
@@ -51,6 +53,16 @@ class HuKangOcrModule(private val context:ReactApplicationContext):ReactContextB
    output.outputStream().use{require(bitmap.compress(Bitmap.CompressFormat.JPEG,97,it)){"JPEG encoding failed"}}
    require(output.length()>0){"Empty processed image"}
    ExifInterface(output).apply{setAttribute(ExifInterface.TAG_ORIENTATION,"1");saveAttributes()}
+   return output
+  }catch(error:Exception){output.delete();throw error}
+ }
+ private fun savePng(bitmap:Bitmap,prefix:String):File {
+  val dir=File(context.filesDir,"scans")
+  require(dir.exists()||dir.mkdirs()){"Cannot create scan directory"}
+  val output=File.createTempFile(prefix,".png",dir)
+  try {
+   output.outputStream().use{require(bitmap.compress(Bitmap.CompressFormat.PNG,100,it)){"PNG encoding failed"}}
+   require(output.length()>0){"Empty benchmark image"}
    return output
   }catch(error:Exception){output.delete();throw error}
  }
@@ -123,6 +135,83 @@ class HuKangOcrModule(private val context:ReactApplicationContext):ReactContextB
     }.addOnFailureListener {error->client.close();promise.reject("OCR_FAILED",error)}
    }catch(error:OutOfMemoryError){opened?.close();promise.reject("OCR_MEMORY_LIMIT","Image too large for OCR",error)}
     catch(error:Exception){opened?.close();promise.reject("OCR_IMAGE_FAILED",error)}
+  }
+ }
+ // Benchmark only. These variants never enter production recognition or a merge.
+ // All outputs share one decoded/upright bitmap so JPEG/PNG differs only in encoding,
+ // while whole/exact/padded PNG compares crop context without another lossy encoding.
+ @ReactMethod fun createBenchmarkImages(uri:String,crop:ReadableMap,promise:Promise){
+  imageWorker.execute {
+   var decoded:Bitmap?=null
+   var upright:Bitmap?=null
+   val cropped=mutableListOf<Bitmap>()
+   val files=mutableListOf<File>()
+   try {
+    val orientation=openImage(uri).use{ExifInterface(it).getAttributeInt(ExifInterface.TAG_ORIENTATION,1)}.let{if(it in 1..8)it else 1}
+    val size=bounds(uri)
+    val (bitmap,sample)=decodeBounded(uri)
+    decoded=bitmap
+    val matrix=Matrix().apply {
+     when(orientation){
+      2->setScale(-1f,1f);3->setRotate(180f);4->setScale(1f,-1f)
+      5->setValues(floatArrayOf(0f,1f,0f,1f,0f,0f,0f,0f,1f));6->setRotate(90f)
+      7->setValues(floatArrayOf(0f,-1f,0f,-1f,0f,0f,0f,0f,1f));8->setRotate(270f)
+     }
+    }
+    val image=if(orientation==1)bitmap else Bitmap.createBitmap(bitmap,0,0,bitmap.width,bitmap.height,matrix,true)
+    upright=image
+    // Crop coordinates are upright source pixels, matching the manually annotated ROI.
+    val sourceWidth=if(orientation in 5..8)size.outHeight else size.outWidth
+    val sourceHeight=if(orientation in 5..8)size.outWidth else size.outHeight
+    val x=crop.getDouble("originX");val y=crop.getDouble("originY")
+    val width=crop.getDouble("width");val height=crop.getDouble("height")
+    require(listOf(x,y,width,height).all{it.isFinite()}&&x>=0&&y>=0&&width>=1&&height>=1&&x+width<=sourceWidth&&y+height<=sourceHeight){"Invalid benchmark crop"}
+    val sx=image.width.toDouble()/sourceWidth;val sy=image.height.toDouble()/sourceHeight
+    fun region(padding:Double):IntArray {
+     val left=floor(maxOf(0.0,x-width*padding)*sx).toInt()
+     val top=floor(maxOf(0.0,y-height*padding)*sy).toInt()
+     val right=ceil(minOf(sourceWidth.toDouble(),x+width+width*padding)*sx).toInt().coerceAtMost(image.width)
+     val bottom=ceil(minOf(sourceHeight.toDouble(),y+height+height*padding)*sy).toInt().coerceAtMost(image.height)
+     require(right>left&&bottom>top){"Empty benchmark crop after sampling"}
+     return intArrayOf(left,top,right-left,bottom-top)
+    }
+    val exact=region(0.0);val padded=region(0.1)
+    fun cut(region:IntArray):Bitmap=Bitmap.createBitmap(image,region[0],region[1],region[2],region[3]).also{if(it!==image)cropped.add(it)}
+    fun output(bitmap:Bitmap,name:String,jpeg:Boolean,region:IntArray?):WritableMap {
+     val file=if(jpeg)saveJpeg(bitmap,"benchmark-$name-")else savePng(bitmap,"benchmark-$name-")
+     files.add(file)
+     return Arguments.createMap().apply {
+      putString("uri",Uri.fromFile(file).toString());putInt("width",bitmap.width);putInt("height",bitmap.height)
+      putInt("sourceOrientation",orientation);putInt("orientation",1);putInt("sampleSize",sample)
+      putInt("sourceWidth",sourceWidth);putInt("sourceHeight",sourceHeight);putDouble("fileSize",file.length().toDouble())
+      putString("encoding",if(jpeg)"jpeg_quality_97" else "png_lossless")
+      putArray("steps",Arguments.createArray().apply{
+       pushString("benchmark_only");if(orientation!=1)pushString("exif_orientation_$orientation")
+       if(sample>1)pushString("memory_downsample_$sample")
+       if(region!=null)pushString(if(name=="padded_roi_png")"manual_roi_padding_10_percent_each_side" else "manual_roi")
+       pushString(if(jpeg)"jpeg_quality_97" else "png_lossless")
+      })
+      if(region!=null)putMap("pixelCrop",Arguments.createMap().apply{
+       putInt("originX",region[0]);putInt("originY",region[1]);putInt("width",region[2]);putInt("height",region[3])
+      })
+      putMap("sourceCrop",Arguments.createMap().apply{
+       putDouble("originX",x);putDouble("originY",y);putDouble("width",width);putDouble("height",height)
+      })
+     }
+    }
+    val outputs=Arguments.createMap()
+    outputs.putMap("whole_png",output(image,"whole_png",false,null))
+    val roi=cut(exact)
+    outputs.putMap("roi_png",output(roi,"roi_png",false,exact))
+    outputs.putMap("roi_jpeg",output(roi,"roi_jpeg",true,exact))
+    // Recycle each crop before allocating the next; preserve decodeBounded's heap margin.
+    if(roi!==image){roi.recycle();cropped.remove(roi)}
+    val paddedRoi=cut(padded)
+    outputs.putMap("padded_roi_png",output(paddedRoi,"padded_roi_png",false,padded))
+    promise.resolve(outputs)
+   }catch(error:OutOfMemoryError){files.forEach{it.delete()};promise.reject("IMAGE_MEMORY_LIMIT","Image too large for benchmark",error)}
+    catch(error:Exception){files.forEach{it.delete()};promise.reject("IMAGE_BENCHMARK_FAILED",error)}
+   finally{cropped.distinct().forEach{it.recycle()};if(upright!==decoded)upright?.recycle();decoded?.recycle()}
   }
  }
  // Explicit A/B candidate only: never choose it automatically or discard the color image.

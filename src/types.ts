@@ -32,6 +32,7 @@ export type Product = Nutrients & {
   ingredientsRawText: string | null;
   ingredientsJson: string | null;
   ocrRawText: string | null;
+  recognitionEvidenceJson?: string | null;
   dataSource: "manual"|"local_ocr"|"open_food_facts"|"online_vision"|"mixed";
   lastVerifiedAt: string | null;
   createdAt: string;

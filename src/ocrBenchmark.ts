@@ -16,12 +16,18 @@ const fixtures=[
 ];
 type Stage={status:"ok"|"error"|"not_run";reason?:string;rawText?:string;fields?:Record<string,number|null>;basis?:{amount:number|null;unit:string|null};scope?:string;[key:string]:unknown};
 type Run={fixtureId:string;evidence:string;platform:string;stages:Record<string,Stage>};
+const encodingContextExperiments=[
+  {variant:"whole_png",stage:"experimental_whole_png",hypothesis:"Whole-image lossless export: does source decoding/normalization alone change OCR?"},
+  {variant:"roi_png",stage:"experimental_roi_png",hypothesis:"Exact ROI versus whole PNG: does removing surrounding context change OCR without added JPEG loss?"},
+  {variant:"roi_jpeg",stage:"experimental_roi_jpeg",hypothesis:"Exact ROI JPEG97 versus ROI PNG: does encoding the same decoded crop change OCR?"},
+  {variant:"padded_roi_png",stage:"experimental_padded_roi_png",hypothesis:"ROI with 10 percent padding on each side versus exact ROI PNG: does nearby context change OCR?"},
+] as const;
 const mapped=(n:Nutrients)=>Object.fromEntries((Object.keys(nutritionVisionKeys) as (keyof Nutrients)[]).map(k=>[nutritionVisionKeys[k],n[k]??null]));
 const errorText=(error:unknown)=>error instanceof Error?error.message:String(error);
 export async function runRealNutritionBenchmark(progress:(label:string)=>void,options:{vision?:boolean}={}){
   const runs:Run[]=[];
   for(const fixture of fixtures){
-    const stages:Record<string,Stage>=Object.fromEntries(["original","preprocessed","parser","production","vision","merged","experimental_gray","experimental_upscaled","experimental_deskew"].map(name=>[name,{status:"not_run",reason:"Stage not reached"}]));
+    const stages:Record<string,Stage>=Object.fromEntries(["original","preprocessed","parser","production","vision","merged","experimental_gray","experimental_upscaled","experimental_deskew",...encodingContextExperiments.map(experiment=>experiment.stage)].map(name=>[name,{status:"not_run",reason:"Stage not reached"}]));
     if(options.vision===false)stages.vision={status:"not_run",reason:"CI_NO_VISION_KEY"};
     const run:Run={fixtureId:fixture.fixtureId,evidence:"device_mlkit_image_execution",platform:Platform.OS,stages};runs.push(run);
     try{
@@ -56,6 +62,23 @@ export async function runRealNutritionBenchmark(progress:(label:string)=>void,op
       else{const debug=await loadScanDebug(),diagnostic=debug.vision as {status?:string;reason?:string}|undefined;stages.vision={status:diagnostic?.status==="failed"?"error":"not_run",reason:diagnostic?.reason??"No Vision execution"}}
       const merged=production.merged;
       stages.merged={status:"ok",fields:mapped(merged.nutrients),basis:{amount:merged.basisAmount,unit:merged.basisUnit},scope:vision?"ocr_plus_vision":"local_only",result:merged};
+      // Hypothesis tests only. The native bridge decodes the source once and writes
+      // exact ROI PNG/JPEG from the same pixels; no variant feeds production/merge.
+      if(typeof NativeModules.HuKangOcr?.createBenchmarkImages!=="function"){
+        for(const experiment of encodingContextExperiments)stages[experiment.stage]={status:"not_run",reason:"BENCHMARK_VARIANT_MODULE_UNAVAILABLE",hypothesis:experiment.hypothesis};
+      }else{
+        try{
+          const variants=await NativeModules.HuKangOcr.createBenchmarkImages(uri,fixture.roi);
+          for(const experiment of encodingContextExperiments){
+            const variant=variants[experiment.variant];
+            if(typeof variant?.uri!=="string"||!variant.uri){stages[experiment.stage]={status:"error",reason:"BENCHMARK_VARIANT_FILE_MISSING",hypothesis:experiment.hypothesis};continue}
+            await read(variant.uri,experiment.stage);
+            stages[experiment.stage].preprocessing=variant;
+            stages[experiment.stage].hypothesis=experiment.hypothesis;
+            stages[experiment.stage].scope="experimental_parser_only";
+          }
+        }catch(error){for(const experiment of encodingContextExperiments)stages[experiment.stage]={status:"error",reason:errorText(error),hypothesis:experiment.hypothesis}}
+      }
       try{const variant=await NativeModules.HuKangOcr.createOcrVariant(prepared.uri);await read(variant.uri,"experimental_gray");stages.experimental_gray.preprocessing=variant}catch(error){stages.experimental_gray={status:"error",reason:errorText(error)}}
       try{const variant=await preprocessImageForOcr(prepared.uri,{upright:prepared,experimentalScale:2,maxEdge:4096});await read(variant.uri,"experimental_upscaled");stages.experimental_upscaled.preprocessing=variant}catch(error){stages.experimental_upscaled={status:"error",reason:errorText(error)}}
       const slope=estimateNutritionSlope(stages.preprocessed.lines as OcrLine[]??[]);

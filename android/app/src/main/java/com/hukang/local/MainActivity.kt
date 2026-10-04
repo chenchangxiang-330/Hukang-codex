@@ -44,10 +44,21 @@ class MainActivity : ReactActivity() {
           ) {
             override fun getLaunchOptions(): Bundle? {
               // Only the isolated cloud Debug APK accepts the regression-test intent.
-              if (!BuildConfig.IS_CLOUD_DEBUG || !this@MainActivity.intent.getBooleanExtra("ocrBenchmark", false)) {
-                return null
+              if (!BuildConfig.IS_CLOUD_DEBUG) return null
+              val storagePhase = this@MainActivity.intent.getStringExtra("storagePhase")
+              val storageRunId = this@MainActivity.intent.getStringExtra("storageRunId")
+              if ((storagePhase == "write" || storagePhase == "verify") &&
+                  storageRunId != null && Regex("^[A-Za-z0-9][A-Za-z0-9_-]{5,79}$").matches(storageRunId)) {
+                return Bundle().apply {
+                  putString("storagePhase", storagePhase)
+                  putString("storageRunId", storageRunId)
+                }
               }
-              return Bundle().apply { putBoolean("ocrBenchmark", true) }
+              if (!this@MainActivity.intent.getBooleanExtra("ocrBenchmark", false)) return null
+              return Bundle().apply {
+                putBoolean("ocrBenchmark", true)
+                putString("ocrRunId", this@MainActivity.intent.getStringExtra("ocrRunId") ?: "local-ocr")
+              }
             }
           })
   }

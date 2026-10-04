@@ -1,16 +1,20 @@
 import React,{useState}from"react";
-import{Alert,Linking,Pressable,Text,View}from"react-native";
+import{Alert,Linking,Platform,Pressable,Text,View}from"react-native";
 import{File,Paths}from"expo-file-system";
 import*as Sharing from"expo-sharing";
 import{loadScanDebug,type ScanDebugRecord}from"./scanMetrics";
 import{runRealNutritionBenchmark}from"./ocrBenchmark";
+import{buildInfo}from"./buildInfo";
 
 export default function RecognitionDiagnostics({debug,onRefresh}:{debug:ScanDebugRecord;onRefresh:(debug:ScanDebugRecord)=>void}){
   const[busy,setBusy]=useState(false),[status,setStatus]=useState("");
   const refresh=async()=>onRefresh(await loadScanDebug());
   const benchmark=async()=>{setBusy(true);try{await runRealNutritionBenchmark(setStatus);await refresh();setStatus("执行记录已保存。未配置 Vision 时会明确标注未执行。")}catch(error){setStatus(String(error))}finally{setBusy(false)}};
-  const exportEvidence=async()=>{try{const current=await loadScanDebug();const file=new File(Paths.cache,`HuKang-recognition-${Date.now()}.json`);file.write(JSON.stringify(current.ab??current,null,2));await Sharing.shareAsync(file.uri,{mimeType:"application/json"})}catch{Alert.alert("导出失败","请稍后重试。")}};
+  const device={os:Platform.OS,version:Platform.Version,...(Platform.OS==="android"?{brand:Platform.constants.Brand,model:Platform.constants.Model,release:Platform.constants.Release}:{})};
+  const exportEvidence=async()=>{try{const current=await loadScanDebug();const file=new File(Paths.cache,`HuKang-recognition-${Date.now()}.json`);file.write(JSON.stringify({...current,buildInfo,device,exportedAt:new Date().toISOString(),...(current.ab??{})},null,2));await Sharing.shareAsync(file.uri,{mimeType:"application/json"})}catch{Alert.alert("导出失败","请稍后重试。")}};
   return <View style={{gap:10}}>
+    <Text selectable>版本 {buildInfo.version} · {buildInfo.channel} · 源码 {buildInfo.sourceCommit??"本地开发，未标定提交"}</Text>
+    <Text selectable>{JSON.stringify(device)}</Text>
     <Text style={{fontWeight:"700"}}>OCR 原始文字（未被 Parser / Vision 改写）</Text>
     <Text selectable style={{padding:12,backgroundColor:"white"}}>{debug.rawText||"暂无原始文字；请查看 OCR_START / OCR_FAILED 事件"}</Text>
     <Pressable disabled={busy} onPress={refresh}><Text>刷新诊断</Text></Pressable>

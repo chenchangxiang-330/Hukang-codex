@@ -8,7 +8,8 @@ import{parseNutritionLabel}from"./parser";
 import{logScanEvent,logScanError,saveScanDebug}from"./scanMetrics";
 import{visionSkipMessage}from"./textRecognitionEvidence";
 import type{Nutrients}from"./types";
-type CreateArgs={photo:string;barcode?:string;source:"local_ocr"|"online_vision"|"mixed";rawText:string;draft:Record<string,string>};
+import{nutritionSaveEvidence}from"./recognitionSaveEvidence";
+type CreateArgs={photo:string;barcode?:string;source:"local_ocr"|"online_vision"|"mixed";rawText:string;recognitionEvidenceJson:string;draft:Record<string,string>};
 type Props={photo:string;originalPhoto?:string;barcode?:string;scanMeta?:string;back:()=>void;onCreate:(value:CreateArgs)=>void};
 type Recognition=Awaited<ReturnType<typeof recognizeNutrition>>;
 const fields:[keyof Nutrients,string,string][]=[["energyKj","能量","kJ"],["energyKcal","能量","kcal"],["proteinG","蛋白质","g"],["fatG","脂肪","g"],["saturatedFatG","饱和脂肪","g"],["transFatG","反式脂肪","g"],["carbohydrateG","碳水化合物","g"],["sodiumMg","钠","mg"],["totalSugarG","总糖","g"],["addedSugarG","添加糖","g"],["fiberG","膳食纤维","g"]];
@@ -54,7 +55,7 @@ function NutritionResult({photo,originalPhoto,barcode,back,onCreate}:Props){
       if(value.trim()&&(!/^\d+(?:\.\d+)?$/.test(value)||!Number.isFinite(Number(value)))){Alert.alert("请核对数字","营养值只能填写非负数字，未知请留空。");return}draft[key]=value;
     }
     const source=choice==="local"||!result.vision?"local_ocr":choice==="vision"||!result.ocr?.text?"online_vision":"mixed";
-    const finish=()=>{void logScanEvent("USER_CONFIRMED",{draft,source:choice??"merged",localChoice});onCreate({photo,barcode,source,rawText:source==="online_vision"?result.vision?.raw_text??"":localChoice==="original"?result.originalOcr?.text??"":result.ocr?.text??"",draft})};
+    const finish=()=>{void logScanEvent("USER_CONFIRMED",{draft,source:choice??"merged",localChoice});onCreate({photo,barcode,source,...nutritionSaveEvidence({primary:result.ocr,original:result.originalOcr,vision:result.vision,choice,localChoice}),draft})};
     if(result.needsReview)Alert.alert("请逐项对照照片","小数点可能丢失。原图补充也只是候选，不能当作第二个独立引擎验证。读不清的项目请留空，不要直接确认。",[{text:"继续核对",style:"cancel"},{text:"已逐项核对",onPress:finish}]);else finish();
   };
   const button=(label:string,action:()=>void)=><Pressable onPress={action} style={{padding:10}}><Text style={{color,fontWeight:"700"}}>{label}</Text></Pressable>;
