@@ -2,6 +2,19 @@
 
 本文件在迁移工作进行中建立。接续源码基线：`a98fc594cc8bc416d8f9f386f19e185126746e38`，独立分支 `codex/paddleocr-android-migration`。本轮应用提交、模型身份、Android 实际推理、测试、云构建、APK 与同图前后对比结果须由最终执行证据补齐；以下没有宣称本轮构建或 Android 识别已经通过。
 
+
+本轮已推送应用提交 `5e354fb38b317104ef7910a5310a0285277f1e94`，创建 [PR #1](https://github.com/chenchangxiang-330/Hukang-codex/pull/1)（草稿），[首次云端 run38185589167](https://github.com/chenchangxiang-330/Hukang-codex/actions/runs/38185589167) 正在原生构建。默认仍 ML Kit，显式 Android 同图门禁通过后才能切换。后续仅文档提交不代表已生成新 APK。
+
+只读参考完整提交：`5af9d4a5e6cd3ee91e09e7adaf6921dfce696852`，分支 `codex/mainland-v2`。完整/浅克隆因 GitHub 连接重置失败，实际 Kotlin、配置来源锁与许可通过 GitHub 文件 API 在此完整提交读取；没有修改参考仓库、提交、推送或触发其构建。两模型从官方 BOS 原始归档直接重新取得，按参考独立来源锁校验，不从 APK 提取、不重新转换或量化。
+
+静态/主机验证：TypeScript PASS，143/143 Node tests PASS，脚本语法、diff检查 PASS；模型及原始配置逐字节 SHA 和完整有序字典验证 PASS。字典原18383项（首项U+3000），有效18384项，CTC输出18385类；有序字典SHA `02c0a0121c577dfa211f11de21084e3abd23478a77ea4fbdf71ee7a3e990a717`。检测模型4826518 bytes/SHA `a431985659dc921974177a95adcfbb90fd9e51989a5e04d70d0b75f597b6e61d`；识别16534782 bytes/SHA `da72dc72ca4dc220df0dfde68c1dedc31c58d3e76a25871122e5056227d50092`。配置SHA、固定官方revision与参数见 `models/paddleocr/v5-mobile/manifest.json` 和 `source-lock.json`。这些不等于Android推理。
+
+依赖实际AAR只读检查：ORT 1.21.1 minAPI24、OpenCV4.5.3.0 minAPI21，均包含arm64-v8a/x86_64。保留本项目API24与两ABI配置，尚待APK核验/安装。固定Kotlin检测BGR/最长边960/stride32、识别BGR/48高/最小320宽，原始完整字典和配置随APK打包，telemetry关、推理无模型下载。Paddle/ORT/OpenCV/QuickBird完整许可随APK资产保留。保留ML Kit；诊断页可持久设置ML Kit兼容回退，显式benchmark忽略设备override且不暗中fallback。
+
+所有成功OCR入口独立保留原始native、parser input及实际输入图片原字节和SHA，营养确认值独立section。Paddle原图decodecap8MP/4096可能与旧ML Kit内部解码不同，每次记录sampleSize/坐标空间/矩阵，不能说两引擎输入像素必然相同。OpenCV部分异常释放缺口已补finally。QA-04 SQL业务关联缺口未重构，四入口独立归档不等于全部业务证据关联完成。
+
+本轮API24/35 x86_64云验证计划：先APK身份/模型/native ABI/安装启动，然后关闭Wi-Fi/移动数据、真实ML Kit和Paddle原图/ROI/生产链分别输出运行ID；核对10字段及牛奶三个小数原文；真实OCR证据模拟保存和改名，再force-stop/离线冷启动核对JSON与真实图片hash。原生同50ms采样PSS/Java/native heap，只是观察峰值；不等于绝对峰值或手机性能。真实手机、ARM64设备、EXIF2–8、16KB页、触摸UI和扩展实图仍待验。
+
 ## 本轮迁移结果：待填写
 
 | 项目 | 状态 / 后续应填写的证据 |
