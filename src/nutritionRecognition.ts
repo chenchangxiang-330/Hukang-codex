@@ -1,11 +1,11 @@
-import { inspectImage,recognizeDetailed,type OcrResult } from "./ocr";
+import { inspectImage,recognizeDetailed,type OcrEngine,type OcrResult } from "./ocr";
 import { parseNutritionLabel,nutritionCompleteness } from "./parser";
 import { mergeRecognitionResults } from "./recognitionMerge";
 import {mergeLocalOcrCandidates,preserveLocalOcrConflicts} from "./localOcrEvidence";
 import { runVisionFallback } from "./visionFallback";
 import { logScanEvent,logScanError,saveScanDebug,countScanMetric,loadScanDebug } from "./scanMetrics";
 
-export async function recognizeNutrition(photo:string,onStatus:(text:string)=>void,isCancelled=()=>false,options:{originalPhoto?:string;vision?:boolean}={}){
+export async function recognizeNutrition(photo:string,onStatus:(text:string)=>void,isCancelled=()=>false,options:{originalPhoto?:string;vision?:boolean;engine?:OcrEngine}={}){
   let qualityWarning=false,ocr:OcrResult|null=null;
   onStatus("正在读取营养成分表…");
   try{const quality=await inspectImage(photo);await saveScanDebug({quality});await countScanMetric("photoValid");
@@ -13,7 +13,7 @@ export async function recognizeNutrition(photo:string,onStatus:(text:string)=>vo
     if(qualityWarning)await logScanEvent("IMAGE_QUALITY_ADVISORY",{quality});
   }catch(error){await logScanError("image_quality_advisory",error)}
   // Quality heuristics must never prevent OCR or prevent Vision from seeing the image.
-  try{ocr=await recognizeDetailed(photo,"nutrition")}catch(error){await logScanEvent("OCR_CALL_FAILED");await logScanError("nutrition_ocr",error)}
+  try{ocr=await recognizeDetailed(photo,"nutrition",options.engine)}catch(error){await logScanEvent("OCR_CALL_FAILED");await logScanError("nutrition_ocr",error)}
   const input=ocr?.parserText??"";
   if(ocr?.text.trim())await countScanMetric("ocrText");
   await logScanEvent("PARSER_INPUT",{value:input,source:"ocr_geometry_rows"});
@@ -26,7 +26,7 @@ export async function recognizeNutrition(photo:string,onStatus:(text:string)=>vo
   if(options.originalPhoto&&options.originalPhoto!==photo&&!isCancelled()&&(!nutritionCompleteness(parsed).complete||!ocr||ocr.lowConfidence)){
     onStatus("正在对照未裁剪的原图…");
     try{
-      originalOcr=await recognizeDetailed(options.originalPhoto,"nutrition");originalParsed=parseNutritionLabel(originalOcr.parserText);
+      originalOcr=await recognizeDetailed(options.originalPhoto,"nutrition",options.engine);originalParsed=parseNutritionLabel(originalOcr.parserText);
       await logScanEvent("ORIGINAL_OCR_EVIDENCE",{uri:options.originalPhoto,ocr:originalOcr,parsed:originalParsed});
     }catch(error){await logScanError("original_nutrition_ocr",error)}
   }

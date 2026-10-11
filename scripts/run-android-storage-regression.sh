@@ -4,6 +4,9 @@ set -euo pipefail
 # Run only against the isolated cloud Debug package, without clearing its data.
 app_package='com.hukang.local.clouddebug'
 run_id="storage-$(date +%s)-$$"
+paddle_run_id="${1:-}"
+paddle_args=()
+if [ -n "$paddle_run_id" ]; then paddle_args=(--es storagePaddleOcrRunId "$paddle_run_id"); fi
 mkdir -p smoke-evidence
 
 run_phase() {
@@ -17,7 +20,7 @@ run_phase() {
     adb shell run-as "$app_package" mv "files/storage-regression-$phase.json" "files/storage-regression-$phase.before-$run_id.json"
   fi
   adb shell am start -W -n "$app_package/com.hukang.local.MainActivity" \
-    --es storagePhase "$phase" --es storageRunId "$run_id" | tee "smoke-evidence/storage-$phase-launch.txt"
+    --es storagePhase "$phase" --es storageRunId "$run_id" "${paddle_args[@]}" | tee "smoke-evidence/storage-$phase-launch.txt"
   grep -q 'Status: ok' "smoke-evidence/storage-$phase-launch.txt"
   adb shell pidof "$app_package" > "smoke-evidence/storage-$phase-pid.txt"
   for attempt in $(seq 1 90); do
@@ -53,14 +56,19 @@ run_phase write
 old_airplane=$(adb shell settings get global airplane_mode_on | tr -d '\r')
 old_wifi=$(adb shell settings get global wifi_on | tr -d '\r')
 old_data=$(adb shell settings get global mobile_data | tr -d '\r')
+set_airplane() {
+  adb shell settings put global airplane_mode_on "$1"
+  # API 24 lacks the newer connectivity shell command; actual offline state is verified below.
+  if [ "$1" = 1 ]; then adb shell cmd connectivity airplane-mode enable || true; else adb shell cmd connectivity airplane-mode disable || true; fi
+}
 restore_network() {
-  if [ "$old_airplane" = 1 ]; then adb shell cmd connectivity airplane-mode enable; else adb shell cmd connectivity airplane-mode disable; fi
+  set_airplane "$old_airplane"
   if [ "$old_wifi" = 1 ]; then adb shell svc wifi enable; else adb shell svc wifi disable; fi
   if [ "$old_data" = 1 ]; then adb shell svc data enable; else adb shell svc data disable; fi
 }
 trap restore_network EXIT
 adb shell am force-stop "$app_package"
-adb shell cmd connectivity airplane-mode enable
+set_airplane 1
 adb shell svc wifi disable
 adb shell svc data disable
 sleep 3

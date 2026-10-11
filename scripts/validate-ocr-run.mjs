@@ -2,7 +2,7 @@ import { readFileSync } from "node:fs";
 import { resolve } from "node:path";
 import { fileURLToPath } from "node:url";
 
-export function validateOcrRun(result, expectedRunId) {
+export function validateOcrRun(result, expectedRunId, expectedEngine = "mlkit") {
   if (!expectedRunId || result.runId !== expectedRunId)
     throw new Error("OCR run identity mismatch: refusing stale evidence");
   if (result.status !== "completed") throw new Error("OCR execution did not complete");
@@ -10,8 +10,9 @@ export function validateOcrRun(result, expectedRunId) {
   if (!Number.isFinite(started) || !Number.isFinite(completed) || completed < started)
     throw new Error("Invalid OCR execution timestamps");
   if (result.runs?.length !== 2) throw new Error("Expected both real nutrition images");
+  if (result.engine != null && result.engine !== expectedEngine) throw new Error("OCR engine mismatch");
   for (const run of result.runs) {
-    if (run.evidence !== "device_mlkit_image_execution") throw new Error("OCR evidence not from device");
+    if (run.evidence !== `device_${expectedEngine}_image_execution`) throw new Error("OCR evidence not from device");
     for (const name of ["original", "preprocessed", "production"])
       if (run.stages?.[name]?.status !== "ok" || !run.stages[name].rawText)
         throw new Error(`${run.fixtureId}/${name}: OCR did not return real text`);
@@ -21,6 +22,6 @@ export function validateOcrRun(result, expectedRunId) {
 }
 
 if (process.argv[1] && resolve(process.argv[1]) === fileURLToPath(import.meta.url)) {
-  validateOcrRun(JSON.parse(readFileSync(process.argv[2], "utf8")), process.argv[3]);
+  validateOcrRun(JSON.parse(readFileSync(process.argv[2], "utf8")), process.argv[3], process.argv[4]);
   console.log("Fresh OCR run identity and completion verified.");
 }

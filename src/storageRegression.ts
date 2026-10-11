@@ -1,10 +1,13 @@
-import { File, Paths } from "expo-file-system";
+import { Directory, File, Paths } from "expo-file-system";
 import NetInfo from "@react-native-community/netinfo";
 import * as DB from "./database";
 import { loadProfile, loadScannerPreferences, saveProfile, saveScannerPreferences } from "./preferences";
 import { emptyProfile, type HealthProfile, type Product } from "./types";
 import { assertStorageValue, validateStorageRegressionRequest, type StorageRegressionCheck, type StorageRegressionPhase } from "./storageRegressionAssertions";
 import { nutritionSaveEvidence, productSaveEvidence } from "./recognitionSaveEvidence";
+import { storageOcrCandidates, type RealStorageOcrCandidate, type StorageOcrResult } from "./storageOcrEvidence";
+import { buildInfo } from "./buildInfo";
+import { readOcrImageFileEvidence } from "./ocrEvidenceArchive";
 
 // This is deliberately separate from the user's UI and accepts no server URL,
 // key, notification permission, OCR text supplied by a test annotation, or DB clear.
@@ -17,7 +20,73 @@ type Manifest = {
   productId: number; inventoryId: number; logId: number; photoUri: string; photoBase64: string;
   snapshot: Snapshot; previousProfile: HealthProfile; previousPreferences: Awaited<ReturnType<typeof loadScannerPreferences>>;
   countsBefore: { products: number; inventory: number; nutritionLogs: number };
+  realOcrRunId?: string;
+  realOcrRecords?: RealOcrRecord[];
 };
+type PreservedOcrImage = { role: "primary" | "original"; sourceUri: string; preservedUri: string; sha256: string; bytes: number; archiveUri: string; archiveJson: string; archiveImageUri: string };
+type RealOcrRecord = { fixtureId: string; productId: number; product: Product; images: PreservedOcrImage[] };
+export type StorageRegressionOptions = { paddleOcrRunId?: string };
+
+async function fileEvidence(uri: string): Promise<{ sha256: string; bytes: number }> {
+  return readOcrImageFileEvidence(uri);
+}
+
+async function writeRealOcrRecords(candidates: RealStorageOcrCandidate[], runId: string, check: (name: string, actual: unknown, expected: unknown) => void) {
+  const directory = new Directory(Paths.document, "storage-regression", runId);
+  directory.create({ intermediates: true, idempotent: true });
+  const records: RealOcrRecord[] = [];
+  for (const [index, candidate] of candidates.entries()) {
+    const images: PreservedOcrImage[] = [];
+    const preserve = async (ocr: StorageOcrResult, role: "primary" | "original") => {
+      const archiveFile = new File(ocr.evidenceUri);
+      check(`real_${candidate.fixtureId}_${role}_archive_json_exists`, archiveFile.exists && archiveFile.size > 0, true);
+      const archiveJson = await archiveFile.text(), archive = JSON.parse(archiveJson);
+      check(`real_${candidate.fixtureId}_${role}_archive_complete`, archive.status, "completed");
+      check(`real_${candidate.fixtureId}_${role}_archive_no_metadata_gaps`, archive.missingMetadata, []);
+      check(`real_${candidate.fixtureId}_${role}_archive_parser_input`, archive.parserInput, ocr.parserText);
+      for (const key of ["text", "lines", "imageUri", "imageSha256", "engine", "inputImage", "models", "versions", "nativeDurationMs"] as const) {
+        check(`real_${candidate.fixtureId}_${role}_archive_raw_${key}`, archive.raw?.[key], ocr[key]);
+      }
+      for (const [key, rawValue] of Object.entries(archive.raw ?? {})) {
+        check(`real_${candidate.fixtureId}_${role}_native_field_${key}_unchanged`, (ocr as unknown as Record<string, unknown>)[key], rawValue);
+      }
+      check(`real_${candidate.fixtureId}_${role}_archive_input_identity`, [archive.retainedInput?.uri, archive.retainedInput?.sha256], [ocr.retainedImageUri, ocr.imageSha256]);
+      const source = new File(ocr.retainedImageUri), copy = new File(directory, `fixture-${index}-${role}.jpg`);
+      check(`real_${candidate.fixtureId}_${role}_source_nonempty`, source.exists && source.size > 0, true);
+      const before = await fileEvidence(source.uri);
+      check(`real_${candidate.fixtureId}_${role}_ocr_image_sha_matches_bytes`, before.sha256, ocr.imageSha256);
+      if (copy.exists) throw new Error("STORAGE_REAL_OCR_IMAGE_ALREADY_EXISTS");
+      await source.copy(copy);
+      const after = await fileEvidence(copy.uri);
+      check(`real_${candidate.fixtureId}_${role}_copied_image_bytes_and_sha`, after, before);
+      images.push({ role, sourceUri: ocr.imageUri, preservedUri: copy.uri, ...after, archiveUri: archiveFile.uri, archiveJson, archiveImageUri: ocr.retainedImageUri });
+      return copy.uri;
+    };
+    const primaryUri = await preserve(candidate.ocr, "primary");
+    const originalUri = candidate.originalOcr ? await preserve(candidate.originalOcr, "original") : null;
+    const capture = nutritionSaveEvidence({ primary: candidate.ocr, original: candidate.originalOcr, vision: candidate.vision, choice: "local", localChoice: null, images: { primaryUri, originalUri }, confirmation: { kind: "automated_storage_regression_not_user_review", basisAmount: candidate.basisAmount, basisUnit: candidate.basisUnit, nutrients: candidate.nutrients } });
+    const saved = productSaveEvidence({ rawText: capture.rawText, recognitionEvidenceJson: capture.recognitionEvidenceJson, source: candidate.vision == null ? "local_ocr" : "mixed" }, null);
+    const name = `实际OCR候选 ${candidate.fixtureId} ${runId}`;
+    const productId = await DB.saveProduct({ barcode: null, name, brand: null, variant: null, category: "自动存储回归·未经用户验收", netContent: null, netContentUnit: null, basisAmount: candidate.basisAmount, basisUnit: candidate.basisUnit, ...candidate.nutrients, ingredients: null, ingredientsRawText: null, ingredientsJson: null, imageUri: primaryUri, ...saved });
+    const beforeRename = await DB.getProduct(productId);
+    if (!beforeRename) throw new Error("STORAGE_REAL_OCR_PRODUCT_MISSING");
+    const renamed = `${name} · 已改名`;
+    await DB.saveProduct({ ...beforeRename, ...productSaveEvidence({}, beforeRename), name: renamed }, productId);
+    const product = await DB.getProduct(productId);
+    if (!product) throw new Error("STORAGE_REAL_OCR_PRODUCT_MISSING_AFTER_RENAME");
+    check(`real_${candidate.fixtureId}_rename_applied`, product.name, renamed);
+    check(`real_${candidate.fixtureId}_rename_preserves_evidence_bytes`, product.recognitionEvidenceJson, capture.recognitionEvidenceJson);
+    check(`real_${candidate.fixtureId}_rename_preserves_raw_text`, product.ocrRawText, candidate.ocr.text);
+    check(`real_${candidate.fixtureId}_rename_preserves_source`, product.dataSource, saved.dataSource);
+    const evidence = JSON.parse(product.recognitionEvidenceJson ?? "null");
+    check(`real_${candidate.fixtureId}_full_primary_ocr_preserved`, evidence?.local?.primary, candidate.ocr);
+    check(`real_${candidate.fixtureId}_full_original_ocr_preserved`, evidence?.local?.original, candidate.originalOcr);
+    check(`real_${candidate.fixtureId}_independent_vision_preserved`, evidence?.vision, candidate.vision);
+    check(`real_${candidate.fixtureId}_candidate_values_separate`, evidence?.confirmed?.nutrients, candidate.nutrients);
+    records.push({ fixtureId: candidate.fixtureId, productId, product, images });
+  }
+  return records;
+}
 
 async function readSnapshot(productId: number, inventoryId: number, logId: number) {
   const product = await DB.getProduct(productId);
@@ -60,8 +129,9 @@ async function writeManifest(file: File, value: Manifest) {
   await pending.move(file);
 }
 
-export async function runStorageRegression(phase: StorageRegressionPhase, runId: string, status: (value: string) => void) {
+export async function runStorageRegression(phase: StorageRegressionPhase, runId: string, status: (value: string) => void, options: StorageRegressionOptions = {}) {
   validateStorageRegressionRequest(phase, runId);
+  if (options.paddleOcrRunId !== undefined) validateStorageRegressionRequest("write", options.paddleOcrRunId);
   const checks: StorageRegressionCheck[] = [];
   const check = (name: string, actual: unknown, expected: unknown) => checks.push(assertStorageValue(name, actual, expected));
   const manifestFile = new File(Paths.document, `storage-regression-${runId}.manifest.json`);
@@ -69,6 +139,13 @@ export async function runStorageRegression(phase: StorageRegressionPhase, runId:
   await DB.initializeDatabase();
   if (phase === "write") {
     if (manifestFile.exists) throw new Error("STORAGE_RUN_ALREADY_EXISTS:use_a_new_run_id");
+    let realCandidates: RealStorageOcrCandidate[] = [];
+    if (options.paddleOcrRunId !== undefined) {
+      if (typeof buildInfo.sourceCommit !== "string" || !/^[a-f0-9]{40}$/i.test(buildInfo.sourceCommit)) throw new Error("STORAGE_REAL_OCR_BUILD_IDENTITY_UNVERIFIED");
+      const executionFile = new File(Paths.document, "ocr-regression-paddle.json");
+      if (!executionFile.exists) throw new Error("STORAGE_REAL_OCR_EXECUTION_FILE_MISSING");
+      realCandidates = storageOcrCandidates(JSON.parse(await executionFile.text()), options.paddleOcrRunId, buildInfo.sourceCommit);
+    }
     const previousProfile = await loadProfile(), previousPreferences = await loadScannerPreferences();
     // Test intents must never replace a real user's profile/preferences. The
     // CI emulator starts with defaults; a used device gets an explicit refusal.
@@ -136,9 +213,13 @@ export async function runStorageRegression(phase: StorageRegressionPhase, runId:
     check("only_one_product_added", after.products.length, countsBefore.products + 1);
     check("only_one_inventory_added", after.inventory.length, countsBefore.inventory + 1);
     check("only_one_log_added", after.nutritionLogs.length, countsBefore.nutritionLogs + 1);
-    const manifest: Manifest = { schemaVersion: 1, runId, status: "written", writtenAt: new Date().toISOString(), launchToken, productId, inventoryId, logId: initialLog.id, photoUri: photo.uri, photoBase64: await photo.base64(), snapshot, previousProfile, previousPreferences, countsBefore };
+    const realOcrRecords = await writeRealOcrRecords(realCandidates, runId, check);
+    const finalCounts = await DB.exportAll();
+    check("synthetic_and_real_product_count", finalCounts.products.length, countsBefore.products + 1 + realOcrRecords.length);
+    check("real_ocr_adds_no_inventory_or_logs", [finalCounts.inventory.length, finalCounts.nutritionLogs.length], [countsBefore.inventory + 1, countsBefore.nutritionLogs + 1]);
+    const manifest: Manifest = { schemaVersion: 1, runId, status: "written", writtenAt: new Date().toISOString(), launchToken, productId, inventoryId, logId: initialLog.id, photoUri: photo.uri, photoBase64: await photo.base64(), snapshot, previousProfile, previousPreferences, countsBefore, realOcrRunId: options.paddleOcrRunId, realOcrRecords };
     await writeManifest(manifestFile, manifest);
-    return { schemaVersion: 1, status: "completed", phase, runId, launchToken, checks, writtenAt: manifest.writtenAt, manifestUri: manifestFile.uri, snapshot, countsBefore, countsAfter: { products: after.products.length, inventory: after.inventory.length, nutritionLogs: after.nutritionLogs.length }, recognitionEvidence: "mock_selection_storage_only_no_vision_request", scope: "native_api_write_only_requires_external_force_stop_and_offline_verify" };
+    return { schemaVersion: 1, status: "completed", phase, runId, launchToken, checks, writtenAt: manifest.writtenAt, manifestUri: manifestFile.uri, snapshot, countsBefore, countsAfter: { products: finalCounts.products.length, inventory: finalCounts.inventory.length, nutritionLogs: finalCounts.nutritionLogs.length }, realOcrRunId: manifest.realOcrRunId, realOcrRecords, recognitionEvidence: "synthetic_mock_vision_plus_optional_real_paddle_fixture_storage", scope: "native_api_write_only_requires_external_force_stop_and_offline_verify" };
   }
   status("正在离线冷启动读取写入记录…");
   if (!manifestFile.exists) throw new Error("STORAGE_MANIFEST_MISSING");
@@ -146,6 +227,7 @@ export async function runStorageRegression(phase: StorageRegressionPhase, runId:
   check("manifest_version", manifest.schemaVersion, 1);
   check("manifest_run_id", manifest.runId, runId);
   check("manifest_written", manifest.status, "written");
+  check("real_ocr_execution_id_matches", manifest.realOcrRunId ?? null, options.paddleOcrRunId ?? null);
   check("new_js_process", manifest.launchToken !== launchToken, true);
   check("read_after_write", Date.parse(manifest.writtenAt) <= Date.now(), true);
   const network = await NetInfo.fetch();
@@ -159,8 +241,18 @@ export async function runStorageRegression(phase: StorageRegressionPhase, runId:
   const photo = new File(manifest.photoUri);
   check("photo_still_nonempty", photo.exists && photo.size > 0, true);
   check("photo_contents_persisted_exactly", await photo.base64(), manifest.photoBase64);
+  for (const record of manifest.realOcrRecords ?? []) {
+    const product = await DB.getProduct(record.productId);
+    check(`real_${record.fixtureId}_renamed_product_persisted_exactly`, product, record.product);
+    for (const image of record.images) {
+      const actual = await fileEvidence(image.preservedUri);
+      check(`real_${record.fixtureId}_${image.role}_offline_file_sha_and_bytes`, actual, { sha256: image.sha256, bytes: image.bytes });
+      check(`real_${record.fixtureId}_${image.role}_offline_archive_json_unchanged`, await new File(image.archiveUri).text(), image.archiveJson);
+      check(`real_${record.fixtureId}_${image.role}_offline_archive_image_sha_and_bytes`, await fileEvidence(image.archiveImageUri), { sha256: image.sha256, bytes: image.bytes });
+    }
+  }
   const after = await DB.exportAll();
-  check("product_count_unchanged", after.products.length, manifest.countsBefore.products + 1);
+  check("product_count_unchanged", after.products.length, manifest.countsBefore.products + 1 + (manifest.realOcrRecords?.length ?? 0));
   check("inventory_count_unchanged", after.inventory.length, manifest.countsBefore.inventory + 1);
   check("log_count_unchanged", after.nutritionLogs.length, manifest.countsBefore.nutritionLogs + 1);
   // Restore only the original defaults that passed the pristine-state guard.
@@ -169,5 +261,5 @@ export async function runStorageRegression(phase: StorageRegressionPhase, runId:
   await saveScannerPreferences(manifest.previousPreferences);
   check("original_profile_restored", await loadProfile(), manifest.previousProfile);
   check("original_preferences_restored", await loadScannerPreferences(), manifest.previousPreferences);
-  return { schemaVersion: 1, status: "completed", phase, runId, launchToken, writeLaunchToken: manifest.launchToken, writtenAt: manifest.writtenAt, checks, snapshot, network: { isConnected: network.isConnected, isInternetReachable: network.isInternetReachable, type: network.type }, profileAndPreferencesRestored: true, recognitionEvidence: "mock_selection_storage_only_no_vision_request", scope: "native_api_offline_process_restart_durability_not_user_touch_confirmation" };
+  return { schemaVersion: 1, status: "completed", phase, runId, launchToken, writeLaunchToken: manifest.launchToken, writtenAt: manifest.writtenAt, checks, snapshot, realOcrRunId: manifest.realOcrRunId, realOcrRecords: manifest.realOcrRecords ?? [], network: { isConnected: network.isConnected, isInternetReachable: network.isInternetReachable, type: network.type }, profileAndPreferencesRestored: true, recognitionEvidence: "synthetic_mock_vision_plus_optional_real_paddle_fixture_storage", scope: "native_api_offline_process_restart_durability_not_user_touch_confirmation" };
 }

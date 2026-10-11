@@ -55,7 +55,7 @@ function NutritionResult({photo,originalPhoto,barcode,back,onCreate}:Props){
       if(value.trim()&&(!/^\d+(?:\.\d+)?$/.test(value)||!Number.isFinite(Number(value)))){Alert.alert("请核对数字","营养值只能填写非负数字，未知请留空。");return}draft[key]=value;
     }
     const source=choice==="local"||!result.vision?"local_ocr":choice==="vision"||!result.ocr?.text?"online_vision":"mixed";
-    const finish=()=>{void logScanEvent("USER_CONFIRMED",{draft,source:choice??"merged",localChoice});onCreate({photo,barcode,source,...nutritionSaveEvidence({primary:result.ocr,original:result.originalOcr,vision:result.vision,choice,localChoice}),draft})};
+    const finish=()=>{void logScanEvent("USER_CONFIRMED",{draft,source:choice??"merged",localChoice});onCreate({photo,barcode,source,...nutritionSaveEvidence({primary:result.ocr,original:result.originalOcr,vision:result.vision,choice,localChoice,images:{primaryUri:photo,originalUri:originalPhoto??null},confirmation:{kind:"user_confirmed",basisAmount:Number(basis.amount),basisUnit:basis.unit,nutrients:Object.fromEntries(fields.map(([key])=>[key,draft[key].trim()===""?null:Number(draft[key])]))}}),draft})};
     if(result.needsReview)Alert.alert("请逐项对照照片","小数点可能丢失。原图补充也只是候选，不能当作第二个独立引擎验证。读不清的项目请留空，不要直接确认。",[{text:"继续核对",style:"cancel"},{text:"已逐项核对",onPress:finish}]);else finish();
   };
   const button=(label:string,action:()=>void)=><Pressable onPress={action} style={{padding:10}}><Text style={{color,fontWeight:"700"}}>{label}</Text></Pressable>;
