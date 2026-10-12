@@ -1,32 +1,52 @@
-# Paddle OCR Android 迁移报告（2026-10-12，待完成）
+# Paddle OCR Android 迁移报告（2026-10-12，最终默认版待云验证）
 
-本文件在迁移工作进行中建立。接续源码基线：`a98fc594cc8bc416d8f9f386f19e185126746e38`，独立分支 `codex/paddleocr-android-migration`。本轮应用提交、模型身份、Android 实际推理、测试、云构建、APK 与同图前后对比结果须由最终执行证据补齐；以下没有宣称本轮构建或 Android 识别已经通过。
+本文件在迁移工作进行中建立。接续源码基线：`a98fc594cc8bc416d8f9f386f19e185126746e38`，独立分支 `codex/paddleocr-android-migration`。候选17d52da的Android35实际结果已补齐；最终默认版源码、API24实际推理与安装包仍须由新执行证据补齐。
 
 
-本轮已推送应用提交 `5e354fb38b317104ef7910a5310a0285277f1e94`，创建 [PR #1](https://github.com/chenchangxiang-330/Hukang-codex/pull/1)（草稿），[首次云端 run38185589167](https://github.com/chenchangxiang-330/Hukang-codex/actions/runs/38185589167) 正在原生构建。默认仍 ML Kit，显式 Android 同图门禁通过后才能切换。后续仅文档提交不代表已生成新 APK。
+本轮候选构建源码 `17d52da65733741956576db3ae397725e8237d90` 的 [Android35 实际 job](https://github.com/chenchangxiang-330/Hukang-codex/actions/runs/38186191792/job/114609884841) 通过。同一 APK、同两张公开照片、本次真实 Android 推理：ML Kit production/merged **7正确/0错填/3缺失**，Paddle production/merged及固定裁剪 **10/0/0**，Paddle原图单独解析 **8/0/2**。牛奶原生原文确有 `3.6g`、`4.4g`、`5.0g`；原图脂肪/钠在几何对应中缺失，不能把裁剪/融合成绩写成原图成绩，更不是整体食品准确率。原图字节SHA和仓库JPG一致；没有把Mac研究JSON输入Android。
+
+Android35 自动存储 write **151** 项、force-stop后离线 verify **27** 项均通过，网络 `isConnected=false/isInternetReachable=false/type=none`，launchToken不同；范围为真实OCR公开图 + 合成业务材料，经生产API模拟确认/改名/保存，**不是触摸UI或用户手机验收**。完整本次OCR/分项评分与存储检查摘要保存于 `tests/fixtures/ocr/results/paddle/20261012-17d52da-api35/`；原始云设备证据artifact `11720370553`，ZIP SHA `ab736e805100ac77aa6296581a800f87570b89a02b999337b2788ca234f28787`。
+
+[首次run38185589167](https://github.com/chenchangxiang-330/Hukang-codex/actions/runs/38185589167) 的原生构建通过，但设备被文档提交触发的PR重跑取消，不能计为设备通过。第二轮run38186191792的Android24在启动器 `adb shell input keyevent 82` 挂住43分钟后因45分钟job限制取消，尚未进入App；它是启动器失败，不能计作API24通过或识别失败。后续修订API24独立headless/软件渲染启动，给所有阶段有界超时。Android35达成候选门禁后才能切换默认；切换后的新APK还须实际执行不传engine的默认扫描probe、双引擎对照与冷启动，最终结果另补。
+
+[PR #1](https://github.com/chenchangxiang-330/Hukang-codex/pull/1) 目前为草稿，主分支未改。最终测试包按实际源码前10位隔离为 `com.hukang.local.clouddebug.p<sha10>`，runner临时签名，旧正式包/旧clouddebug均不覆盖、不卸载、数据不自动迁移；不同源码的测试包可并存。APK源码身份和后续仅文档提交须区分。
 
 只读参考完整提交：`5af9d4a5e6cd3ee91e09e7adaf6921dfce696852`，分支 `codex/mainland-v2`。完整/浅克隆因 GitHub 连接重置失败，实际 Kotlin、配置来源锁与许可通过 GitHub 文件 API 在此完整提交读取；没有修改参考仓库、提交、推送或触发其构建。两模型从官方 BOS 原始归档直接重新取得，按参考独立来源锁校验，不从 APK 提取、不重新转换或量化。
 
 静态/主机验证：TypeScript PASS，143/143 Node tests PASS，脚本语法、diff检查 PASS；模型及原始配置逐字节 SHA 和完整有序字典验证 PASS。字典原18383项（首项U+3000），有效18384项，CTC输出18385类；有序字典SHA `02c0a0121c577dfa211f11de21084e3abd23478a77ea4fbdf71ee7a3e990a717`。检测模型4826518 bytes/SHA `a431985659dc921974177a95adcfbb90fd9e51989a5e04d70d0b75f597b6e61d`；识别16534782 bytes/SHA `da72dc72ca4dc220df0dfde68c1dedc31c58d3e76a25871122e5056227d50092`。配置SHA、固定官方revision与参数见 `models/paddleocr/v5-mobile/manifest.json` 和 `source-lock.json`。这些不等于Android推理。
 
-依赖实际AAR只读检查：ORT 1.21.1 minAPI24、OpenCV4.5.3.0 minAPI21，均包含arm64-v8a/x86_64。保留本项目API24与两ABI配置，尚待APK核验/安装。固定Kotlin检测BGR/最长边960/stride32、识别BGR/48高/最小320宽，原始完整字典和配置随APK打包，telemetry关、推理无模型下载。Paddle/ORT/OpenCV/QuickBird完整许可随APK资产保留。保留ML Kit；诊断页可持久设置ML Kit兼容回退，显式benchmark忽略设备override且不暗中fallback。
+依赖实际AAR只读检查：ORT 1.21.1 minAPI24、OpenCV4.5.3.0 minAPI21，均包含arm64-v8a/x86_64。保留本项目API24与两ABI配置，候选17d/5e APK已核验API24与两ABI，Android35安装通过；Android24实际安装仍待修复后的云测试。固定Kotlin检测BGR/最长边960/stride32、识别BGR/48高/最小320宽，原始完整字典和配置随APK打包，telemetry关、推理无模型下载。Paddle/ORT/OpenCV/QuickBird完整许可随APK资产保留。保留ML Kit；诊断页可持久设置ML Kit兼容回退，显式benchmark忽略设备override且不暗中fallback。
 
 所有成功OCR入口独立保留原始native、parser input及实际输入图片原字节和SHA，营养确认值独立section。Paddle原图decodecap8MP/4096可能与旧ML Kit内部解码不同，每次记录sampleSize/坐标空间/矩阵，不能说两引擎输入像素必然相同。OpenCV部分异常释放缺口已补finally。QA-04 SQL业务关联缺口未重构，四入口独立归档不等于全部业务证据关联完成。
 
-本轮API24/35 x86_64云验证计划：先APK身份/模型/native ABI/安装启动，然后关闭Wi-Fi/移动数据、真实ML Kit和Paddle原图/ROI/生产链分别输出运行ID；核对10字段及牛奶三个小数原文；真实OCR证据模拟保存和改名，再force-stop/离线冷启动核对JSON与真实图片hash。原生同50ms采样PSS/Java/native heap，只是观察峰值；不等于绝对峰值或手机性能。真实手机、ARM64设备、EXIF2–8、16KB页、触摸UI和扩展实图仍待验。
+最终默认版API24/35 x86_64云验证计划：先APK身份/模型/native ABI/安装启动，然后关闭Wi-Fi/移动数据、真实ML Kit和Paddle原图/ROI/生产链分别输出运行ID；核对10字段及牛奶三个小数原文；真实OCR证据模拟保存和改名，再force-stop/离线冷启动核对JSON与真实图片hash。原生同50ms采样PSS/Java/native heap，只是观察峰值；不等于绝对峰值或手机性能。真实手机、ARM64设备、EXIF2–8、16KB页、触摸UI和扩展实图仍待验。
 
-## 本轮迁移结果：待填写
+## 候选阶段的实测、性能与兼容性
 
-| 项目 | 状态 / 后续应填写的证据 |
+以下仅对应 `17d52da`、Android35 x86_64 CPU、一次冷启动之后顺序调用。两公开照片十字段不是总体准确率；原图/裁剪同源也不是四个独立样本。
+
+| 项目 | 本次真实执行 |
 | --- | --- |
-| 应用源码提交 / APK 内置提交 | 待填写完整 SHA；区分源码提交、文档提交和实际构建提交 |
-| 原生运行时、模型 / 字典 / 参数身份 | 待填写精确版本、文件 SHA-256、预后处理、ABI；不能仅写“Paddle” |
-| 类型检查与自动测试 | 待填写实际执行命令、数量及结果；回放和纯函数测试单列 |
-| GitHub Actions 原生构建 | 待填写 run URL、检出提交、实际日志结果 |
-| 安装包 | 待填写可获取路径/产物链接、包名、版本、ABI、APK SHA-256及签名边界 |
-| Android 原图 / ROI 实际推理 | 待填写设备/API/ABI、runId、输入 hash、独立原文/行框、正确/错误/缺失、基准、额外断言；未执行不得写为通过 |
-| 原模型同图前后对比 | 待填写本轮实际对照；历史归档必须标明日期/环境，不能冒称本轮重跑 |
-| 确认保存 / 编辑 / 强停 / 离线冷启动 | 待填写实际执行范围及读回证据；API harness、触摸 UI、真实手机分开 |
+| ML Kit 两图原图 / 裁剪 / production | 原图7/1/2，裁剪4/1/5，生产融合7/0/3 |
+| Paddle 两图原图 / 裁剪 / production | 原图8/0/2，裁剪10/0/0，生产融合10/0/0 |
+| 牛奶真实原文 | 原图及裁剪均有3.6g / 4.4g / 5.0g；原始对象不改写，parser input独立保存 |
+| 新原生实报版本 | ORT1.21.1、OpenCV4.5.3（artifact4.5.3.0）、v3.7.0-hukang.1、reference5af9d4a5e6cd3ee91e09e7adaf6921dfce696852 |
+| ML Kit 原图原生耗时 / 观察PSS | 牛奶16247ms/216978KiB；零食6105ms/273969KiB |
+| Paddle 原图原生耗时 / 观察PSS | 牛奶2958ms/386360KiB；零食1573ms/505364KiB |
+| Paddle 裁剪原生耗时 / 观察PSS | 牛奶1268ms/390443KiB；零食1251ms/539672KiB |
+| Paddle 图片证据归档耗时 | 上述四次18–20ms，图片原字节复制并核对SHA |
+| 存储/强停/离线读回 | write151 / verify27通过；实际OCR图片与JSON读回，合成业务场景另标；不代表触摸确认 |
+| Vision | 本次未执行，CI_NO_VISION_KEY，不算成功或0%准确率 |
+| 静态实包 | 5e/17d原生build成功，minAPI24，ARM64+x86_64，固定模型/配置/完整许可；最终默认源码APK待新build |
+| 包体 | 5e候选266104736bytes，旧bb2测试包135358111bytes，增加130746625bytes（约96.59%）；最终默认包重新量测 |
+
+以上PSS是进程每50ms采样的观察峰值，包含RN/模型/缓存，不能当绝对峰值、纯模型内存或ARM手机性能；没有p50/p95、持续拍摄和低内存压力验收。ML Kit原生SDK不开放内部模型摘要，因此旧引擎models留空/归档partial，不能伪造SHA。
+
+**16KB页设备当前不能宣称兼容**：候选实际APK两ABI的 `libopencv_java4.so` ELF LOAD对齐4096，而ORT两库为16384；APK ZIP offset已16KiB对齐也不会修复预编译OpenCV ELF。依[Android官方要求](https://developer.android.com/guide/practices/page-sizes)需要合适构件/重新编译和实际16KB环境复测，本轮尚未支持/未验。普通API35 x86_64模拟器不代表16KB手机。ARM64、真实相机/图库/EXIF2–8与用户旧库仍待验。
+
+## 最终默认版交付：待本轮云结果补齐
+
+本次默认候选已达到Android35同图门槛。当前默认改动已完成TypeScript与153/153 Node测试（27项相关测试），脚本/YAML语法与diff检查通过；这不是新的Android推理。接续云构建须同时验证项目默认Paddle（不显式传engine且override为空）、保留可持久ML Kit回退、源码版本隔离测试包、API24启动超时修复。此时未声称修订版已构建或默认probe已实际通过。
 
 ## 前置研究的证据边界
 
@@ -86,3 +106,14 @@
 7. **证据颗粒度与其他回归**：当前营养独立原文/结构保存已实现；字段所选来源、手改前后、确认时间、图像位置/hash仍需核对。QA-04 的配料/日期/包装完整持久链及返回手势、通知、档案、今日/历史、编辑删除、权限分别验收，未覆盖项保持未验。
 
 这些为待做项。本轮最终报告应在前面的结果表补上实际完成范围，同时保留本节的未验事项；不得用新引擎或构建成功覆盖第一轮独立缺陷。
+
+## 本轮有限精简
+
+| 文件 | 判断依据 | 删除影响 / 处理 |
+| --- | --- | --- |
+| `android/app/src/main/java/com/paddle/ocr/util/OpenCVUtils.kt` | 参考迁入的普通Kotlin object仅包装System.loadLibrary；全应用调用图实际在HuKangPaddleOcrModule显式加载。检查原生package注册、ReactMethod、Manifest、Gradle、ProGuard、脚本/资源后无JNI入口、反射或动态注册；广泛keep规则不使类被调用 | 删除这一35行重复初始化helper；不删除OpenCV库/许可，也不改参考仓库。类型检查/相关测试后须以本轮云原生构建及实跑验证 |
+| `src/model.ts` | `tests/model.test.mjs`仍直接执行回归，模型行为属于历史兼容检查 | 保留，不仅依据生产入口搜索作删除判断 |
+| `src/MineV13.tsx` | 当前页面仍有实际路由用途，与旧已清理Mine页面不是同一文件 | 保留，不复制China页面/路由 |
+| `src/storage.ts` | 当前main该旧文件已经不存在，本轮没有再次删除 | 不重建旧存储层，不重构database生产保存API |
+
+这批不做全面页面、依赖或数据层重构；旧APK、真实公开材料、诊断能力和签名文件均保留。

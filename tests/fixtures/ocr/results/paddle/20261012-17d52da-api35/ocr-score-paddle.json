@@ -1,0 +1,748 @@
+{
+  "schemaVersion": 1,
+  "metric": "Five visible core numeric fields; correct/evaluated. Missing stages are not evaluated. Explicit error attempts count as missing fields. Basis and unsupported claims reported separately.",
+  "warning": "A score is evidence only for the supplied execution records. Manual-transcription parser tests are not image OCR or Vision accuracy.",
+  "summaries": {
+    "original": {
+      "status": "run",
+      "totalImages": 2,
+      "attemptedImages": 2,
+      "completedImages": 2,
+      "failedImages": 0,
+      "notRunImages": 0,
+      "possibleFields": 10,
+      "evaluatedFields": 10,
+      "correct": 8,
+      "wrong": 0,
+      "missing": 2,
+      "fieldAccuracyPercent": 80,
+      "fieldCoveragePercent": 100,
+      "unsupportedVisibleClaims": 0,
+      "wrongBasisImages": 0,
+      "missingBasisImages": 0,
+      "localOnlyImages": 0
+    },
+    "preprocessed": {
+      "status": "run",
+      "totalImages": 2,
+      "attemptedImages": 2,
+      "completedImages": 2,
+      "failedImages": 0,
+      "notRunImages": 0,
+      "possibleFields": 10,
+      "evaluatedFields": 10,
+      "correct": 10,
+      "wrong": 0,
+      "missing": 0,
+      "fieldAccuracyPercent": 100,
+      "fieldCoveragePercent": 100,
+      "unsupportedVisibleClaims": 0,
+      "wrongBasisImages": 0,
+      "missingBasisImages": 0,
+      "localOnlyImages": 0
+    },
+    "parser": {
+      "status": "run",
+      "totalImages": 2,
+      "attemptedImages": 2,
+      "completedImages": 2,
+      "failedImages": 0,
+      "notRunImages": 0,
+      "possibleFields": 10,
+      "evaluatedFields": 10,
+      "correct": 10,
+      "wrong": 0,
+      "missing": 0,
+      "fieldAccuracyPercent": 100,
+      "fieldCoveragePercent": 100,
+      "unsupportedVisibleClaims": 0,
+      "wrongBasisImages": 0,
+      "missingBasisImages": 0,
+      "localOnlyImages": 0
+    },
+    "production": {
+      "status": "run",
+      "totalImages": 2,
+      "attemptedImages": 2,
+      "completedImages": 2,
+      "failedImages": 0,
+      "notRunImages": 0,
+      "possibleFields": 10,
+      "evaluatedFields": 10,
+      "correct": 10,
+      "wrong": 0,
+      "missing": 0,
+      "fieldAccuracyPercent": 100,
+      "fieldCoveragePercent": 100,
+      "unsupportedVisibleClaims": 0,
+      "wrongBasisImages": 0,
+      "missingBasisImages": 0,
+      "localOnlyImages": 2
+    },
+    "vision": {
+      "status": "not_run",
+      "totalImages": 2,
+      "attemptedImages": 0,
+      "completedImages": 0,
+      "failedImages": 0,
+      "notRunImages": 2,
+      "possibleFields": 10,
+      "evaluatedFields": 0,
+      "correct": 0,
+      "wrong": 0,
+      "missing": 0,
+      "fieldAccuracyPercent": null,
+      "fieldCoveragePercent": 0,
+      "unsupportedVisibleClaims": 0,
+      "wrongBasisImages": 0,
+      "missingBasisImages": 0,
+      "localOnlyImages": 0
+    },
+    "merged": {
+      "status": "run",
+      "totalImages": 2,
+      "attemptedImages": 2,
+      "completedImages": 2,
+      "failedImages": 0,
+      "notRunImages": 0,
+      "possibleFields": 10,
+      "evaluatedFields": 10,
+      "correct": 10,
+      "wrong": 0,
+      "missing": 0,
+      "fieldAccuracyPercent": 100,
+      "fieldCoveragePercent": 100,
+      "unsupportedVisibleClaims": 0,
+      "wrongBasisImages": 0,
+      "missingBasisImages": 0,
+      "localOnlyImages": 2
+    },
+    "experimental_gray": {
+      "status": "not_run",
+      "totalImages": 2,
+      "attemptedImages": 0,
+      "completedImages": 0,
+      "failedImages": 0,
+      "notRunImages": 2,
+      "possibleFields": 10,
+      "evaluatedFields": 0,
+      "correct": 0,
+      "wrong": 0,
+      "missing": 0,
+      "fieldAccuracyPercent": null,
+      "fieldCoveragePercent": 0,
+      "unsupportedVisibleClaims": 0,
+      "wrongBasisImages": 0,
+      "missingBasisImages": 0,
+      "localOnlyImages": 0
+    },
+    "experimental_upscaled": {
+      "status": "not_run",
+      "totalImages": 2,
+      "attemptedImages": 0,
+      "completedImages": 0,
+      "failedImages": 0,
+      "notRunImages": 2,
+      "possibleFields": 10,
+      "evaluatedFields": 0,
+      "correct": 0,
+      "wrong": 0,
+      "missing": 0,
+      "fieldAccuracyPercent": null,
+      "fieldCoveragePercent": 0,
+      "unsupportedVisibleClaims": 0,
+      "wrongBasisImages": 0,
+      "missingBasisImages": 0,
+      "localOnlyImages": 0
+    },
+    "experimental_deskew": {
+      "status": "not_run",
+      "totalImages": 2,
+      "attemptedImages": 0,
+      "completedImages": 0,
+      "failedImages": 0,
+      "notRunImages": 2,
+      "possibleFields": 10,
+      "evaluatedFields": 0,
+      "correct": 0,
+      "wrong": 0,
+      "missing": 0,
+      "fieldAccuracyPercent": null,
+      "fieldCoveragePercent": 0,
+      "unsupportedVisibleClaims": 0,
+      "wrongBasisImages": 0,
+      "missingBasisImages": 0,
+      "localOnlyImages": 0
+    },
+    "experimental_whole_png": {
+      "status": "not_run",
+      "totalImages": 2,
+      "attemptedImages": 0,
+      "completedImages": 0,
+      "failedImages": 0,
+      "notRunImages": 2,
+      "possibleFields": 10,
+      "evaluatedFields": 0,
+      "correct": 0,
+      "wrong": 0,
+      "missing": 0,
+      "fieldAccuracyPercent": null,
+      "fieldCoveragePercent": 0,
+      "unsupportedVisibleClaims": 0,
+      "wrongBasisImages": 0,
+      "missingBasisImages": 0,
+      "localOnlyImages": 0
+    },
+    "experimental_roi_png": {
+      "status": "not_run",
+      "totalImages": 2,
+      "attemptedImages": 0,
+      "completedImages": 0,
+      "failedImages": 0,
+      "notRunImages": 2,
+      "possibleFields": 10,
+      "evaluatedFields": 0,
+      "correct": 0,
+      "wrong": 0,
+      "missing": 0,
+      "fieldAccuracyPercent": null,
+      "fieldCoveragePercent": 0,
+      "unsupportedVisibleClaims": 0,
+      "wrongBasisImages": 0,
+      "missingBasisImages": 0,
+      "localOnlyImages": 0
+    },
+    "experimental_roi_jpeg": {
+      "status": "not_run",
+      "totalImages": 2,
+      "attemptedImages": 0,
+      "completedImages": 0,
+      "failedImages": 0,
+      "notRunImages": 2,
+      "possibleFields": 10,
+      "evaluatedFields": 0,
+      "correct": 0,
+      "wrong": 0,
+      "missing": 0,
+      "fieldAccuracyPercent": null,
+      "fieldCoveragePercent": 0,
+      "unsupportedVisibleClaims": 0,
+      "wrongBasisImages": 0,
+      "missingBasisImages": 0,
+      "localOnlyImages": 0
+    },
+    "experimental_padded_roi_png": {
+      "status": "not_run",
+      "totalImages": 2,
+      "attemptedImages": 0,
+      "completedImages": 0,
+      "failedImages": 0,
+      "notRunImages": 2,
+      "possibleFields": 10,
+      "evaluatedFields": 0,
+      "correct": 0,
+      "wrong": 0,
+      "missing": 0,
+      "fieldAccuracyPercent": null,
+      "fieldCoveragePercent": 0,
+      "unsupportedVisibleClaims": 0,
+      "wrongBasisImages": 0,
+      "missingBasisImages": 0,
+      "localOnlyImages": 0
+    }
+  },
+  "details": [
+    {
+      "fixtureId": "6923644266066",
+      "evidence": "device_paddle_image_execution",
+      "stages": {
+        "original": {
+          "status": "ok",
+          "scope": null,
+          "reason": null,
+          "fields": [
+            {
+              "field": "energy_kj",
+              "expected": 309,
+              "actual": 309,
+              "outcome": "correct"
+            },
+            {
+              "field": "protein_g",
+              "expected": 3.6,
+              "actual": 3.6,
+              "outcome": "correct"
+            },
+            {
+              "field": "fat_g",
+              "expected": 4.4,
+              "actual": null,
+              "outcome": "missing"
+            },
+            {
+              "field": "carbohydrate_g",
+              "expected": 5,
+              "actual": 5,
+              "outcome": "correct"
+            },
+            {
+              "field": "sodium_mg",
+              "expected": 58,
+              "actual": null,
+              "outcome": "missing"
+            }
+          ],
+          "unsupportedFields": [],
+          "basisOutcome": "correct",
+          "rawText": "6L\n好\n特仑苏\n营养成分表\n项目\n每100mL\nNRV%\n能量\n309kJ\n4%\n蛋白质\n3.6g\n脂肪\n6%\n4.4g\n%2\n碳水化合物\n5.0g\n钠钙\n58mg\n3%\n120mg\n15%\n配\n料：生牛乳\n产品类型：全脂灭菌乳\n产品标准号：GB25190\n生产日期：见包装喷码\n保质期：6个月\n生产厂两产地：具体见喷码前两位代码\n存条件：常温密闭保存。\n开启前，无需冷藏；\n开启后，请立即饮用。\n请物连同包装在微波炉中加热。\n润费者热线：400-6603333\n请勿乱扔空包\n国人\nPLEASE DISPOSE PROPERLY\n保持环境酒洁"
+        },
+        "preprocessed": {
+          "status": "ok",
+          "scope": null,
+          "reason": null,
+          "fields": [
+            {
+              "field": "energy_kj",
+              "expected": 309,
+              "actual": 309,
+              "outcome": "correct"
+            },
+            {
+              "field": "protein_g",
+              "expected": 3.6,
+              "actual": 3.6,
+              "outcome": "correct"
+            },
+            {
+              "field": "fat_g",
+              "expected": 4.4,
+              "actual": 4.4,
+              "outcome": "correct"
+            },
+            {
+              "field": "carbohydrate_g",
+              "expected": 5,
+              "actual": 5,
+              "outcome": "correct"
+            },
+            {
+              "field": "sodium_mg",
+              "expected": 58,
+              "actual": 58,
+              "outcome": "correct"
+            }
+          ],
+          "unsupportedFields": [],
+          "basisOutcome": "correct",
+          "rawText": "营养成分表\n项目\n每100mL\nNRV%\n能量\n309kJ\n4%\n蛋白质\n3.6g\n脂肪\n6%\n4.4g\n7%\n碳水化合物\n5.0g\n2%\n钠\n58mg\n钙\n3%\n120mg\n15%"
+        },
+        "parser": {
+          "status": "ok",
+          "scope": null,
+          "reason": null,
+          "fields": [
+            {
+              "field": "energy_kj",
+              "expected": 309,
+              "actual": 309,
+              "outcome": "correct"
+            },
+            {
+              "field": "protein_g",
+              "expected": 3.6,
+              "actual": 3.6,
+              "outcome": "correct"
+            },
+            {
+              "field": "fat_g",
+              "expected": 4.4,
+              "actual": 4.4,
+              "outcome": "correct"
+            },
+            {
+              "field": "carbohydrate_g",
+              "expected": 5,
+              "actual": 5,
+              "outcome": "correct"
+            },
+            {
+              "field": "sodium_mg",
+              "expected": 58,
+              "actual": 58,
+              "outcome": "correct"
+            }
+          ],
+          "unsupportedFields": [],
+          "basisOutcome": "correct",
+          "rawText": "营养成分表\n项目 每100mL NRV%\n能量 309kJ 4%\n蛋白质 3.6g 6%\n脂肪 4.4g 7%\n碳水化合物 5.0g 2%\n钠 58mg 3%\n钙 120mg 15%"
+        },
+        "production": {
+          "status": "ok",
+          "scope": "local_only",
+          "reason": null,
+          "fields": [
+            {
+              "field": "energy_kj",
+              "expected": 309,
+              "actual": 309,
+              "outcome": "correct"
+            },
+            {
+              "field": "protein_g",
+              "expected": 3.6,
+              "actual": 3.6,
+              "outcome": "correct"
+            },
+            {
+              "field": "fat_g",
+              "expected": 4.4,
+              "actual": 4.4,
+              "outcome": "correct"
+            },
+            {
+              "field": "carbohydrate_g",
+              "expected": 5,
+              "actual": 5,
+              "outcome": "correct"
+            },
+            {
+              "field": "sodium_mg",
+              "expected": 58,
+              "actual": 58,
+              "outcome": "correct"
+            }
+          ],
+          "unsupportedFields": [],
+          "basisOutcome": "correct",
+          "rawText": "营养成分表\n项目\n每100mL\nNRV%\n能量\n309kJ\n4%\n蛋白质\n3.6g\n脂肪\n6%\n4.4g\n7%\n碳水化合物\n5.0g\n2%\n钠\n58mg\n钙\n3%\n120mg\n15%"
+        },
+        "vision": {
+          "status": "not_run",
+          "reason": "CI_NO_VISION_KEY",
+          "fields": []
+        },
+        "merged": {
+          "status": "ok",
+          "scope": "local_only",
+          "reason": null,
+          "fields": [
+            {
+              "field": "energy_kj",
+              "expected": 309,
+              "actual": 309,
+              "outcome": "correct"
+            },
+            {
+              "field": "protein_g",
+              "expected": 3.6,
+              "actual": 3.6,
+              "outcome": "correct"
+            },
+            {
+              "field": "fat_g",
+              "expected": 4.4,
+              "actual": 4.4,
+              "outcome": "correct"
+            },
+            {
+              "field": "carbohydrate_g",
+              "expected": 5,
+              "actual": 5,
+              "outcome": "correct"
+            },
+            {
+              "field": "sodium_mg",
+              "expected": 58,
+              "actual": 58,
+              "outcome": "correct"
+            }
+          ],
+          "unsupportedFields": [],
+          "basisOutcome": "correct",
+          "rawText": null
+        },
+        "experimental_gray": {
+          "status": "not_run",
+          "reason": "MIGRATION_CORE_COMPARISON_ONLY",
+          "fields": []
+        },
+        "experimental_upscaled": {
+          "status": "not_run",
+          "reason": "MIGRATION_CORE_COMPARISON_ONLY",
+          "fields": []
+        },
+        "experimental_deskew": {
+          "status": "not_run",
+          "reason": "MIGRATION_CORE_COMPARISON_ONLY",
+          "fields": []
+        },
+        "experimental_whole_png": {
+          "status": "not_run",
+          "reason": "MIGRATION_CORE_COMPARISON_ONLY",
+          "fields": []
+        },
+        "experimental_roi_png": {
+          "status": "not_run",
+          "reason": "MIGRATION_CORE_COMPARISON_ONLY",
+          "fields": []
+        },
+        "experimental_roi_jpeg": {
+          "status": "not_run",
+          "reason": "MIGRATION_CORE_COMPARISON_ONLY",
+          "fields": []
+        },
+        "experimental_padded_roi_png": {
+          "status": "not_run",
+          "reason": "MIGRATION_CORE_COMPARISON_ONLY",
+          "fields": []
+        }
+      }
+    },
+    {
+      "fixtureId": "6937003117814",
+      "evidence": "device_paddle_image_execution",
+      "stages": {
+        "original": {
+          "status": "ok",
+          "scope": null,
+          "reason": null,
+          "fields": [
+            {
+              "field": "energy_kj",
+              "expected": 2075,
+              "actual": 2075,
+              "outcome": "correct"
+            },
+            {
+              "field": "protein_g",
+              "expected": 21,
+              "actual": 21,
+              "outcome": "correct"
+            },
+            {
+              "field": "fat_g",
+              "expected": 37.7,
+              "actual": 37.7,
+              "outcome": "correct"
+            },
+            {
+              "field": "carbohydrate_g",
+              "expected": 19,
+              "actual": 19,
+              "outcome": "correct"
+            },
+            {
+              "field": "sodium_mg",
+              "expected": 1248,
+              "actual": 1248,
+              "outcome": "correct"
+            }
+          ],
+          "unsupportedFields": [],
+          "basisOutcome": "correct",
+          "rawText": "营养成分表\n每100克（g）\n项目\nNRV%\n能量\n2075千焦(k)\n25%\n蛋白质\n21.0克(g)\n35%\n37.7克(g)\n脂肪\n63%\n碳水化合物\n19.0克(g）\n6%\n钠\n1248毫克（mg）\n62%\n请你吃零食\n商业信息中心《2022年中国休闲零食市场报告》"
+        },
+        "preprocessed": {
+          "status": "ok",
+          "scope": null,
+          "reason": null,
+          "fields": [
+            {
+              "field": "energy_kj",
+              "expected": 2075,
+              "actual": 2075,
+              "outcome": "correct"
+            },
+            {
+              "field": "protein_g",
+              "expected": 21,
+              "actual": 21,
+              "outcome": "correct"
+            },
+            {
+              "field": "fat_g",
+              "expected": 37.7,
+              "actual": 37.7,
+              "outcome": "correct"
+            },
+            {
+              "field": "carbohydrate_g",
+              "expected": 19,
+              "actual": 19,
+              "outcome": "correct"
+            },
+            {
+              "field": "sodium_mg",
+              "expected": 1248,
+              "actual": 1248,
+              "outcome": "correct"
+            }
+          ],
+          "unsupportedFields": [],
+          "basisOutcome": "correct",
+          "rawText": "营养成分表\n每100克（g）\n项目\nNRV%\n2075千焦(k)）\n能量\n25%\n21.0克(g）\n蛋白质\n35%\n37.7克(g）\n脂肪\n63%\n碳水化合物\n19.0克(g）\n6%\n1248毫克（mg）\n钠\n62%"
+        },
+        "parser": {
+          "status": "ok",
+          "scope": null,
+          "reason": null,
+          "fields": [
+            {
+              "field": "energy_kj",
+              "expected": 2075,
+              "actual": 2075,
+              "outcome": "correct"
+            },
+            {
+              "field": "protein_g",
+              "expected": 21,
+              "actual": 21,
+              "outcome": "correct"
+            },
+            {
+              "field": "fat_g",
+              "expected": 37.7,
+              "actual": 37.7,
+              "outcome": "correct"
+            },
+            {
+              "field": "carbohydrate_g",
+              "expected": 19,
+              "actual": 19,
+              "outcome": "correct"
+            },
+            {
+              "field": "sodium_mg",
+              "expected": 1248,
+              "actual": 1248,
+              "outcome": "correct"
+            }
+          ],
+          "unsupportedFields": [],
+          "basisOutcome": "correct",
+          "rawText": "营养成分表\n项目 每100克（g） NRV%\n能量 2075千焦(k)） 25%\n蛋白质 21.0克(g） 35%\n脂肪 37.7克(g） 63%\n碳水化合物 19.0克(g） 6%\n钠 1248毫克（mg） 62%"
+        },
+        "production": {
+          "status": "ok",
+          "scope": "local_only",
+          "reason": null,
+          "fields": [
+            {
+              "field": "energy_kj",
+              "expected": 2075,
+              "actual": 2075,
+              "outcome": "correct"
+            },
+            {
+              "field": "protein_g",
+              "expected": 21,
+              "actual": 21,
+              "outcome": "correct"
+            },
+            {
+              "field": "fat_g",
+              "expected": 37.7,
+              "actual": 37.7,
+              "outcome": "correct"
+            },
+            {
+              "field": "carbohydrate_g",
+              "expected": 19,
+              "actual": 19,
+              "outcome": "correct"
+            },
+            {
+              "field": "sodium_mg",
+              "expected": 1248,
+              "actual": 1248,
+              "outcome": "correct"
+            }
+          ],
+          "unsupportedFields": [],
+          "basisOutcome": "correct",
+          "rawText": "营养成分表\n每100克（g）\n项目\nNRV%\n2075千焦(k)）\n能量\n25%\n21.0克(g）\n蛋白质\n35%\n37.7克(g）\n脂肪\n63%\n碳水化合物\n19.0克(g）\n6%\n1248毫克（mg）\n钠\n62%"
+        },
+        "vision": {
+          "status": "not_run",
+          "reason": "CI_NO_VISION_KEY",
+          "fields": []
+        },
+        "merged": {
+          "status": "ok",
+          "scope": "local_only",
+          "reason": null,
+          "fields": [
+            {
+              "field": "energy_kj",
+              "expected": 2075,
+              "actual": 2075,
+              "outcome": "correct"
+            },
+            {
+              "field": "protein_g",
+              "expected": 21,
+              "actual": 21,
+              "outcome": "correct"
+            },
+            {
+              "field": "fat_g",
+              "expected": 37.7,
+              "actual": 37.7,
+              "outcome": "correct"
+            },
+            {
+              "field": "carbohydrate_g",
+              "expected": 19,
+              "actual": 19,
+              "outcome": "correct"
+            },
+            {
+              "field": "sodium_mg",
+              "expected": 1248,
+              "actual": 1248,
+              "outcome": "correct"
+            }
+          ],
+          "unsupportedFields": [],
+          "basisOutcome": "correct",
+          "rawText": null
+        },
+        "experimental_gray": {
+          "status": "not_run",
+          "reason": "MIGRATION_CORE_COMPARISON_ONLY",
+          "fields": []
+        },
+        "experimental_upscaled": {
+          "status": "not_run",
+          "reason": "MIGRATION_CORE_COMPARISON_ONLY",
+          "fields": []
+        },
+        "experimental_deskew": {
+          "status": "not_run",
+          "reason": "MIGRATION_CORE_COMPARISON_ONLY",
+          "fields": []
+        },
+        "experimental_whole_png": {
+          "status": "not_run",
+          "reason": "MIGRATION_CORE_COMPARISON_ONLY",
+          "fields": []
+        },
+        "experimental_roi_png": {
+          "status": "not_run",
+          "reason": "MIGRATION_CORE_COMPARISON_ONLY",
+          "fields": []
+        },
+        "experimental_roi_jpeg": {
+          "status": "not_run",
+          "reason": "MIGRATION_CORE_COMPARISON_ONLY",
+          "fields": []
+        },
+        "experimental_padded_roi_png": {
+          "status": "not_run",
+          "reason": "MIGRATION_CORE_COMPARISON_ONLY",
+          "fields": []
+        }
+      }
+    }
+  ]
+}

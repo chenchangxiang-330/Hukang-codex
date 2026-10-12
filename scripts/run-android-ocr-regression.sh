@@ -6,7 +6,8 @@ engine="${1:-mlkit}"
 case "$engine" in mlkit) suffix="";; paddle) suffix="-paddle";; *) echo "Invalid OCR engine: $engine" >&2; exit 1;; esac
 result_name="ocr-regression${suffix}.json"
 # The hidden entry point is enabled only in the standalone cloud Debug variant.
-app_package='com.hukang.local.clouddebug'
+app_package="${HUKANG_TEST_PACKAGE:-com.hukang.local.clouddebug}"
+[[ "$app_package" =~ ^com\.hukang\.local\.clouddebug(\.p[0-9a-f]{10})?$ ]] || exit 1
 run_id="ocr-${engine}-$(date +%s)-$$"
 mkdir -p smoke-evidence
 adb shell am force-stop "$app_package"

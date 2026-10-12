@@ -4,6 +4,9 @@ apply plugin: "com.facebook.react"
 
 def projectRoot = rootDir.getAbsoluteFile().getParentFile().getAbsolutePath()
 def cloudDebugBuild = (findProperty('cloudDebugBuild') ?: 'false').toBoolean()
+// Each ephemeral-signed cloud build can coexist with older test packages/data.
+def cloudSourceSha = System.getenv('HUKANG_SOURCE_COMMIT') ?: ''
+def cloudDebugSuffix = cloudSourceSha ==~ /^[a-f0-9]{40}$/ ? ".clouddebug.p${cloudSourceSha.take(10)}" : '.clouddebug'
 def paddleModelRoot = new File(projectRoot, 'models/paddleocr/v5-mobile')
 def paddleHashes = [
     'detector.onnx': 'a431985659dc921974177a95adcfbb90fd9e51989a5e04d70d0b75f597b6e61d',
@@ -150,7 +153,7 @@ android {
         debug {
             signingConfig signingConfigs.debug
             if (cloudDebugBuild) {
-                applicationIdSuffix '.clouddebug'
+                applicationIdSuffix cloudDebugSuffix
                 versionNameSuffix '-clouddebug'
                 buildConfigField "boolean", "IS_CLOUD_DEBUG", "true"
             }

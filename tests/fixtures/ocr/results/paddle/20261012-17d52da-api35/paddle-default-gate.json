@@ -1,0 +1,12 @@
+{
+  "status": "passed",
+  "correct": 10,
+  "wrong": 0,
+  "missing": 0,
+  "scope": "two_public_photos_10_fields_only",
+  "nativeMilkDecimals": [
+    "3.6",
+    "4.4",
+    "5.0"
+  ]
+}

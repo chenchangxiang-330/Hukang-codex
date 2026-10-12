@@ -4,14 +4,14 @@ import { textInReadingRows,textInNutritionRows, type OcrLine } from "./ocrGeomet
 import { getOcrEngineOverride } from "./ocrEngineSettings";
 import { archiveOcrEvidence } from "./ocrEvidenceArchive";
 export type OcrEngine="mlkit"|"paddle";
-// Switch only after this application's actual Android same-image acceptance passes.
-export const DEFAULT_OCR_ENGINE:OcrEngine="mlkit";
+// Android 35 same-image acceptance passed; keep an explicit ML Kit override for comparison.
+export const DEFAULT_OCR_ENGINE:OcrEngine="paddle";
 export async function recognizeText(uri: string,engine?:OcrEngine): Promise<string> {
   return (await recognizeDetailed(uri,"general",engine)).text;
 }
 export type OcrInputImage={width:number;height:number;sourceWidth:number;sourceHeight:number;sampleSize:number|null;sourceOrientation:number;coordinateSpace:string;sourceToInputMatrix?:number[];rotationDegrees?:number};
 export type OcrMemory={observedPeakPssKb:number;observedPeakJavaHeapBytes:number;observedPeakNativeHeapBytes:number;samplingIntervalMs:number;sampleCount:number};
-export type OcrResult={text:string;parserText:string;lines:OcrLine[];provider:string;engine:OcrEngine;durationMs:number;nativeDurationMs?:number;bridgeDurationMs:number;lowConfidence:boolean;
+export type OcrResult={text:string;parserText:string;lines:OcrLine[];provider:string;engine:OcrEngine;nativeEngine:OcrEngine|null;durationMs:number;nativeDurationMs?:number;bridgeDurationMs:number;lowConfidence:boolean;
   imageUri:string;imageSha256?:string;imageBytes?:number;inputImage?:OcrInputImage;
   models?:{file:string;sha256:string;bytes:number}[];versions?:Record<string,string>;memory?:OcrMemory;timings?:Record<string,number|number[]|number[][]>;modelVersion?:string;
   evidenceUri?:string;retainedImageUri?:string;archivalDurationMs?:number;archivalError?:string;[key:string]:unknown};
@@ -33,7 +33,8 @@ export async function recognizeDetailed(uri:string,task:"general"|"nutrition"="g
     const lowConfidence=scores.length===0||scores.length!==lines.length||scores.some(n=>n<0.75);
     const bridgeDurationMs=Date.now()-started;
     const nativeDurationMs=typeof result.nativeDurationMs==="number"?result.nativeDurationMs:typeof result.durationMs==="number"?result.durationMs:undefined;
-    const output:OcrResult={...result,engine,imageUri:result.imageUri??uri,lines,parserText:lines.length?(task==="nutrition"?textInNutritionRows(lines):textInReadingRows(lines)):result.text,durationMs:nativeDurationMs??bridgeDurationMs,nativeDurationMs,bridgeDurationMs,lowConfidence};
+    const nativeEngine=result.engine==="mlkit"||result.engine==="paddle"?result.engine:null;
+    const output:OcrResult={...result,engine,nativeEngine,imageUri:result.imageUri??uri,lines,parserText:lines.length?(task==="nutrition"?textInNutritionRows(lines):textInReadingRows(lines)):result.text,durationMs:nativeDurationMs??bridgeDurationMs,nativeDurationMs,bridgeDurationMs,lowConfidence};
     try{
       Object.assign(output,await archiveOcrEvidence({imageUri:uri,task,raw:result,parserInput:output.parserText,expectedImageSha256:output.imageSha256}));
       if(output.archivalError)await logScanEvent("OCR_EVIDENCE_ARCHIVE_FAILED",{engine,error:output.archivalError});

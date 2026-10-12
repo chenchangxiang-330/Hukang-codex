@@ -41,8 +41,8 @@ class ORTSessionManager(
                 environment.setTelemetry(false)
             } catch (t: Throwable) {
                 // Never proceed with inference if the explicit offline privacy
-                // setting cannot be applied. The release manifest independently
-                // removes network permission, but that is not a substitute here.
+                // setting cannot be applied. HuKang's optional barcode/Vision
+                // networking is separate; this engine never downloads assets.
                 throw IllegalStateException("ONNX Runtime telemetry could not be disabled; model load aborted", t)
             }
         }
@@ -168,4 +168,3 @@ class ORTSessionManager(
         return output
     }
 }
-

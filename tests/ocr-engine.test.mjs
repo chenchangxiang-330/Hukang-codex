@@ -30,10 +30,22 @@ test("reversible override keeps a separate key and rejects invalid engines",asyn
 test("explicit benchmark engine ignores device override and retains native evidence",async()=>{
   const {settings,ocr,calls,archives}=harness();await settings.setOcrEngineOverride("paddle");
   const result=await ocr.recognizeDetailed("file:mock-input","nutrition","mlkit");
-  assert.deepEqual(calls,["mlkit"]);assert.equal(result.engine,"mlkit");assert.equal(result.durationMs,27);assert.equal(result.nativeDurationMs,27);
+  assert.deepEqual(calls,["mlkit"]);assert.equal(result.engine,"mlkit");assert.equal(result.nativeEngine,"mlkit");assert.equal(result.durationMs,27);assert.equal(result.nativeDurationMs,27);
   assert.equal(result.text,"蛋白质 3.6g");assert.equal(result.evidenceUri,"file:mock-evidence");
   assert.deepEqual(result.lines,archives[0].raw.lines);assert.equal(archives[0].parserInput,result.parserText);assert.equal(archives[0].raw.parserText,undefined);
   assert.deepEqual(result.memory,archives[0].raw.memory);assert.equal(result.imageSha256,"a".repeat(64));
+});
+test("ordinary recognition without an override selects the Paddle default and preserves native identity",async()=>{
+  const {ocr,settings,calls,archives}=harness();
+  assert.equal(ocr.DEFAULT_OCR_ENGINE,"paddle");assert.equal(await settings.getOcrEngineOverride(),null);
+  const result=await ocr.recognizeDetailed("file:mock-input","nutrition");
+  assert.deepEqual(calls,["paddle"]);assert.equal(result.engine,"paddle");assert.equal(result.nativeEngine,"paddle");
+  assert.equal(archives[0].raw.engine,"paddle");assert.equal(result.text,archives[0].raw.text);
+});
+test("a bridge missing native identity does not acquire it from JavaScript's selected engine",async()=>{
+  const {ocr,native}=harness();native.HuKangPaddleOcr.recognizeDetailed=async()=>({text:"mock",lines:[],provider:"mock-no-native-identity"});
+  const result=await ocr.recognizeDetailed("file:mock-input","nutrition");
+  assert.equal(result.engine,"paddle");assert.equal(result.nativeEngine,null);
 });
 test("ordinary recognition honors override while explicit failed Paddle never calls ML Kit",async()=>{
   const {settings,ocr,calls,native}=harness();await settings.setOcrEngineOverride("paddle");

@@ -1,0 +1,754 @@
+{
+  "write": {
+    "status": "completed",
+    "phase": "write",
+    "runId": "storage-1791763579-3330",
+    "realOcrRunId": "ocr-paddle-1791763564-3255",
+    "buildInfo": {
+      "sourceCommit": "17d52da65733741956576db3ae397725e8237d90",
+      "version": "1.4.0",
+      "channel": "clouddebug"
+    },
+    "completedAt": "2026-10-12T00:06:21.702Z",
+    "network": null,
+    "scope": "native_api_write_only_requires_external_force_stop_and_offline_verify",
+    "launchToken": "storage-launch-1791763581034-82q5u30h3bq",
+    "writeLaunchToken": null,
+    "checks": [
+      {
+        "name": "pristine_profile_required",
+        "passed": true
+      },
+      {
+        "name": "pristine_scanner_preferences_required",
+        "passed": true
+      },
+      {
+        "name": "photo_nonempty",
+        "passed": true
+      },
+      {
+        "name": "editing_preserves_saved_evidence",
+        "passed": true
+      },
+      {
+        "name": "product_barcode",
+        "passed": true
+      },
+      {
+        "name": "product_rawBarcode",
+        "passed": true
+      },
+      {
+        "name": "product_normalizedBarcode",
+        "passed": true
+      },
+      {
+        "name": "product_name",
+        "passed": true
+      },
+      {
+        "name": "product_brand",
+        "passed": true
+      },
+      {
+        "name": "product_variant",
+        "passed": true
+      },
+      {
+        "name": "product_category",
+        "passed": true
+      },
+      {
+        "name": "product_netContent",
+        "passed": true
+      },
+      {
+        "name": "product_netContentUnit",
+        "passed": true
+      },
+      {
+        "name": "product_basisAmount",
+        "passed": true
+      },
+      {
+        "name": "product_basisUnit",
+        "passed": true
+      },
+      {
+        "name": "product_energyKcal",
+        "passed": true
+      },
+      {
+        "name": "product_energyKj",
+        "passed": true
+      },
+      {
+        "name": "product_proteinG",
+        "passed": true
+      },
+      {
+        "name": "product_fatG",
+        "passed": true
+      },
+      {
+        "name": "product_carbohydrateG",
+        "passed": true
+      },
+      {
+        "name": "product_saturatedFatG",
+        "passed": true
+      },
+      {
+        "name": "product_transFatG",
+        "passed": true
+      },
+      {
+        "name": "product_totalSugarG",
+        "passed": true
+      },
+      {
+        "name": "product_addedSugarG",
+        "passed": true
+      },
+      {
+        "name": "product_fiberG",
+        "passed": true
+      },
+      {
+        "name": "product_sodiumMg",
+        "passed": true
+      },
+      {
+        "name": "product_ingredients",
+        "passed": true
+      },
+      {
+        "name": "product_imageUri",
+        "passed": true
+      },
+      {
+        "name": "product_ingredientsRawText",
+        "passed": true
+      },
+      {
+        "name": "product_ingredientsJson",
+        "passed": true
+      },
+      {
+        "name": "product_ocrRawText",
+        "passed": true
+      },
+      {
+        "name": "product_dataSource",
+        "passed": true
+      },
+      {
+        "name": "product_recognitionEvidenceJson",
+        "passed": true
+      },
+      {
+        "name": "product_lastVerifiedAt",
+        "passed": true
+      },
+      {
+        "name": "vision_selection_keeps_local_raw_text",
+        "passed": true
+      },
+      {
+        "name": "independent_mock_vision_text",
+        "passed": true
+      },
+      {
+        "name": "independent_original_ocr_text",
+        "passed": true
+      },
+      {
+        "name": "explicit_vision_selection",
+        "passed": true
+      },
+      {
+        "name": "initial_log_nondefault_basis_scaling",
+        "passed": true
+      },
+      {
+        "name": "initial_log_unknowns_remain_null",
+        "passed": true
+      },
+      {
+        "name": "profile_written_exactly",
+        "passed": true
+      },
+      {
+        "name": "preferences_written_exactly",
+        "passed": true
+      },
+      {
+        "name": "inventory_product_relationship",
+        "passed": true
+      },
+      {
+        "name": "inventory_quantity",
+        "passed": true
+      },
+      {
+        "name": "inventory_unknown_expiry",
+        "passed": true
+      },
+      {
+        "name": "inventory_production_date",
+        "passed": true
+      },
+      {
+        "name": "inventory_photo_path",
+        "passed": true
+      },
+      {
+        "name": "inventory_opened",
+        "passed": true
+      },
+      {
+        "name": "inventory_opened_timestamp",
+        "passed": true
+      },
+      {
+        "name": "log_product_relationship",
+        "passed": true
+      },
+      {
+        "name": "log_amount_and_unit",
+        "passed": true
+      },
+      {
+        "name": "log_energyKcal",
+        "passed": true
+      },
+      {
+        "name": "log_energyKj",
+        "passed": true
+      },
+      {
+        "name": "log_proteinG",
+        "passed": true
+      },
+      {
+        "name": "log_fatG",
+        "passed": true
+      },
+      {
+        "name": "log_carbohydrateG",
+        "passed": true
+      },
+      {
+        "name": "log_saturatedFatG",
+        "passed": true
+      },
+      {
+        "name": "log_transFatG",
+        "passed": true
+      },
+      {
+        "name": "log_totalSugarG",
+        "passed": true
+      },
+      {
+        "name": "log_addedSugarG",
+        "passed": true
+      },
+      {
+        "name": "log_fiberG",
+        "passed": true
+      },
+      {
+        "name": "log_sodiumMg",
+        "passed": true
+      },
+      {
+        "name": "only_one_product_added",
+        "passed": true
+      },
+      {
+        "name": "only_one_inventory_added",
+        "passed": true
+      },
+      {
+        "name": "only_one_log_added",
+        "passed": true
+      },
+      {
+        "name": "real_6923644266066_primary_archive_json_exists",
+        "passed": true
+      },
+      {
+        "name": "real_6923644266066_primary_archive_complete",
+        "passed": true
+      },
+      {
+        "name": "real_6923644266066_primary_archive_no_metadata_gaps",
+        "passed": true
+      },
+      {
+        "name": "real_6923644266066_primary_archive_parser_input",
+        "passed": true
+      },
+      {
+        "name": "real_6923644266066_primary_archive_raw_text",
+        "passed": true
+      },
+      {
+        "name": "real_6923644266066_primary_archive_raw_lines",
+        "passed": true
+      },
+      {
+        "name": "real_6923644266066_primary_archive_raw_imageUri",
+        "passed": true
+      },
+      {
+        "name": "real_6923644266066_primary_archive_raw_imageSha256",
+        "passed": true
+      },
+      {
+        "name": "real_6923644266066_primary_archive_raw_engine",
+        "passed": true
+      },
+      {
+        "name": "real_6923644266066_primary_archive_raw_inputImage",
+        "passed": true
+      },
+      {
+        "name": "real_6923644266066_primary_archive_raw_models",
+        "passed": true
+      },
+      {
+        "name": "real_6923644266066_primary_archive_raw_versions",
+        "passed": true
+      },
+      {
+        "name": "real_6923644266066_primary_archive_raw_nativeDurationMs",
+        "passed": true
+      },
+      {
+        "name": "real_6923644266066_primary_native_field_memory_unchanged",
+        "passed": true
+      },
+      {
+        "name": "real_6923644266066_primary_native_field_modelVersion_unchanged",
+        "passed": true
+      },
+      {
+        "name": "real_6923644266066_primary_native_field_models_unchanged",
+        "passed": true
+      },
+      {
+        "name": "real_6923644266066_primary_native_field_engine_unchanged",
+        "passed": true
+      },
+      {
+        "name": "real_6923644266066_primary_native_field_imageBytes_unchanged",
+        "passed": true
+      },
+      {
+        "name": "real_6923644266066_primary_native_field_versions_unchanged",
+        "passed": true
+      },
+      {
+        "name": "real_6923644266066_primary_native_field_height_unchanged",
+        "passed": true
+      },
+      {
+        "name": "real_6923644266066_primary_native_field_nativeDurationMs_unchanged",
+        "passed": true
+      },
+      {
+        "name": "real_6923644266066_primary_native_field_imageUri_unchanged",
+        "passed": true
+      },
+      {
+        "name": "real_6923644266066_primary_native_field_durationMs_unchanged",
+        "passed": true
+      },
+      {
+        "name": "real_6923644266066_primary_native_field_lines_unchanged",
+        "passed": true
+      },
+      {
+        "name": "real_6923644266066_primary_native_field_inputImage_unchanged",
+        "passed": true
+      },
+      {
+        "name": "real_6923644266066_primary_native_field_text_unchanged",
+        "passed": true
+      },
+      {
+        "name": "real_6923644266066_primary_native_field_imageSha256_unchanged",
+        "passed": true
+      },
+      {
+        "name": "real_6923644266066_primary_native_field_timings_unchanged",
+        "passed": true
+      },
+      {
+        "name": "real_6923644266066_primary_native_field_provider_unchanged",
+        "passed": true
+      },
+      {
+        "name": "real_6923644266066_primary_native_field_width_unchanged",
+        "passed": true
+      },
+      {
+        "name": "real_6923644266066_primary_archive_input_identity",
+        "passed": true
+      },
+      {
+        "name": "real_6923644266066_primary_source_nonempty",
+        "passed": true
+      },
+      {
+        "name": "real_6923644266066_primary_ocr_image_sha_matches_bytes",
+        "passed": true
+      },
+      {
+        "name": "real_6923644266066_primary_copied_image_bytes_and_sha",
+        "passed": true
+      },
+      {
+        "name": "real_6923644266066_rename_applied",
+        "passed": true
+      },
+      {
+        "name": "real_6923644266066_rename_preserves_evidence_bytes",
+        "passed": true
+      },
+      {
+        "name": "real_6923644266066_rename_preserves_raw_text",
+        "passed": true
+      },
+      {
+        "name": "real_6923644266066_rename_preserves_source",
+        "passed": true
+      },
+      {
+        "name": "real_6923644266066_full_primary_ocr_preserved",
+        "passed": true
+      },
+      {
+        "name": "real_6923644266066_full_original_ocr_preserved",
+        "passed": true
+      },
+      {
+        "name": "real_6923644266066_independent_vision_preserved",
+        "passed": true
+      },
+      {
+        "name": "real_6923644266066_candidate_values_separate",
+        "passed": true
+      },
+      {
+        "name": "real_6937003117814_primary_archive_json_exists",
+        "passed": true
+      },
+      {
+        "name": "real_6937003117814_primary_archive_complete",
+        "passed": true
+      },
+      {
+        "name": "real_6937003117814_primary_archive_no_metadata_gaps",
+        "passed": true
+      },
+      {
+        "name": "real_6937003117814_primary_archive_parser_input",
+        "passed": true
+      },
+      {
+        "name": "real_6937003117814_primary_archive_raw_text",
+        "passed": true
+      },
+      {
+        "name": "real_6937003117814_primary_archive_raw_lines",
+        "passed": true
+      },
+      {
+        "name": "real_6937003117814_primary_archive_raw_imageUri",
+        "passed": true
+      },
+      {
+        "name": "real_6937003117814_primary_archive_raw_imageSha256",
+        "passed": true
+      },
+      {
+        "name": "real_6937003117814_primary_archive_raw_engine",
+        "passed": true
+      },
+      {
+        "name": "real_6937003117814_primary_archive_raw_inputImage",
+        "passed": true
+      },
+      {
+        "name": "real_6937003117814_primary_archive_raw_models",
+        "passed": true
+      },
+      {
+        "name": "real_6937003117814_primary_archive_raw_versions",
+        "passed": true
+      },
+      {
+        "name": "real_6937003117814_primary_archive_raw_nativeDurationMs",
+        "passed": true
+      },
+      {
+        "name": "real_6937003117814_primary_native_field_memory_unchanged",
+        "passed": true
+      },
+      {
+        "name": "real_6937003117814_primary_native_field_modelVersion_unchanged",
+        "passed": true
+      },
+      {
+        "name": "real_6937003117814_primary_native_field_models_unchanged",
+        "passed": true
+      },
+      {
+        "name": "real_6937003117814_primary_native_field_engine_unchanged",
+        "passed": true
+      },
+      {
+        "name": "real_6937003117814_primary_native_field_imageBytes_unchanged",
+        "passed": true
+      },
+      {
+        "name": "real_6937003117814_primary_native_field_versions_unchanged",
+        "passed": true
+      },
+      {
+        "name": "real_6937003117814_primary_native_field_height_unchanged",
+        "passed": true
+      },
+      {
+        "name": "real_6937003117814_primary_native_field_nativeDurationMs_unchanged",
+        "passed": true
+      },
+      {
+        "name": "real_6937003117814_primary_native_field_imageUri_unchanged",
+        "passed": true
+      },
+      {
+        "name": "real_6937003117814_primary_native_field_durationMs_unchanged",
+        "passed": true
+      },
+      {
+        "name": "real_6937003117814_primary_native_field_lines_unchanged",
+        "passed": true
+      },
+      {
+        "name": "real_6937003117814_primary_native_field_inputImage_unchanged",
+        "passed": true
+      },
+      {
+        "name": "real_6937003117814_primary_native_field_text_unchanged",
+        "passed": true
+      },
+      {
+        "name": "real_6937003117814_primary_native_field_imageSha256_unchanged",
+        "passed": true
+      },
+      {
+        "name": "real_6937003117814_primary_native_field_timings_unchanged",
+        "passed": true
+      },
+      {
+        "name": "real_6937003117814_primary_native_field_provider_unchanged",
+        "passed": true
+      },
+      {
+        "name": "real_6937003117814_primary_native_field_width_unchanged",
+        "passed": true
+      },
+      {
+        "name": "real_6937003117814_primary_archive_input_identity",
+        "passed": true
+      },
+      {
+        "name": "real_6937003117814_primary_source_nonempty",
+        "passed": true
+      },
+      {
+        "name": "real_6937003117814_primary_ocr_image_sha_matches_bytes",
+        "passed": true
+      },
+      {
+        "name": "real_6937003117814_primary_copied_image_bytes_and_sha",
+        "passed": true
+      },
+      {
+        "name": "real_6937003117814_rename_applied",
+        "passed": true
+      },
+      {
+        "name": "real_6937003117814_rename_preserves_evidence_bytes",
+        "passed": true
+      },
+      {
+        "name": "real_6937003117814_rename_preserves_raw_text",
+        "passed": true
+      },
+      {
+        "name": "real_6937003117814_rename_preserves_source",
+        "passed": true
+      },
+      {
+        "name": "real_6937003117814_full_primary_ocr_preserved",
+        "passed": true
+      },
+      {
+        "name": "real_6937003117814_full_original_ocr_preserved",
+        "passed": true
+      },
+      {
+        "name": "real_6937003117814_independent_vision_preserved",
+        "passed": true
+      },
+      {
+        "name": "real_6937003117814_candidate_values_separate",
+        "passed": true
+      },
+      {
+        "name": "synthetic_and_real_product_count",
+        "passed": true
+      },
+      {
+        "name": "real_ocr_adds_no_inventory_or_logs",
+        "passed": true
+      }
+    ]
+  },
+  "verify": {
+    "status": "completed",
+    "phase": "verify",
+    "runId": "storage-1791763579-3330",
+    "realOcrRunId": "ocr-paddle-1791763564-3255",
+    "buildInfo": {
+      "sourceCommit": "17d52da65733741956576db3ae397725e8237d90",
+      "version": "1.4.0",
+      "channel": "clouddebug"
+    },
+    "completedAt": "2026-10-12T00:06:29.175Z",
+    "network": {
+      "isConnected": false,
+      "isInternetReachable": false,
+      "type": "none"
+    },
+    "scope": "native_api_offline_process_restart_durability_not_user_touch_confirmation",
+    "launchToken": "storage-launch-1791763588620-6b7mksxkljn",
+    "writeLaunchToken": "storage-launch-1791763581034-82q5u30h3bq",
+    "checks": [
+      {
+        "name": "manifest_version",
+        "passed": true
+      },
+      {
+        "name": "manifest_run_id",
+        "passed": true
+      },
+      {
+        "name": "manifest_written",
+        "passed": true
+      },
+      {
+        "name": "real_ocr_execution_id_matches",
+        "passed": true
+      },
+      {
+        "name": "new_js_process",
+        "passed": true
+      },
+      {
+        "name": "read_after_write",
+        "passed": true
+      },
+      {
+        "name": "offline_network_state",
+        "passed": true
+      },
+      {
+        "name": "product_persisted_exactly",
+        "passed": true
+      },
+      {
+        "name": "inventory_persisted_exactly",
+        "passed": true
+      },
+      {
+        "name": "log_persisted_exactly",
+        "passed": true
+      },
+      {
+        "name": "profile_persisted_exactly",
+        "passed": true
+      },
+      {
+        "name": "scanner_preferences_persisted_exactly",
+        "passed": true
+      },
+      {
+        "name": "photo_still_nonempty",
+        "passed": true
+      },
+      {
+        "name": "photo_contents_persisted_exactly",
+        "passed": true
+      },
+      {
+        "name": "real_6923644266066_renamed_product_persisted_exactly",
+        "passed": true
+      },
+      {
+        "name": "real_6923644266066_primary_offline_file_sha_and_bytes",
+        "passed": true
+      },
+      {
+        "name": "real_6923644266066_primary_offline_archive_json_unchanged",
+        "passed": true
+      },
+      {
+        "name": "real_6923644266066_primary_offline_archive_image_sha_and_bytes",
+        "passed": true
+      },
+      {
+        "name": "real_6937003117814_renamed_product_persisted_exactly",
+        "passed": true
+      },
+      {
+        "name": "real_6937003117814_primary_offline_file_sha_and_bytes",
+        "passed": true
+      },
+      {
+        "name": "real_6937003117814_primary_offline_archive_json_unchanged",
+        "passed": true
+      },
+      {
+        "name": "real_6937003117814_primary_offline_archive_image_sha_and_bytes",
+        "passed": true
+      },
+      {
+        "name": "product_count_unchanged",
+        "passed": true
+      },
+      {
+        "name": "inventory_count_unchanged",
+        "passed": true
+      },
+      {
+        "name": "log_count_unchanged",
+        "passed": true
+      },
+      {
+        "name": "original_profile_restored",
+        "passed": true
+      },
+      {
+        "name": "original_preferences_restored",
+        "passed": true
+      }
+    ]
+  }
+}

@@ -2,7 +2,8 @@
 set -euo pipefail
 
 apk_path="${1:?Pass the downloaded Debug APK path}"
-app_package='com.hukang.local.clouddebug'
+app_package="${HUKANG_TEST_PACKAGE:-com.hukang.local.clouddebug}"
+[[ "$app_package" =~ ^com\.hukang\.local\.clouddebug(\.p[0-9a-f]{10})?$ ]] || exit 1
 mkdir -p smoke-evidence
 trap 'adb logcat -d > smoke-evidence/logcat.txt 2>&1 || true' EXIT
 

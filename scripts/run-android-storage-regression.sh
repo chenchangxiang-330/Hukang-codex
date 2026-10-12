@@ -2,7 +2,8 @@
 set -euo pipefail
 
 # Run only against the isolated cloud Debug package, without clearing its data.
-app_package='com.hukang.local.clouddebug'
+app_package="${HUKANG_TEST_PACKAGE:-com.hukang.local.clouddebug}"
+[[ "$app_package" =~ ^com\.hukang\.local\.clouddebug(\.p[0-9a-f]{10})?$ ]] || exit 1
 run_id="storage-$(date +%s)-$$"
 paddle_run_id="${1:-}"
 paddle_args=()
