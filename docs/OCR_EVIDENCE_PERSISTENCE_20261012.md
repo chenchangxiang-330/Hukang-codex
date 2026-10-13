@@ -32,4 +32,4 @@
 
 本地相关 16 项 Node 测试及 TypeScript 检查通过，包含真实磁盘 SQLite 关闭重开、完整元数据/图像身份/确认值分离、改名保留、NULL 与明确 0、运行记录匹配和归档错误分支。Node 数据由模拟保存材料构造；不是实际 Paddle 推理，也不是 Android 冷启动验收。
 
-本轮源码17d52da65733741956576db3ae397725e8237d90在Android35 x86_64实际执行：OCR runId `ocr-paddle-1791763564-3255`、存储runId `storage-1791763579-3330`，write151 / verify27检查通过，force-stop后launchToken不同，NetInfo.isConnected=false。真实公开图片和独立归档SHA/JSON原字节读回通过；合成Vision不代表服务运行。原始执行和检查摘要见 `tests/fixtures/ocr/results/paddle/20261012-17d52da-api35/`；cloud run38186191792的API24启动器挂住后取消，未执行这项验收。最终默认Paddle源码的新云验证仍待本轮完成。用户手机触摸确认、四入口业务关联和真实 Vision 服务仍须独立验收。
+本轮源码17d52da65733741956576db3ae397725e8237d90在Android35 x86_64实际执行：OCR runId `ocr-paddle-1791763564-3255`、存储runId `storage-1791763579-3330`，write151 / verify27检查通过，force-stop后launchToken不同，NetInfo.isConnected=false。真实公开图片和独立归档SHA/JSON原字节读回通过；合成Vision不代表服务运行。原始执行和检查摘要见 `tests/fixtures/ocr/results/paddle/20261012-17d52da-api35/`；cloud run38186191792的API24启动器挂住后取消，未执行这项验收。最终默认Paddle源码8f02cdd的Android35实际默认probe、双引擎和存储回归通过；API24模拟器未完成启动，未执行App。用户手机触摸确认、四入口业务关联和真实 Vision 服务仍须独立验收。

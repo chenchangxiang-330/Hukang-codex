@@ -1,13 +1,13 @@
-# Paddle OCR Android 迁移报告（2026-10-12，最终默认版待云验证）
+# Paddle OCR Android 迁移报告（2026-10-13，最终默认版）
 
-本文件在迁移工作进行中建立。接续源码基线：`a98fc594cc8bc416d8f9f386f19e185126746e38`，独立分支 `codex/paddleocr-android-migration`。候选17d52da的Android35实际结果已补齐；最终默认版源码、API24实际推理与安装包仍须由新执行证据补齐。
+本文件在迁移工作进行中建立。接续源码基线：`a98fc594cc8bc416d8f9f386f19e185126746e38`，独立分支 `codex/paddleocr-android-migration`。候选17d52da的Android35实际结果已补齐；最终默认版8f02cdd的Android35默认路径、安装包和保存回归已补齐。API24模拟器仍未进入App，明确列为待验。
 
 
 本轮候选构建源码 `17d52da65733741956576db3ae397725e8237d90` 的 [Android35 实际 job](https://github.com/chenchangxiang-330/Hukang-codex/actions/runs/38186191792/job/114609884841) 通过。同一 APK、同两张公开照片、本次真实 Android 推理：ML Kit production/merged **7正确/0错填/3缺失**，Paddle production/merged及固定裁剪 **10/0/0**，Paddle原图单独解析 **8/0/2**。牛奶原生原文确有 `3.6g`、`4.4g`、`5.0g`；原图脂肪/钠在几何对应中缺失，不能把裁剪/融合成绩写成原图成绩，更不是整体食品准确率。原图字节SHA和仓库JPG一致；没有把Mac研究JSON输入Android。
 
 Android35 自动存储 write **151** 项、force-stop后离线 verify **27** 项均通过，网络 `isConnected=false/isInternetReachable=false/type=none`，launchToken不同；范围为真实OCR公开图 + 合成业务材料，经生产API模拟确认/改名/保存，**不是触摸UI或用户手机验收**。完整本次OCR/分项评分与存储检查摘要保存于 `tests/fixtures/ocr/results/paddle/20261012-17d52da-api35/`；原始云设备证据artifact `11720370553`，ZIP SHA `ab736e805100ac77aa6296581a800f87570b89a02b999337b2788ca234f28787`。
 
-[首次run38185589167](https://github.com/chenchangxiang-330/Hukang-codex/actions/runs/38185589167) 的原生构建通过，但设备被文档提交触发的PR重跑取消，不能计为设备通过。第二轮run38186191792的Android24在启动器 `adb shell input keyevent 82` 挂住43分钟后因45分钟job限制取消，尚未进入App；它是启动器失败，不能计作API24通过或识别失败。后续修订API24独立headless/软件渲染启动，给所有阶段有界超时。Android35达成候选门禁后才能切换默认；切换后的新APK还须实际执行不传engine的默认扫描probe、双引擎对照与冷启动，最终结果另补。
+[首次run38185589167](https://github.com/chenchangxiang-330/Hukang-codex/actions/runs/38185589167) 的原生构建通过，但设备被文档提交触发的PR重跑取消，不能计为设备通过。第二轮run38186191792的Android24在启动器 `adb shell input keyevent 82` 挂住43分钟后因45分钟job限制取消，尚未进入App；它是启动器失败，不能计作API24通过或识别失败。修订版8f02cdd改为独立headless/软件渲染启动并导出ADB路径；API24仍在20分钟有界阶段内未完成启动，未产生App证据，不能计为通过。Android35已执行不传engine的默认扫描probe、双引擎对照与冷启动并通过。
 
 [PR #1](https://github.com/chenchangxiang-330/Hukang-codex/pull/1) 目前为草稿，主分支未改。最终测试包按实际源码前10位隔离为 `com.hukang.local.clouddebug.p<sha10>`，runner临时签名，旧正式包/旧clouddebug均不覆盖、不卸载、数据不自动迁移；不同源码的测试包可并存。APK源码身份和后续仅文档提交须区分。
 
@@ -15,11 +15,11 @@ Android35 自动存储 write **151** 项、force-stop后离线 verify **27** 项
 
 静态/主机验证：TypeScript PASS，143/143 Node tests PASS，脚本语法、diff检查 PASS；模型及原始配置逐字节 SHA 和完整有序字典验证 PASS。字典原18383项（首项U+3000），有效18384项，CTC输出18385类；有序字典SHA `02c0a0121c577dfa211f11de21084e3abd23478a77ea4fbdf71ee7a3e990a717`。检测模型4826518 bytes/SHA `a431985659dc921974177a95adcfbb90fd9e51989a5e04d70d0b75f597b6e61d`；识别16534782 bytes/SHA `da72dc72ca4dc220df0dfde68c1dedc31c58d3e76a25871122e5056227d50092`。配置SHA、固定官方revision与参数见 `models/paddleocr/v5-mobile/manifest.json` 和 `source-lock.json`。这些不等于Android推理。
 
-依赖实际AAR只读检查：ORT 1.21.1 minAPI24、OpenCV4.5.3.0 minAPI21，均包含arm64-v8a/x86_64。保留本项目API24与两ABI配置，候选17d/5e APK已核验API24与两ABI，Android35安装通过；Android24实际安装仍待修复后的云测试。固定Kotlin检测BGR/最长边960/stride32、识别BGR/48高/最小320宽，原始完整字典和配置随APK打包，telemetry关、推理无模型下载。Paddle/ORT/OpenCV/QuickBird完整许可随APK资产保留。保留ML Kit；诊断页可持久设置ML Kit兼容回退，显式benchmark忽略设备override且不暗中fallback。
+依赖实际AAR只读检查：ORT 1.21.1 minAPI24、OpenCV4.5.3.0 minAPI21，均包含arm64-v8a/x86_64。保留本项目API24与两ABI配置，最终8f APK已核验minAPI24与两ABI，Android35安装通过；API24静态包核验通过但模拟器未完成启动，实际安装/推理仍待验。固定Kotlin检测BGR/最长边960/stride32、识别BGR/48高/最小320宽，原始完整字典和配置随APK打包，telemetry关、推理无模型下载。Paddle/ORT/OpenCV/QuickBird完整许可随APK资产保留。保留ML Kit；诊断页可持久设置ML Kit兼容回退，显式benchmark忽略设备override且不暗中fallback。
 
 所有成功OCR入口独立保留原始native、parser input及实际输入图片原字节和SHA，营养确认值独立section。Paddle原图decodecap8MP/4096可能与旧ML Kit内部解码不同，每次记录sampleSize/坐标空间/矩阵，不能说两引擎输入像素必然相同。OpenCV部分异常释放缺口已补finally。QA-04 SQL业务关联缺口未重构，四入口独立归档不等于全部业务证据关联完成。
 
-最终默认版API24/35 x86_64云验证计划：先APK身份/模型/native ABI/安装启动，然后关闭Wi-Fi/移动数据、真实ML Kit和Paddle原图/ROI/生产链分别输出运行ID；核对10字段及牛奶三个小数原文；真实OCR证据模拟保存和改名，再force-stop/离线冷启动核对JSON与真实图片hash。原生同50ms采样PSS/Java/native heap，只是观察峰值；不等于绝对峰值或手机性能。真实手机、ARM64设备、EXIF2–8、16KB页、触摸UI和扩展实图仍待验。
+Android35 x86_64云验证已完成：APK身份/模型/native ABI/安装启动、离线双引擎、默认probe、生产链、保存改名和force-stop离线冷启动均有运行ID和证据；API24只完成静态包，模拟器未进入App。原生同50ms采样PSS/Java/native heap只是观察峰值；不等于绝对峰值或手机性能。真实手机、ARM64设备、EXIF2–8、16KB页、触摸UI和扩展实图仍待验。
 
 ## 候选阶段的实测、性能与兼容性
 
@@ -37,16 +37,22 @@ Android35 自动存储 write **151** 项、force-stop后离线 verify **27** 项
 | Paddle 图片证据归档耗时 | 上述四次18–20ms，图片原字节复制并核对SHA |
 | 存储/强停/离线读回 | write151 / verify27通过；实际OCR图片与JSON读回，合成业务场景另标；不代表触摸确认 |
 | Vision | 本次未执行，CI_NO_VISION_KEY，不算成功或0%准确率 |
-| 静态实包 | 5e/17d原生build成功，minAPI24，ARM64+x86_64，固定模型/配置/完整许可；最终默认源码APK待新build |
+| 静态实包 | 8f02cdd原生build成功，minAPI24，ARM64+x86_64，固定模型/配置/完整许可；APK SHA `0436f69a…`，独立V2摘要通过 |
 | 包体 | 5e候选266104736bytes，旧bb2测试包135358111bytes，增加130746625bytes（约96.59%）；最终默认包重新量测 |
 
 以上PSS是进程每50ms采样的观察峰值，包含RN/模型/缓存，不能当绝对峰值、纯模型内存或ARM手机性能；没有p50/p95、持续拍摄和低内存压力验收。ML Kit原生SDK不开放内部模型摘要，因此旧引擎models留空/归档partial，不能伪造SHA。
 
 **16KB页设备当前不能宣称兼容**：候选实际APK两ABI的 `libopencv_java4.so` ELF LOAD对齐4096，而ORT两库为16384；APK ZIP offset已16KiB对齐也不会修复预编译OpenCV ELF。依[Android官方要求](https://developer.android.com/guide/practices/page-sizes)需要合适构件/重新编译和实际16KB环境复测，本轮尚未支持/未验。普通API35 x86_64模拟器不代表16KB手机。ARM64、真实相机/图库/EXIF2–8与用户旧库仍待验。
 
-## 最终默认版交付：待本轮云结果补齐
+## 最终默认版交付：已完成 Android35，API24 待验
 
-本次默认候选已达到Android35同图门槛。当前默认改动已完成TypeScript与153/153 Node测试（27项相关测试），脚本/YAML语法与diff检查通过；这不是新的Android推理。接续云构建须同时验证项目默认Paddle（不显式传engine且override为空）、保留可持久ML Kit回退、源码版本隔离测试包、API24启动超时修复。此时未声称修订版已构建或默认probe已实际通过。
+本次默认候选已达到Android35同图门槛。最终默认改动已完成TypeScript与153/153 Node测试（27项相关测试），脚本/YAML语法与diff检查通过。源码提交 `8f02cdd3a40e2c2794a3c66a0e50ce66976a9f53` 的 [Actions run 38207365009](https://github.com/chenchangxiang-330/Hukang-codex/actions/runs/38207365009) 原生构建与 Android35 job `114674784404` 通过；API24 job `114674784415` 失败在模拟器启动阶段，未进入 App。
+
+最终 APK：`com.hukang.local.clouddebug.p8f02cdd3a4`，266106712 bytes，SHA-256 `0436f69aa648c8e8faa767b33cfcf20e36d7e67d2244e1ec17267b5c76ecffe9`，artifact `11727249361`（ZIP SHA `e3d097dfdd2ce6c184752db1c5dca93aa95dc0cbcd3c581eebdf35f46d06fcfb`）。APK 含 `arm64-v8a`/`x86_64`、minAPI24、固定模型/配置/字典/许可；临时 Debug 签名，只适合内测。独立 V2 签名和内容摘要验证通过；不是正式商店签名。
+
+Android35/x86_64 实际执行（artifact `11727674376`，ZIP SHA `fbee6f4c7e92916071ba4b82b91ede474c07927a24c0f1489f94ac9e8f056048`）：普通默认调用未传 engine 且设备 override 为空，nativeEngine=`paddle`；Paddle 原图 8/0/2，固定 ROI、defaultProbe 和 production/merged 均 10/0/0；两图原始输出真实包含牛奶 `3.6g`、`4.4g`、`5.0g`。Vision 为 `CI_NO_VISION_KEY` 未执行。存储 write151/verify27 通过，force-stop 后离线网络为 none，真实 OCR 图片、原文、行框、模型身份和独立归档读回通过；此为云 API 回归，不是用户触摸确认。
+
+API24 失败原因是自建模拟器在有界启动阶段没有完成可用启动，最终退出码124；artifact `11728601344` 保存了 adb 路径、模拟器日志和包校验，未产生 OCR/存储证据。API24 静态 minSdk 构建通过，但 API24 设备运行仍待后续云基础设施或真实 API24 手机验证。16KB 页设备、ARM64 真机、真实相机/图库/EXIF 和连续低内存仍未验。
 
 ## 前置研究的证据边界
 
