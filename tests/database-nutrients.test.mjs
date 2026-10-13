@@ -83,9 +83,10 @@ test("on-disk SQLite close/reopen preserves selected Vision evidence, edit sourc
   let db;
   try{
     db=new DatabaseSync(dbPath);db.exec(schema);migrate(db);
-    const primary={text:"蛋白质36g\n原始OCR"},original={text:"未裁剪原始OCR"};
+    const primary={text:"蛋白质36g\n原始OCR",parserText:"蛋白质36g",engine:"paddle",imageUri:"file:///files/primary.jpg",imageSha256:"a".repeat(64),lines:[{text:"蛋白质36g",confidence:.8,left:10,top:20,right:100,bottom:40,polygon:[{x:10,y:20},{x:100,y:20},{x:100,y:40},{x:10,y:40}]}],inputImage:{width:500,height:800,coordinateSpace:"decoded_image_pixels"},models:[{file:"test-model.onnx",sha256:"b".repeat(64),bytes:100}],versions:{onnxRuntime:"mock-runtime",paddleSourceCommit:"mock-source"},durationMs:345,nativeDurationMs:321,memory:{peakPssKb:12345},timings:{recognitionMs:210}},original={...primary,text:"未裁剪原始OCR",imageUri:"file:///files/original.jpg",imageSha256:"c".repeat(64)};
     const vision={mock:true,raw_text:"MOCK Vision 蛋白质不可读",nutrition:{protein_g:null}};
-    const confirmation=nutritionSaveEvidence({primary,original,vision,choice:"vision",localChoice:null});
+    const confirmed={kind:"automated_storage_regression_not_user_review",basisAmount:125,basisUnit:"mL",nutrients:{proteinG:null,transFatG:0}};
+    const confirmation=nutritionSaveEvidence({primary,original,vision,choice:"vision",localChoice:null,images:{primaryUri:primary.imageUri,originalUri:original.imageUri},confirmation:confirmed});
     const chosen=productSaveEvidence({rawText:confirmation.rawText,source:"online_vision",recognitionEvidenceJson:confirmation.recognitionEvidenceJson},null);
     const values=[...productValues];
     values[9]=125;values[10]="mL";values[13]=null;values[14]=null;values[17]=null;
@@ -105,6 +106,8 @@ test("on-disk SQLite close/reopen preserves selected Vision evidence, edit sourc
     assert.equal(reopened.ocrRawText,primary.text);assert.equal(reopened.dataSource,"online_vision");
     assert.deepEqual(JSON.parse(reopened.recognitionEvidenceJson).vision,vision);
     assert.deepEqual(JSON.parse(reopened.recognitionEvidenceJson).local,{primary,original});
+    assert.deepEqual(JSON.parse(reopened.recognitionEvidenceJson).confirmed,confirmed);
+    assert.deepEqual(JSON.parse(reopened.recognitionEvidenceJson).images,{primaryUri:primary.imageUri,originalUri:original.imageUri});
     assert.equal(reopened.proteinG,null);assert.equal(reopened.fatG,null);assert.equal(reopened.carbohydrateG,null);
     assert.equal(reopened.addedSugarG,null);assert.equal(reopened.transFatG,0);assert.equal(reopened.imageUri,photoUri);
     const inventory=db.prepare("SELECT * FROM inventory WHERE product_id=?").get(id),log=db.prepare(logSelect).get("2026-10-04");

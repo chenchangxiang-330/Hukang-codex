@@ -4,6 +4,44 @@ apply plugin: "com.facebook.react"
 
 def projectRoot = rootDir.getAbsoluteFile().getParentFile().getAbsolutePath()
 def cloudDebugBuild = (findProperty('cloudDebugBuild') ?: 'false').toBoolean()
+// Each ephemeral-signed cloud build can coexist with older test packages/data.
+def cloudSourceSha = System.getenv('HUKANG_SOURCE_COMMIT') ?: ''
+def cloudDebugSuffix = cloudSourceSha ==~ /^[a-f0-9]{40}$/ ? ".clouddebug.p${cloudSourceSha.take(10)}" : '.clouddebug'
+def paddleModelRoot = new File(projectRoot, 'models/paddleocr/v5-mobile')
+def paddleHashes = [
+    'detector.onnx': 'a431985659dc921974177a95adcfbb90fd9e51989a5e04d70d0b75f597b6e61d',
+    'recognizer.onnx': 'da72dc72ca4dc220df0dfde68c1dedc31c58d3e76a25871122e5056227d50092',
+    'detector.yml': '98069072e1b6b37d727fd9d9f11725faa46d6ea0de012f2ed26caea011c37699',
+    'inference.yml': '5dfeb2777f6d0db8177d8128a8acfcf6e6276dc4ac73ea3bf0dc06d6a5e85d8e'
+]
+def verifyPaddleModels = tasks.register('verifyPaddleModels') {
+    inputs.dir(paddleModelRoot)
+    doLast {
+        if (!new File(paddleModelRoot, 'manifest.json').isFile()) throw new GradleException('Missing fixed Paddle model manifest')
+        paddleHashes.each { name, expected ->
+            def model = new File(paddleModelRoot, name)
+            if (!model.isFile()) throw new GradleException("Missing fixed Paddle asset: $name. No runtime model download is allowed.")
+            def digest = java.security.MessageDigest.getInstance('SHA-256')
+            model.withInputStream { stream ->
+                byte[] buffer = new byte[65536]
+                int count
+                while ((count = stream.read(buffer)) != -1) digest.update(buffer, 0, count)
+            }
+            if (digest.digest().encodeHex().toString() != expected) throw new GradleException("Paddle model/config hash mismatch: $name")
+        }
+    }
+}
+def copyPaddleModels = tasks.register('copyPaddleModels', Sync) {
+    dependsOn(verifyPaddleModels)
+    from(paddleModelRoot)
+    into(layout.buildDirectory.dir('generated/paddleAssets/models/paddleocr/v5-mobile'))
+    include '*.onnx', '*.yml', '*.json', '*.txt', '*.md'
+}
+def copyPaddleLicenses = tasks.register('copyPaddleLicenses', Sync) {
+    from('licenses')
+    from('PADDLE_THIRD_PARTY_NOTICES.md')
+    into(layout.buildDirectory.dir('generated/licenseAssets/licenses/paddleocr'))
+}
 
 /**
  * This is the configuration block to customize your React Native Android app.
@@ -115,7 +153,7 @@ android {
         debug {
             signingConfig signingConfigs.debug
             if (cloudDebugBuild) {
-                applicationIdSuffix '.clouddebug'
+                applicationIdSuffix cloudDebugSuffix
                 versionNameSuffix '-clouddebug'
                 buildConfigField "boolean", "IS_CLOUD_DEBUG", "true"
             }
@@ -139,9 +177,13 @@ android {
         }
     }
     androidResources {
+        noCompress += ['onnx']
         ignoreAssetsPattern '!.svn:!.git:!.ds_store:!*.scc:!CVS:!thumbs.db:!picasa.ini:!*~'
     }
+    sourceSets.main.assets.srcDir(layout.buildDirectory.dir('generated/paddleAssets'))
+    sourceSets.main.assets.srcDir(layout.buildDirectory.dir('generated/licenseAssets'))
 }
+tasks.named('preBuild').configure { dependsOn(copyPaddleModels, copyPaddleLicenses) }
 
 // Apply static values from `gradle.properties` to the `android.packagingOptions`
 // Accepts values in comma delimited lists, example:
@@ -168,6 +210,9 @@ dependencies {
     implementation("androidx.exifinterface:exifinterface:1.4.2")
     // The version of react-native is set by the React Native Gradle Plugin
     implementation("com.facebook.react:react-android")
+    // Fixed local inference; the AAR manifests require API24/21 and include both tested ABIs.
+    implementation("com.microsoft.onnxruntime:onnxruntime-android:1.21.1")
+    implementation("com.quickbirdstudios:opencv:4.5.3.0")
 
     def isGifEnabled = (findProperty('expo.gif.enabled') ?: "") == "true";
     def isWebpEnabled = (findProperty('expo.webp.enabled') ?: "") == "true";

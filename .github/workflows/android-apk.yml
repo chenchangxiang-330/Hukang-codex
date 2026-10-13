@@ -8,6 +8,22 @@ on:
       - 'android/**'
       - 'src/**'
       - 'assets/**'
+      - 'models/**'
+      - 'tests/**'
+      - 'scripts/**'
+      - 'App.tsx'
+      - 'index.ts'
+      - 'app.json'
+      - 'package*.json'
+      - 'tsconfig.json'
+  pull_request:
+    branches: [main]
+    paths:
+      - '.github/workflows/android-apk.yml'
+      - 'android/**'
+      - 'src/**'
+      - 'assets/**'
+      - 'models/**'
       - 'tests/**'
       - 'scripts/**'
       - 'App.tsx'
@@ -16,6 +32,9 @@ on:
       - 'package*.json'
       - 'tsconfig.json'
   workflow_dispatch:
+
+env:
+  HUKANG_SOURCE_COMMIT: ${{ github.event.pull_request.head.sha || github.sha }}
 
 permissions:
   contents: read
@@ -31,6 +50,8 @@ jobs:
     steps:
       - name: Check out source
         uses: actions/checkout@v7
+        with:
+          ref: ${{ env.HUKANG_SOURCE_COMMIT }}
 
       - name: Set up Node.js
         uses: actions/setup-node@v7
@@ -63,6 +84,11 @@ jobs:
           npm run typecheck
           npm test
 
+      - name: Verify bundled official Paddle assets and original dictionary
+        run: |
+          python -m pip install PyYAML==6.0.3
+          python scripts/fetch-paddle-models.py --verify --receipt cloud-model-verification.json
+
       - name: Generate temporary test-only debug key on runner
         run: |
           test ! -e android/app/debug.keystore
@@ -73,7 +99,9 @@ jobs:
           chmod 600 android/app/debug.keystore
 
       - name: Embed exact source identity in device diagnostics
-        run: node scripts/stamp-build-info.mjs "$GITHUB_SHA"
+        run: |
+          node scripts/stamp-build-info.mjs "$HUKANG_SOURCE_COMMIT"
+          echo "HUKANG_TEST_PACKAGE=com.hukang.local.clouddebug.p${HUKANG_SOURCE_COMMIT:0:10}" >> "$GITHUB_ENV"
 
       - name: Build standalone Debug APK for phone and emulator
         env:
@@ -87,9 +115,12 @@ jobs:
           "$ANDROID_HOME/build-tools/36.0.0/apksigner" verify --verbose android/app/build/outputs/apk/debug/app-debug.apk
           unzip -l android/app/build/outputs/apk/debug/app-debug.apk | grep 'assets/index.android.bundle'
           mkdir -p cloud-apk
+          "$ANDROID_HOME/build-tools/36.0.0/apksigner" verify --print-certs android/app/build/outputs/apk/debug/app-debug.apk > cloud-apk/SIGNING_CERT.txt
+          python scripts/verify-paddle-apk.py android/app/build/outputs/apk/debug/app-debug.apk "$ANDROID_HOME/build-tools/36.0.0/aapt" "$HUKANG_SOURCE_COMMIT" > cloud-apk/APK_CONTENTS.json
+          cp cloud-model-verification.json cloud-apk/MODEL_VERIFICATION.json
           cp android/app/build/outputs/apk/debug/app-debug.apk cloud-apk/HuKang-cloud-debug.apk
           sha256sum cloud-apk/HuKang-cloud-debug.apk > cloud-apk/SHA256SUMS
-          printf 'source_commit=%s\npackage=com.hukang.local.clouddebug\nabis=arm64-v8a,x86_64\nsigning=ephemeral-debug\n' "$GITHUB_SHA" > cloud-apk/BUILD_INFO.txt
+          printf 'source_commit=%s\npackage=%s\nabis=arm64-v8a,x86_64\nsigning=ephemeral-debug\n' "$HUKANG_SOURCE_COMMIT" "$HUKANG_TEST_PACKAGE" > cloud-apk/BUILD_INFO.txt
 
       - name: Upload APK
         uses: actions/upload-artifact@v6
@@ -102,9 +133,15 @@ jobs:
   install-smoke-test:
     needs: android-apk
     runs-on: ubuntu-24.04
-    timeout-minutes: 25
+    timeout-minutes: 45
+    strategy:
+      fail-fast: false
+      matrix:
+        api: [24, 35]
     steps:
       - uses: actions/checkout@v7
+        with:
+          ref: ${{ env.HUKANG_SOURCE_COMMIT }}
       - name: Set up Node.js for OCR scoring
         uses: actions/setup-node@v7
         with:
@@ -119,22 +156,27 @@ jobs:
           echo 'KERNEL=="kvm", GROUP="kvm", MODE="0666", OPTIONS+="static_node=kvm"' | sudo tee /etc/udev/rules.d/99-kvm4all.rules
           sudo udevadm control --reload-rules
           sudo udevadm trigger --name-match=kvm
-      - name: Install and launch without Metro on Android 35
+      - name: Select the isolated source-version package
+        run: echo "HUKANG_TEST_PACKAGE=com.hukang.local.clouddebug.p${HUKANG_SOURCE_COMMIT:0:10}" >> "$GITHUB_ENV"
+      - name: Boot and compare on Android 24 with bounded commands
+        if: matrix.api == 24
+        run: bash scripts/start-android24-ci.sh
+      - name: Install and compare offline engines on Android ${{ matrix.api }}
+        if: matrix.api != 24
         uses: reactivecircus/android-emulator-runner@4c44018e59b437e86cdfc41da381398f93ed8808 # v2
         with:
-          api-level: 35
+          api-level: ${{ matrix.api }}
           arch: x86_64
           target: google_apis
+          ram-size: 4096M
+          heap-size: 512M
           disable-animations: true
-          script: |
-            bash scripts/smoke-android-apk.sh cloud-apk/HuKang-cloud-debug.apk
-            bash scripts/run-android-ocr-regression.sh
-            bash scripts/run-android-storage-regression.sh
+          script: bash scripts/compare-android-ocr-ci.sh
       - name: Upload installation evidence
         if: always()
         uses: actions/upload-artifact@v6
         with:
-          name: HuKang-Debug-Install-Evidence
+          name: HuKang-Debug-Install-Evidence-API${{ matrix.api }}
           path: smoke-evidence/
           if-no-files-found: warn
           retention-days: 30

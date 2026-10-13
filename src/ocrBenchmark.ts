@@ -1,6 +1,7 @@
 import { Asset } from "expo-asset";
 import { NativeModules,Platform } from "react-native";
-import { recognizeDetailed } from "./ocr";
+import { DEFAULT_OCR_ENGINE,recognizeDetailed,type OcrEngine,type OcrResult } from "./ocr";
+import { getOcrEngineOverride } from "./ocrEngineSettings";
 import {estimateNutritionSlope,type OcrLine} from "./ocrGeometry";
 import { preprocessImageForOcr } from "./imagePreprocessing";
 import { parseNutritionLabel } from "./parser";
@@ -24,12 +25,13 @@ const encodingContextExperiments=[
 ] as const;
 const mapped=(n:Nutrients)=>Object.fromEntries((Object.keys(nutritionVisionKeys) as (keyof Nutrients)[]).map(k=>[nutritionVisionKeys[k],n[k]??null]));
 const errorText=(error:unknown)=>error instanceof Error?error.message:String(error);
-export async function runRealNutritionBenchmark(progress:(label:string)=>void,options:{vision?:boolean}={}){
+export async function runRealNutritionBenchmark(progress:(label:string)=>void,options:{vision?:boolean;engine?:OcrEngine;experiments?:boolean}={}){
   const runs:Run[]=[];
   for(const fixture of fixtures){
-    const stages:Record<string,Stage>=Object.fromEntries(["original","preprocessed","parser","production","vision","merged","experimental_gray","experimental_upscaled","experimental_deskew",...encodingContextExperiments.map(experiment=>experiment.stage)].map(name=>[name,{status:"not_run",reason:"Stage not reached"}]));
+    const stages:Record<string,Stage>=Object.fromEntries(["original","preprocessed","defaultProbe","parser","production","vision","merged","experimental_gray","experimental_upscaled","experimental_deskew",...encodingContextExperiments.map(experiment=>experiment.stage)].map(name=>[name,{status:"not_run",reason:"Stage not reached"}]));
+    stages.defaultProbe={status:"not_run",reason:"DEFAULT_ENGINE_NOT_SELECTED",defaultEngine:DEFAULT_OCR_ENGINE};
     if(options.vision===false)stages.vision={status:"not_run",reason:"CI_NO_VISION_KEY"};
-    const run:Run={fixtureId:fixture.fixtureId,evidence:"device_mlkit_image_execution",platform:Platform.OS,stages};runs.push(run);
+    const run:Run={fixtureId:fixture.fixtureId,evidence:options.engine==="paddle"?"device_paddle_image_execution":"device_mlkit_image_execution",platform:Platform.OS,stages};runs.push(run);
     try{
       const asset=Asset.fromModule(fixture.asset);
       // Bare RN Android drawable names render in <Image> but are not disk paths.
@@ -38,8 +40,9 @@ export async function runRealNutritionBenchmark(progress:(label:string)=>void,op
       await asset.downloadAsync();const uri=asset.localUri??asset.uri;
       const read=async(imageUri:string,name:string)=>{
         progress(`${fixture.fixtureId} · ${name}`);
-        try{const ocr=await recognizeDetailed(imageUri,"nutrition"),parsed=parseNutritionLabel(ocr.parserText);
-          stages[name]={status:"ok",rawText:ocr.text,parserInput:ocr.parserText,fields:mapped(parsed.nutrients),basis:{amount:parsed.basisAmount,unit:parsed.basisUnit},durationMs:ocr.durationMs,provider:ocr.provider,lines:ocr.lines};return parsed;
+        try{const ocr=await recognizeDetailed(imageUri,"nutrition",options.engine),parsed=parseNutritionLabel(ocr.parserText);
+          run.evidence=`device_${ocr.engine??"mlkit"}_image_execution`;
+          stages[name]={status:"ok",rawText:ocr.text,parserInput:ocr.parserText,fields:mapped(parsed.nutrients),basis:{amount:parsed.basisAmount,unit:parsed.basisUnit},durationMs:ocr.durationMs,provider:ocr.provider,lines:ocr.lines,ocr};return parsed;
         }catch(error){stages[name]={status:"error",reason:errorText(error)};return null}
       };
       await read(uri,"original");
@@ -51,10 +54,35 @@ export async function runRealNutritionBenchmark(progress:(label:string)=>void,op
       const parsed=await read(prepared.uri,"preprocessed");
       stages.preprocessed.preprocessing=prepared;
       if(parsed)stages.parser={status:"ok",rawText:parsed.rawText,fields:mapped(parsed.nutrients),basis:{amount:parsed.basisAmount,unit:parsed.basisUnit},quality:parsed.quality};
+      if(options.engine===DEFAULT_OCR_ENGINE){
+        progress(`${fixture.fixtureId} · 默认 OCR 路径`);
+        stages.defaultProbe={status:"error",reason:"DEFAULT_PROBE_NOT_COMPLETED",scope:"local_only",
+          defaultEngine:DEFAULT_OCR_ENGINE,requestedEngineProvided:false};
+        try{
+          const overrideBefore=await getOcrEngineOverride();stages.defaultProbe.overrideBefore=overrideBefore;
+          if(overrideBefore!==null)throw new Error("DEFAULT_PROBE_OVERRIDE_ACTIVE");
+          // Deliberately omit the engine argument: this is the ordinary application's dispatch.
+          // Only the actual ROI file is supplied. Annotated values remain in the offline scorer.
+          const ocr=await recognizeDetailed(prepared.uri,"nutrition");
+          Object.assign(stages.defaultProbe,{rawText:ocr.text,parserInput:ocr.parserText,ocr,
+            durationMs:ocr.durationMs,provider:ocr.provider,lines:ocr.lines});
+          const overrideAfter=await getOcrEngineOverride();stages.defaultProbe.overrideAfter=overrideAfter;
+          if(overrideAfter!==null)throw new Error("DEFAULT_PROBE_OVERRIDE_CHANGED");
+          if(ocr.engine!==DEFAULT_OCR_ENGINE||ocr.nativeEngine!==DEFAULT_OCR_ENGINE)throw new Error("DEFAULT_PROBE_NATIVE_ENGINE_MISMATCH");
+          const reference=stages.preprocessed.ocr as OcrResult|undefined;
+          stages.defaultProbe.expectedImageSha256=reference?.imageSha256;
+          if(!reference?.imageSha256||ocr.imageSha256!==reference.imageSha256)throw new Error("DEFAULT_PROBE_INPUT_SHA_MISMATCH");
+          if(ocr.archivalError)throw new Error("DEFAULT_PROBE_ARCHIVE_FAILED");
+          const defaultParsed=parseNutritionLabel(ocr.parserText);
+          Object.assign(stages.defaultProbe,{status:"ok",fields:mapped(defaultParsed.nutrients),
+            basis:{amount:defaultParsed.basisAmount,unit:defaultParsed.basisUnit},quality:defaultParsed.quality});
+          delete stages.defaultProbe.reason;
+        }catch(error){Object.assign(stages.defaultProbe,{status:"error",reason:errorText(error)})}
+      }
       progress(`${fixture.fixtureId} · ${options.vision===false?"Vision 未执行（CI 无密钥）":"Vision（需有效配置与授权）"}`);
       // Exercise the same orchestration used by the nutrition confirmation UI,
       // including original/ROI evidence. Truth is never available to this call.
-      const production=await recognizeNutrition(prepared.uri,progress,()=>false,{originalPhoto:uri,vision:options.vision});
+      const production=await recognizeNutrition(prepared.uri,progress,()=>false,{originalPhoto:uri,vision:options.vision,engine:options.engine});
       const vision=production.vision;
       stages.production={status:"ok",rawText:production.ocr?.text??"",fields:mapped(production.merged.nutrients),basis:{amount:production.merged.basisAmount,unit:production.merged.basisUnit},scope:vision?"ocr_plus_vision":"local_only",result:production};
       if(vision)stages.vision={status:"ok",rawText:vision.raw_text,fields:vision.nutrition??{},basis:vision.basis??undefined,result:vision};
@@ -62,6 +90,10 @@ export async function runRealNutritionBenchmark(progress:(label:string)=>void,op
       else{const debug=await loadScanDebug(),diagnostic=debug.vision as {status?:string;reason?:string}|undefined;stages.vision={status:diagnostic?.status==="failed"?"error":"not_run",reason:diagnostic?.reason??"No Vision execution"}}
       const merged=production.merged;
       stages.merged={status:"ok",fields:mapped(merged.nutrients),basis:{amount:merged.basisAmount,unit:merged.basisUnit},scope:vision?"ocr_plus_vision":"local_only",result:merged};
+      if(options.experiments===false){
+        for(const name of Object.keys(stages).filter(name=>name.startsWith("experimental_")))stages[name]={status:"not_run",reason:"MIGRATION_CORE_COMPARISON_ONLY"};
+        continue;
+      }
       // Hypothesis tests only. The native bridge decodes the source once and writes
       // exact ROI PNG/JPEG from the same pixels; no variant feeds production/merge.
       if(typeof NativeModules.HuKangOcr?.createBenchmarkImages!=="function"){
@@ -88,5 +120,5 @@ export async function runRealNutritionBenchmark(progress:(label:string)=>void,op
     }catch(error){stages.preprocessed={status:"error",reason:errorText(error)}}
     await saveScanDebug({ab:{runs,completedAt:new Date().toISOString()}});
   }
-  return{schemaVersion:1,runs,completedAt:new Date().toISOString()};
+  return{schemaVersion:1,defaultEngine:DEFAULT_OCR_ENGINE,runs,completedAt:new Date().toISOString()};
 }

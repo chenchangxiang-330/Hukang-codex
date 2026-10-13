@@ -52,11 +52,14 @@ class MainActivity : ReactActivity() {
                 return Bundle().apply {
                   putString("storagePhase", storagePhase)
                   putString("storageRunId", storageRunId)
+                  val paddleRunId = this@MainActivity.intent.getStringExtra("storagePaddleOcrRunId")
+                  if (paddleRunId != null && Regex("^[A-Za-z0-9][A-Za-z0-9_-]{5,79}$").matches(paddleRunId)) putString("paddleOcrRunId", paddleRunId)
                 }
               }
               if (!this@MainActivity.intent.getBooleanExtra("ocrBenchmark", false)) return null
               return Bundle().apply {
                 putBoolean("ocrBenchmark", true)
+                putString("ocrEngine", if (this@MainActivity.intent.getStringExtra("ocrEngine") == "paddle") "paddle" else "mlkit")
                 putString("ocrRunId", this@MainActivity.intent.getStringExtra("ocrRunId") ?: "local-ocr")
               }
             }

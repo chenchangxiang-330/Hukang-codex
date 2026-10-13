@@ -1,7 +1,9 @@
 export type OcrLine = {
+  id?: string; page?: number;
   text: string;
   confidence: number | null;
   left: number; top: number; right: number; bottom: number;
+  polygon?: { x: number; y: number }[];
 };
 
 // Preserve raw OCR separately. Geometry only restores rows, never characters.

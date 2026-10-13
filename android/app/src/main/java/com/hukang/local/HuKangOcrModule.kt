@@ -17,6 +17,7 @@ import com.google.mlkit.vision.text.chinese.ChineseTextRecognizerOptions
 import java.io.File
 import java.io.InputStream
 import java.util.concurrent.Executors
+import java.util.concurrent.atomic.AtomicBoolean
 import kotlin.math.ceil
 import kotlin.math.floor
 class HuKangOcrModule(private val context:ReactApplicationContext):ReactContextBaseJavaModule(context){
@@ -108,12 +109,21 @@ class HuKangOcrModule(private val context:ReactApplicationContext):ReactContextB
  @ReactMethod fun recognizeDetailed(uri:String,promise:Promise){
   imageWorker.execute {
    val started=SystemClock.elapsedRealtime()
+   val sampler=MemorySampler()
+   val samplingFinished=AtomicBoolean(false)
+   fun finishMemory():Map<String,Number>?=if(samplingFinished.compareAndSet(false,true))sampler.finish()else null
    var opened:TextRecognizer?=null
    try {
+    val evidence=OcrFileEvidence(context)
+    val file=evidence.file(uri)
+    val size=evidence.bounds(uri)
+    val orientation=evidence.orientation(uri)
     val client=TextRecognition.getClient(ChineseTextRecognizerOptions.Builder().build())
     opened=client
     val parsed=Uri.parse(uri).let{if(it.scheme==null)Uri.fromFile(File(uri))else it}
     val image=InputImage.fromFilePath(context,parsed)
+    val imageDecodeMs=SystemClock.elapsedRealtime()-started
+    val ocrStarted=SystemClock.elapsedRealtime()
     client.process(image).addOnSuccessListener {result->
      try {
       val lines=Arguments.createArray()
@@ -124,17 +134,34 @@ class HuKangOcrModule(private val context:ReactApplicationContext):ReactContextB
         val score=line.confidence.toDouble()
         if(score.isFinite()&&score>0)putDouble("confidence",score)else putNull("confidence")
         putInt("left",box.left);putInt("top",box.top);putInt("right",box.right);putInt("bottom",box.bottom)
+        line.cornerPoints?.let{points->putArray("polygon",Arguments.createArray().apply{
+         for(point in points)pushMap(Arguments.createMap().apply{putInt("x",point.x);putInt("y",point.y)})
+        })}
        })
       }
+      val memory=finishMemory()?:emptyMap()
+      val duration=SystemClock.elapsedRealtime()-started
       promise.resolve(Arguments.createMap().apply {
        putString("text",result.text);putArray("lines",lines);putString("provider",provider)
-       putDouble("durationMs",(SystemClock.elapsedRealtime()-started).toDouble())
+       putString("engine","mlkit");putString("imageUri",uri);putString("imageSha256",file["sha256"] as String)
+       putDouble("imageBytes",(file["bytes"] as Number).toDouble())
+       putDouble("durationMs",duration.toDouble());putDouble("nativeDurationMs",duration.toDouble())
        putInt("width",image.width);putInt("height",image.height)
+       putMap("inputImage",Arguments.createMap().apply{
+        putInt("width",image.width);putInt("height",image.height);putInt("sourceWidth",size.outWidth);putInt("sourceHeight",size.outHeight)
+        // ML Kit owns URI decoding. Do not claim an unobservable sample multiplier.
+        putNull("sampleSize");putInt("sourceOrientation",orientation);putInt("rotationDegrees",image.rotationDegrees)
+        putString("coordinateSpace","mlkit_input_image_pixels")
+       })
+       putArray("models",Arguments.createArray());putMap("versions",Arguments.makeNativeMap(mapOf("mlkitChinese" to "16.0.1")))
+       putMap("memory",Arguments.makeNativeMap(memory))
+       putMap("timings",Arguments.makeNativeMap(mapOf("imageDecodeMs" to imageDecodeMs,"ocrMs" to (SystemClock.elapsedRealtime()-ocrStarted))))
       })
-     }catch(error:Exception){promise.reject("OCR_RESULT_FAILED",error)}finally{client.close()}
-    }.addOnFailureListener {error->client.close();promise.reject("OCR_FAILED",error)}
-   }catch(error:OutOfMemoryError){opened?.close();promise.reject("OCR_MEMORY_LIMIT","Image too large for OCR",error)}
-    catch(error:Exception){opened?.close();promise.reject("OCR_IMAGE_FAILED",error)}
+     }catch(error:OutOfMemoryError){promise.reject("OCR_MEMORY_LIMIT","Image too large for OCR",error)}
+      catch(error:Exception){promise.reject("OCR_RESULT_FAILED",error)}finally{finishMemory();client.close()}
+    }.addOnFailureListener {error->finishMemory();client.close();promise.reject("OCR_FAILED",error)}
+   }catch(error:OutOfMemoryError){finishMemory();opened?.close();promise.reject("OCR_MEMORY_LIMIT","Image too large for OCR",error)}
+    catch(error:Exception){finishMemory();opened?.close();promise.reject("OCR_IMAGE_FAILED",error)}
   }
  }
  // Benchmark only. These variants never enter production recognition or a merge.
